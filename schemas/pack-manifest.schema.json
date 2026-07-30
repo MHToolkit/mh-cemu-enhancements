@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "mh-cemu-enhancements pack manifest",
+  "type": "object",
+  "required": [
+    "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
+    "default_install", "pack_dir", "install_folder", "rules", "source", "license"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+    "platform": { "type": "string" },
+    "title": { "type": "string" },
+    "title_id": { "type": "string", "pattern": "^[0-9A-F]{16}$" },
+    "title_slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+    "region": { "type": "string" },
+    "update": { "type": "string" },
+    "status": { "enum": ["Static Verified", "Runtime Experimental", "Runtime Verified"] },
+    "default_install": { "type": "boolean" },
+    "pack_dir": { "type": "string" },
+    "install_folder": { "type": "string" },
+    "rules": { "type": "string" },
+    "patch": { "type": "string" },
+    "preimages": { "$ref": "#/$defs/wordAssertions" },
+    "anchors": { "$ref": "#/$defs/wordAssertions" },
+    "source": {
+      "type": "object",
+      "required": ["rpx_sha256", "module_checksum"],
+      "properties": {
+        "rpx_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "module_checksum": { "type": "string", "pattern": "^0x[0-9a-fA-F]{8}$" }
+      }
+    },
+    "license": { "type": "string" }
+  },
+  "$defs": {
+    "wordAssertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["address", "word"],
+        "properties": {
+          "address": { "type": "string", "pattern": "^0x[0-9a-fA-F]{8}$" },
+          "word": { "type": "string", "pattern": "^0x[0-9a-fA-F]{8}$" },
+          "meaning": { "type": "string" }
+        }
+      }
+    }
+  }
+}

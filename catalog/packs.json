@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "catalog": "mh-cemu-enhancements",
+  "packs": [
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/fps-lock-30/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-full-item-box-experimental/manifest.json"
+    }
+  ]
+}

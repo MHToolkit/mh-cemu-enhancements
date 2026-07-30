@@ -1,0 +1,41 @@
+{
+  "id": "mh3g-hd-jp-v96-lobby-full-item-box",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Static Verified",
+  "default_install": true,
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box",
+  "install_folder": "MH3G HD JP v96 - Lobby Full Item Box",
+  "rules": "rules.txt",
+  "patch": "patch_lobby_full_item_box.asm",
+  "preimages": [
+    {
+      "address": "0x021bba90",
+      "word": "0x48501135",
+      "meaning": "Original branch-with-link into the restricted lobby item-box flow."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x021bbefc",
+      "word": "0x48541005",
+      "meaning": "First instruction of the existing full home item-box flow."
+    },
+    {
+      "address": "0x021bbf28",
+      "word": "0x300056f4",
+      "meaning": "Existing full-home GUI resource pointer low half for GUI\\lobby\\myh_box2_n."
+    }
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "Redirects the restricted lobby item-box dispatch to the existing home full-item-box flow."
+}

@@ -1,0 +1,21 @@
+{
+  "id": "mh3g-hd-jp-v96-fps-lock-30",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Static Verified",
+  "default_install": true,
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/fps-lock-30",
+  "install_folder": "MH3G HD JP v96 - Lock 30 FPS",
+  "rules": "rules.txt",
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and pack rules; no game assets included.",
+  "summary": "Uses Cemu's per-pack vsyncFrequency control; it does not patch RPX code or global Cemu settings."
+}

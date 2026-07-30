@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = MH3G HD JP v96 - Lobby Full Item Box
+path = MH Cemu Enhancements/MH3G HD JP v96
+description = Redirects the restricted lobby item box to the existing home full item-box flow. Static verified only.
+version = 7
