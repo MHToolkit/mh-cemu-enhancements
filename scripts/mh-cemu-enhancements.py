@@ -368,6 +368,8 @@ def select_packs(packs: Iterable[dict[str, Any]], selected_ids: list[str], inclu
         chosen = [catalog[pack_id] for pack_id in selected_ids]
     else:
         chosen = [pack for pack in packs if pack["default_install"]]
+        if include_experimental:
+            chosen.extend(pack for pack in packs if pack["status"] == "Runtime Experimental")
     experimental = [pack["id"] for pack in chosen if pack["status"] == "Runtime Experimental"]
     if experimental and not include_experimental:
         raise ValueError("experimental pack requires --include-experimental: " + ", ".join(experimental))

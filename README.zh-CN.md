@@ -27,11 +27,10 @@ python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx
 
-# 显式安装默认关闭的任务箱实验包。
+# 在默认两个包之上追加全部默认关闭的 Experimental 包（目前即任务箱实验包）。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-quest-full-item-box-experimental \
   --include-experimental
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root

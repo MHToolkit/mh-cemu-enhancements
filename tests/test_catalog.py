@@ -124,6 +124,20 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
+    def test_include_experimental_adds_experimental_packs_to_defaults(self):
+        result = self.tool.validate_repository(REPO)
+
+        selected = self.tool.select_packs(result.packs, [], include_experimental=True)
+
+        self.assertEqual(
+            {
+                "mh3g-hd-jp-v96-fps-lock-30",
+                "mh3g-hd-jp-v96-lobby-full-item-box",
+                "mh3g-hd-jp-v96-quest-full-item-box-experimental",
+            },
+            {pack["id"] for pack in selected},
+        )
+
     def test_inspect_reports_installed_pack_that_is_not_enabled(self):
         result = self.tool.validate_repository(REPO)
         with tempfile.TemporaryDirectory() as tmp:

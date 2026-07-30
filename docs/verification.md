@@ -2,7 +2,7 @@
 
 ## Static gates passed
 
-1. `python3 -m unittest discover -s tests -v` — ten tests passed: manifest/schema validation, negative validation gates, RPX SHA-256 + PPC preimages/anchors, standard and isolated idempotent installation, Experimental exclusion, isolated-profile inspection, isolated launch-command generation, legacy-path migration/uninstall, and reproducible asset-free archive construction.
+1. `python3 -m unittest discover -s tests -v` — eleven tests passed: manifest/schema validation, negative validation gates, RPX SHA-256 + PPC preimages/anchors, standard and isolated idempotent installation, Experimental inclusion/exclusion, isolated-profile inspection, isolated launch-command generation, legacy-path migration/uninstall, and reproducible asset-free archive construction.
 2. `python3 scripts/mh-cemu-enhancements.py validate` — three manifests accepted.
 3. `python3 scripts/mh-cemu-enhancements.py verify-reference --reference-rpx <pinned MH3G_Cafe.rpx>` — accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and all declared PPC words.
 4. A temporary harness linked against the locally built Cemu `PPCAssembler` accepted the lobby `b 0x021bbefc` instruction and both quest `addic r0, r0, 0x56f4` instructions. The Cemu app was not started.

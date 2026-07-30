@@ -27,11 +27,10 @@ python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /absolute/path/to/cemu-data-root \
   --reference-rpx /absolute/path/to/MH3G_Cafe.rpx
 
-# Explicitly include the default-off quest experiment.
+# Add every default-off Experimental pack (currently the quest experiment) to the default two packs.
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /absolute/path/to/cemu-data-root \
   --reference-rpx /absolute/path/to/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-quest-full-item-box-experimental \
   --include-experimental
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
