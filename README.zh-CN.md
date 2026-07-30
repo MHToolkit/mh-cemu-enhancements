@@ -8,13 +8,13 @@
 
 | 开关 | 状态 | 默认安装 | Cemu 中独立开关 |
 | --- | --- | --- | --- |
-| 锁定 30 FPS | `Static Verified` | 是 | 是 |
-| 集会所/酒场完整家中箱子 | `Static Verified` | 是 | 是 |
+| 锁定 30 FPS | `Runtime Verified` | 是 | 是 |
+| 集会所/酒场完整家中箱子 | `Runtime Experimental` | 否 | 是 |
 | 任务补给箱/交纳箱完整家中箱子 | `Runtime Experimental` | 否 | 是 |
 
 适用身份：Wii U Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、Cemu patch module checksum `0x348600a0`。
 
-`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。任务箱包明确是实验项，默认不安装。
+`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。两个箱子包都明确是实验项，默认不安装。
 
 ## 校验、安装、卸载、分发
 
@@ -22,12 +22,20 @@
 python3 scripts/mh-cemu-enhancements.py validate
 python3 scripts/mh-cemu-enhancements.py verify-reference --reference-rpx /绝对路径/MH3G_Cafe.rpx
 
-# 默认只安装非 Experimental 包；不启动 Cemu，也不改 Cemu 的启用状态。
+# 默认只安装锁定 30 FPS；不启动 Cemu，也不改 Cemu 的启用状态。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx
 
-# 在默认两个包之上追加全部默认关闭的 Experimental 包（目前即任务箱实验包）。
+# 显式选中酒场 Experimental 候选包，并同时安装锁定 30 FPS。
+python3 scripts/mh-cemu-enhancements.py install \
+  --cemu-root /绝对路径/cemu-data-root \
+  --reference-rpx /绝对路径/MH3G_Cafe.rpx \
+  --pack mh3g-hd-jp-v96-fps-lock-30 \
+  --pack mh3g-hd-jp-v96-lobby-full-item-box \
+  --include-experimental
+
+# 在默认包之外追加全部默认关闭的 Experimental 包（酒场与任务箱）。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx \
@@ -35,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.0.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.2.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -52,12 +60,12 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
   --cemu-app /绝对路径/Cemu.app
 ```
 
-手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需开关，并重新载入/重启游戏。任务箱 Experimental 包不应用于日常或联机。
+手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需开关，并重新载入/重启游戏。两个 Experimental 箱子包都不应用于日常或联机。
 
 ## 补丁语义、兼容与联机
 
 - 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置。
-- 酒场补丁把受限箱子的菜单分派跳转到游戏内已存在的家中完整箱子流程；安装前校验源指令、跳转目标锚点和 RPX SHA-256。
+- 酒场候选包将受限箱子的分配尺寸、分配/构造调用、两个构造参数和 GUI 资源替换为对应的家中完整箱子构造路径；安装前校验源指令、目标锚点和 RPX SHA-256。未在游戏内看到装备、护石与道具操作前，始终保持 `Runtime Experimental`。
 - 任务补给箱/交纳箱补丁将两个**菜单资源分派**指向已有的家中完整箱子资源；它不是箱子模型替换，也不触碰存档。因为尚未进行隔离游戏内验证，保持 `Runtime Experimental`、默认关闭。
 - 联机建议只启用 **锁定 30 FPS**；两个箱子包都关闭。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。

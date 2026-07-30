@@ -47,16 +47,20 @@ The supplied Bilibili URL (`BV1XC4y1q74u`) could not be retrieved by the static 
 
 All instruction words below are big-endian words from the immutable RPX text section. The installer verifies the RPX SHA-256 and every source/anchor word before copying a PPC pack; Cemu additionally gates the patch group with `moduleMatches = 0x348600a0`.
 
-### Lobby restricted box -> existing home full-box flow
+### Lobby restricted box -> full home-box construction path (Experimental)
 
-| Role | Address | Word | Disassembly / purpose |
+The first candidate patched only `0x021bba90` with a branch into the middle of the home path. The user’s in-game result showed that Cemu loaded and applied that pack while the restricted three-option menu remained. The static RCA is that the single branch skipped the full path's allocation size, allocator, constructor, and GUI-resource setup; it is superseded and must not be treated as gameplay success.
+
+| Role | Address | Original big-endian word | Candidate replacement / matched home-path evidence |
 | --- | --- | --- | --- |
-| Source preimage | `0x021bba90` | `0x48501135` | `bl 0x026bcbc4`, the restricted-lobby flow entry call |
-| Replacement | `0x021bba90` | `0x4800046c` | `b 0x021bbefc` |
-| Target anchor | `0x021bbefc` | `0x48541005` | first instruction in the existing full home-item-box block |
-| Full-menu resource anchor | `0x021bbf28` | `0x300056f4` | `addic r0, r0, 0x56f4` for `GUI\\lobby\\myh_box2_n` |
+| Allocation size | `0x021bba78` | `0x386002a0` (`li r3, 0x2a0`) | `li r3, 0x300`; anchor `0x021bbef4 = 0x38600300` |
+| Allocation call | `0x021bba80` | `0x48500f55` (`bl 0x026bc9d4`, restricted allocator) | `bl 0x026fcf00`; home anchor `0x021bbefc = 0x48541005`; Cemu resolved word `0x48541481` |
+| Constructor call | `0x021bba90` | `0x48501135` (`bl 0x026bcbc4`, restricted constructor) | `bl 0x026fd0f0`; home anchor `0x021bbf0c = 0x485411e5`; Cemu resolved word `0x48541661` |
+| Stack constructor argument | `0x021bbaac` | `0x90a1000c` (`stw r5, 0xc(r1)`) | `stw r31, 0xc(r1)`; home anchor `0x021bbf2c = 0x93e1000c` |
+| GUI resource | `0x021bbab0` | `0x30005664` (`GUI\\lobby\\sho_item`) | `addic r0, r0, 0x56f4`; home anchor `0x021bbf28 = 0x300056f4` for `GUI\\lobby\\myh_box2_n` |
+| Register constructor argument | `0x021bbac4` | `0x7f0ac378` (`mr r10, r24`) | `lwz r10, 4(r27)`; home anchor `0x021bbf14 = 0x815b0004` |
 
-The target is inside the same lobby menu dispatcher and enters the game’s existing full-home path rather than changing a world chest model or save data. This earns **Static Verified**, not Runtime Verified.
+At the common dispatcher call, this makes `r3`–`r10` and stack arguments `8(r1)` through `0x14(r1)` match the existing full-home path where they differ. Cemu's actual `PPCAssembler` accepted all six candidate instructions; `BRANCH_S26` relocation uses the patched instruction address, yielding the recorded final branch words above. The target is still interaction/UI construction, never a chest model or save address. This candidate is **Runtime Experimental**, default-off, until in-game evidence shows equipment, talismans, and item actions.
 
 ### Quest supply/delivery -> home resource dispatch (Experimental)
 

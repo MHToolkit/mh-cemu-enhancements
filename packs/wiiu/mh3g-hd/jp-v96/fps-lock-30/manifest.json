@@ -6,7 +6,7 @@
   "title_slug": "mh3g-hd",
   "region": "JP",
   "update": "v96",
-  "status": "Static Verified",
+  "status": "Runtime Verified",
   "default_install": true,
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/fps-lock-30",
   "install_folder": "MH3G HD JP v96 - Lock 30 FPS",
