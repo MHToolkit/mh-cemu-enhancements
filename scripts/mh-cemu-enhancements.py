@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate, install, remove, and package portable Cemu enhancement packs.
 
-This tool deliberately manages only ``graphicPacks/mh-cemu-enhancements``.
+This tool deliberately manages only its owned ``graphicPacks/mh-cemu-enhancements`` directory.
 It never launches Cemu and never reads or writes save/MLC data.
 """
 
@@ -12,6 +12,7 @@ import dataclasses
 from datetime import datetime, timezone
 import hashlib
 import json
+import shlex
 import shutil
 import struct
 import sys
@@ -20,11 +21,18 @@ import zipfile
 import zlib
 from pathlib import Path
 from typing import Any, Iterable
+from xml.etree import ElementTree
 
 
 CATALOG_PATH = Path("catalog/packs.json")
 MANIFEST_SCHEMA_PATH = Path("schemas/pack-manifest.schema.json")
-INSTALL_ROOT = Path("graphicPacks/mh-cemu-enhancements")
+INSTALL_DIRECTORY = Path("mh-cemu-enhancements")
+NEMESSIX_ISOLATED_ROOT_SUFFIX = (
+    "Library",
+    "Application Support",
+    "Nemessix Dev",
+    "cemu",
+)
 FORBIDDEN_ASSET_SUFFIXES = {".rpx", ".rpl", ".wua", ".wux", ".wud", ".cci", ".arc"}
 
 
@@ -40,6 +48,96 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def _normalized_root(path: Path) -> Path:
+    # Cemu validates the lexical environment value; resolving /tmp and other
+    # macOS symlinks would produce a different value than the caller supplied.
+    return path.expanduser().absolute()
+
+
+def _is_nemessix_isolated_root(cemu_root: Path) -> bool:
+    return _normalized_root(cemu_root).parts[-len(NEMESSIX_ISOLATED_ROOT_SUFFIX):] == NEMESSIX_ISOLATED_ROOT_SUFFIX
+
+
+def graphic_packs_root(cemu_root: Path) -> Path:
+    """Return the user-data graphicPacks directory for either supported root layout."""
+    root = _normalized_root(cemu_root)
+    if _is_nemessix_isolated_root(root):
+        return root / "data" / "graphicPacks"
+    return root / "graphicPacks"
+
+
+def install_root(cemu_root: Path) -> Path:
+    return graphic_packs_root(cemu_root) / INSTALL_DIRECTORY
+
+
+def _legacy_isolated_install_root(cemu_root: Path) -> Path | None:
+    root = _normalized_root(cemu_root)
+    if _is_nemessix_isolated_root(root):
+        return root / "graphicPacks" / INSTALL_DIRECTORY
+    return None
+
+
+def _settings_path(cemu_root: Path) -> tuple[Path, str]:
+    root = _normalized_root(cemu_root)
+    if _is_nemessix_isolated_root(root):
+        return root / "config" / "settings.xml", "isolated"
+    return root / "settings.xml", "standard"
+
+
+def isolated_launch_command(cemu_app: Path, cemu_root: Path) -> str:
+    """Build, but never execute, the command for the supplied isolated Cemu build."""
+    root = _normalized_root(cemu_root)
+    if not root.is_absolute() or not _is_nemessix_isolated_root(root):
+        suffix = "/".join(NEMESSIX_ISOLATED_ROOT_SUFFIX)
+        raise ValueError(f"isolated Cemu root must end with /{suffix}")
+    binary = _normalized_root(cemu_app) / "Contents" / "MacOS" / "Cemu_release"
+    return f"env NEMESSIX_CEMU_DATA_ROOT={shlex.quote(str(root))} {shlex.quote(str(binary))}"
+
+
+def inspect_cemu_root(cemu_root: Path, packs: Iterable[dict[str, Any]]) -> dict[str, Any]:
+    """Report installation and Cemu saved-enable state without mutating any Cemu file."""
+    root = _normalized_root(cemu_root)
+    user_data_root = root / "data" if _is_nemessix_isolated_root(root) else root
+    target = install_root(root)
+    config_path, config_layout = _settings_path(root)
+    enabled_rules: set[Path] = set()
+    config_error: str | None = None
+    if config_path.is_file():
+        try:
+            document = ElementTree.parse(config_path)
+            for entry in document.findall("./GraphicPack/Entry"):
+                if entry.get("disabled", "false").lower() == "true":
+                    continue
+                filename = entry.get("filename")
+                if filename:
+                    path = Path(filename)
+                    enabled_rules.add(_normalized_root(path if path.is_absolute() else user_data_root / path))
+        except (ElementTree.ParseError, OSError) as exc:
+            config_error = str(exc)
+    pack_reports = []
+    for pack in packs:
+        rules = target / pack["install_folder"] / pack["rules"]
+        pack_reports.append(
+            {
+                "id": pack["id"],
+                "installed": rules.is_file(),
+                "enabled": _normalized_root(rules) in enabled_rules,
+                "rules_path": rules,
+            }
+        )
+    return {
+        "cemu_root": root,
+        "user_data_root": user_data_root,
+        "graphic_packs_root": graphic_packs_root(root),
+        "install_root": target,
+        "config_path": config_path,
+        "config_layout": config_layout,
+        "config_exists": config_path.is_file(),
+        "config_error": config_error,
+        "packs": pack_reports,
+    }
 
 
 def _number(value: Any) -> int:
@@ -292,7 +390,7 @@ def install(repo_root: Path, cemu_root: Path, packs: list[dict[str, Any]], refer
         errors = verify_reference(reference_rpx, packs)
         if errors:
             raise ValueError("reference verification failed:\n" + "\n".join(errors))
-    target = cemu_root / INSTALL_ROOT
+    target = install_root(cemu_root)
     parent = target.parent
     parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="mh-cemu-enhancements-", dir=parent) as temp:
@@ -325,17 +423,27 @@ def install(repo_root: Path, cemu_root: Path, packs: list[dict[str, Any]], refer
             else:
                 shutil.rmtree(target)
         shutil.move(str(staged), str(target))
+    legacy_target = _legacy_isolated_install_root(cemu_root)
+    if (
+        legacy_target is not None
+        and legacy_target != target
+        and (legacy_target / ".install-receipt.json").is_file()
+    ):
+        shutil.rmtree(legacy_target)
     return target
 
 
 def uninstall(cemu_root: Path) -> None:
-    target = cemu_root / INSTALL_ROOT
+    target = install_root(cemu_root)
     if target.exists():
         shutil.rmtree(target)
+    legacy_target = _legacy_isolated_install_root(cemu_root)
+    if legacy_target is not None and (legacy_target / ".install-receipt.json").is_file():
+        shutil.rmtree(legacy_target)
 
 
 def _distribution_files(repo_root: Path) -> list[Path]:
-    ignored_top = {".git", "dist", "__pycache__", ".ruff_cache", ".pytest_cache"}
+    ignored_top = {".git", ".idea", "dist", "__pycache__", ".ruff_cache", ".pytest_cache"}
     result = []
     for path in repo_root.rglob("*"):
         relative = path.relative_to(repo_root)
@@ -378,6 +486,11 @@ def _cli() -> int:
     install_parser.add_argument("--include-experimental", action="store_true")
     remove = commands.add_parser("uninstall")
     remove.add_argument("--cemu-root", type=Path, required=True)
+    inspect_parser = commands.add_parser("inspect", help="read-only installation and saved-enable-state report")
+    inspect_parser.add_argument("--cemu-root", type=Path, required=True)
+    launch = commands.add_parser("isolated-launch-command", help="print, but do not execute, the isolated Cemu launch command")
+    launch.add_argument("--cemu-root", type=Path, required=True)
+    launch.add_argument("--cemu-app", type=Path, required=True)
     package = commands.add_parser("package")
     package.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
@@ -406,7 +519,16 @@ def _cli() -> int:
         print(f"installed {len(packs)} pack(s) at {target}")
     elif args.command == "uninstall":
         uninstall(args.cemu_root)
-        print(f"removed {args.cemu_root / INSTALL_ROOT}")
+        print(f"removed {install_root(args.cemu_root)}")
+    elif args.command == "inspect":
+        report = inspect_cemu_root(args.cemu_root, result.packs)
+        print(json.dumps(report, default=str, ensure_ascii=False, indent=2, sort_keys=True))
+    elif args.command == "isolated-launch-command":
+        try:
+            print(isolated_launch_command(args.cemu_app, args.cemu_root))
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
     elif args.command == "package":
         output = package_repository(args.repo_root, args.output)
         print(f"created {output} {sha256_file(output)}")

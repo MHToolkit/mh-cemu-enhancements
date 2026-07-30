@@ -35,12 +35,25 @@ python3 scripts/mh-cemu-enhancements.py install \
   --include-experimental
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
+python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.0.zip
 ```
 
-Install writes only `<cemu-root>/graphicPacks/mh-cemu-enhancements/`, with a receipt. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If a directory at that path has no receipt, it is renamed to a local backup before replacement.
+Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
 
-After installation, enable each desired pack in Cemu's Graphic Packs UI. The installer never changes Cemu's saved enable/disable choices, which keeps all three switches independent.
+`inspect` is read-only: it reports the resolved Graphic Pack directory, the applicable settings file, each pack's installation status, and its saved Cemu enable state. After installation, enable each desired pack in Cemu's Graphic Packs UI. The installer never changes Cemu's saved enable/disable choices, which keeps all three switches independent.
+
+### macOS isolated profile launch
+
+The supplied Cemu build uses the isolated profile **only** when `NEMESSIX_CEMU_DATA_ROOT` is present. Starting the `.app` normally (for example, from Finder) uses the standard `~/Library/Application Support/Cemu` profile and cannot see packs installed in the isolated root. To avoid mixing profiles, print the exact command without launching Cemu:
+
+```bash
+python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
+  --cemu-root "/absolute/path/Library/Application Support/Nemessix Dev/cemu" \
+  --cemu-app /absolute/path/Cemu.app
+```
+
+Run the printed command manually, then open **Graphic Packs**, select the desired independent switches, and restart/reload the title. Do not use the Experimental quest pack for normal or multiplayer play.
 
 ## Compatibility and online use
 

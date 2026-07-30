@@ -124,6 +124,83 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
+    def test_inspect_reports_installed_pack_that_is_not_enabled(self):
+        result = self.tool.validate_repository(REPO)
+        with tempfile.TemporaryDirectory() as tmp:
+            cemu_root = Path(tmp) / "Library" / "Application Support" / "Nemessix Dev" / "cemu"
+            selected = self.tool.select_packs(result.packs, [], include_experimental=False)
+            self.tool.install(REPO, cemu_root, selected, reference_rpx=None, verify=False)
+            self.assertTrue(
+                (
+                    cemu_root
+                    / "data"
+                    / "graphicPacks"
+                    / "mh-cemu-enhancements"
+                    / "MH3G HD JP v96 - Lock 30 FPS"
+                    / "rules.txt"
+                ).is_file()
+            )
+            config = cemu_root / "config" / "settings.xml"
+            config.parent.mkdir(parents=True)
+            config.write_text("<?xml version='1.0'?><content><GraphicPack/></content>\n")
+
+            report = self.tool.inspect_cemu_root(cemu_root, result.packs)
+
+            self.assertEqual("isolated", report["config_layout"])
+            self.assertEqual(config, report["config_path"])
+            fps = next(pack for pack in report["packs"] if pack["id"] == "mh3g-hd-jp-v96-fps-lock-30")
+            self.assertTrue(fps["installed"])
+            self.assertFalse(fps["enabled"])
+
+    def test_isolated_launch_command_pins_the_requested_data_root(self):
+        cemu_root = Path("/tmp/Library/Application Support/Nemessix Dev/cemu")
+        app = Path("/tmp/Cemu.app")
+
+        command = self.tool.isolated_launch_command(app, cemu_root)
+
+        self.assertIn("NEMESSIX_CEMU_DATA_ROOT", command)
+        self.assertIn("'/tmp/Library/Application Support/Nemessix Dev/cemu'", command)
+        self.assertIn("/tmp/Cemu.app/Contents/MacOS/Cemu_release", command)
+        with self.assertRaises(ValueError):
+            self.tool.isolated_launch_command(app, Path("/tmp/not-a-nemessix-root"))
+
+    def test_install_migrates_only_receipted_legacy_isolated_location(self):
+        result = self.tool.validate_repository(REPO)
+        with tempfile.TemporaryDirectory() as tmp:
+            cemu_root = Path(tmp) / "Library" / "Application Support" / "Nemessix Dev" / "cemu"
+            selected = self.tool.select_packs(result.packs, [], include_experimental=False)
+            legacy = cemu_root / "graphicPacks" / "mh-cemu-enhancements"
+            legacy.mkdir(parents=True)
+            (legacy / ".install-receipt.json").write_text("{}\n")
+            self.tool.install(REPO, cemu_root, selected, reference_rpx=None, verify=False)
+
+            self.assertFalse(legacy.exists())
+            self.assertTrue(
+                (
+                    cemu_root
+                    / "data"
+                    / "graphicPacks"
+                    / "mh-cemu-enhancements"
+                    / "MH3G HD JP v96 - Lobby Full Item Box"
+                    / "patch_lobby_full_item_box.asm"
+                ).is_file()
+            )
+
+    def test_uninstall_removes_receipted_legacy_isolated_location_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cemu_root = Path(tmp) / "Library" / "Application Support" / "Nemessix Dev" / "cemu"
+            legacy = cemu_root / "graphicPacks" / "mh-cemu-enhancements"
+            legacy.mkdir(parents=True)
+            (legacy / ".install-receipt.json").write_text("{}\n")
+            foreign = cemu_root / "graphicPacks" / "foreign-pack"
+            foreign.mkdir()
+            (foreign / "rules.txt").write_text("foreign\n")
+
+            self.tool.uninstall(cemu_root)
+
+            self.assertFalse(legacy.exists())
+            self.assertTrue((foreign / "rules.txt").is_file())
+
     def test_archive_is_reproducible_and_contains_no_game_assets(self):
         result = self.tool.validate_repository(REPO)
         self.assertEqual([], result.errors, "\n".join(result.errors))
@@ -136,6 +213,7 @@ class CatalogTests(unittest.TestCase):
             names = self.tool.zip_member_names(one)
             self.assertNotIn("mh3g_cafe.rpx", names)
             self.assertFalse(any(name.startswith(".ruff_cache/") for name in names))
+            self.assertFalse(any(name.startswith(".idea/") for name in names))
 
 
 if __name__ == "__main__":

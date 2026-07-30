@@ -35,12 +35,25 @@ python3 scripts/mh-cemu-enhancements.py install \
   --include-experimental
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
+python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.0.zip
 ```
 
-安装器只写入 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 及其中 receipt。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若该目录原先不存在 receipt，会先原地改名备份。
+安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
 
-安装完成后，在 Cemu 的 **Graphic Packs** UI 逐项启用；安装器不写 Cemu 的已启用状态，因此三项始终是独立开关。
+`inspect` 为只读诊断：它输出解析后的 Graphic Pack 目录、对应 settings 文件、每个 pack 的安装状态以及 Cemu 保存的启用状态。安装完成后，在 Cemu 的 **Graphic Packs** UI 逐项启用；安装器不写 Cemu 的已启用状态，因此三项始终是独立开关。
+
+### macOS 隔离 profile 启动
+
+提供的 Cemu build 只有在设置 `NEMESSIX_CEMU_DATA_ROOT` 时才会使用隔离 profile。从 Finder 等方式直接启动 `.app` 会落入标准 `~/Library/Application Support/Cemu` profile，因此看不到安装在隔离根的包。为避免混用 profile，先仅打印正确启动命令（不会启动 Cemu）：
+
+```bash
+python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
+  --cemu-root "/绝对路径/Library/Application Support/Nemessix Dev/cemu" \
+  --cemu-app /绝对路径/Cemu.app
+```
+
+手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需开关，并重新载入/重启游戏。任务箱 Experimental 包不应用于日常或联机。
 
 ## 补丁语义、兼容与联机
 
