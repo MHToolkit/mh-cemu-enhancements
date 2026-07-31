@@ -65,7 +65,7 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 ## Compatibility and online use
 
 - The 30 FPS pack uses per-pack `vsyncFrequency = 30`, not a global Cemu setting.
-- The lobby candidate routes selector `0x07` through a Cemu code cave that establishes the full-home path's required `r31 = 1` context, then enters the game’s existing full-home-box code. Its exact source/target words are checked before installation. It remains `Runtime Experimental` until an in-game test shows equipment, talismans, and item actions.
+- The lobby candidate changes the restricted `sho_item` mode argument from `1` to `0`, following the equivalent 3DS Port Tanzia mode-flag semantics. Its exact source word and control-flow anchors are checked before installation. It remains `Runtime Experimental` until an in-game test shows equipment, talismans, and item actions.
 - The quest patch substitutes the supply and delivery menu-resource dispatches with the existing home-box resource. It remains `Runtime Experimental` until isolated gameplay tests prove all actions and quest-state safety.
 - For multiplayer, enable **only Lock 30 FPS**. Leave both box packs disabled.
 - Never enable this JP v96 catalog against another title, region, update, RPX hash, or module checksum.

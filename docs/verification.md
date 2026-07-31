@@ -1,16 +1,16 @@
-# Local verification record (2026-07-30)
+# Local verification record (2026-07-31)
 
 ## Current static gates
 
-1. `python3 -m unittest discover -s tests -v` — fourteen tests passed: manifest/schema validation, negative validation gates, the lobby selector/context code-cave contract, RPX SHA-256 + PPC preimages/anchors, standard and isolated idempotent installation, exact Experimental selection/exclusion, isolated-profile inspection, isolated launch-command generation, legacy-path migration/uninstall, and reproducible asset-free archive construction.
+1. `python3 -m unittest discover -s tests -v` — fourteen tests passed: manifest/schema validation, negative validation gates, the lobby mode-argument contract, RPX SHA-256 + PPC preimages/anchors, standard and isolated idempotent installation, exact Experimental selection/exclusion, isolated-profile inspection, isolated launch-command generation, legacy-path migration/uninstall, and reproducible asset-free archive construction.
 2. `python3 scripts/mh-cemu-enhancements.py validate` — three manifests accepted.
 3. `python3 scripts/mh-cemu-enhancements.py verify-reference --reference-rpx <pinned MH3G_Cafe.rpx>` — accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and all declared PPC words.
-4. A temporary harness linked against the locally built Cemu `PPCAssembler` accepted the code-cave source branch, `li r31, 1`, and the branch to the full-home path. With the first code-cave allocation at `0x01800000`, their resolved PPC words are `0x4b644588`, `0x3be00001`, and `0x489bbef0`. The Cemu app was not started by this project.
+4. A PPC assembly smoke check encodes `li r9, 0` as `0x39200000`; the pack has no code cave or relocation. The Cemu app was not started by this project.
 5. `ruff check scripts tests` and `git diff --check` passed.
 
 ## Runtime evidence and current standard-profile installation
 
-The user confirmed that the 30 FPS switch took effect with the JP v96 title, so the FPS manifest is now `Runtime Verified`. The lobby runs established the opposite result: the standard-profile Cemu log records JP v96, `Set vsync frequency to 30`, and `Applying patch group 'MH3G HD JP v96'`, but the restricted three-option menu remained. Both the old one-branch and the six-site construction candidate are superseded by the selector/context code-cave candidate, which remains `Runtime Experimental` and default-off.
+The user confirmed that the 30 FPS switch took effect with the JP v96 title, so the FPS manifest is now `Runtime Verified`. The lobby runs established the opposite result for the branch, six-site substitution, and full-home code-cave candidates: the standard-profile Cemu log records JP v96, `Set vsync frequency to 30`, and `Applying patch group 'MH3G HD JP v96'`, but the restricted three-option menu remained. Those candidates are superseded by the 3DS-informed restricted-mode override, which remains `Runtime Experimental` and default-off.
 
 After a zero-Cemu-process check, the installer copied exactly the runtime-verified FPS pack and the explicitly selected lobby candidate to the user's normal Cemu profile:
 
@@ -18,7 +18,7 @@ After a zero-Cemu-process check, the installer copied exactly the runtime-verifi
 /Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements/
 ```
 
-The receipt contains the two pack tree hashes and the verified RPX hash. Read-only inspection confirmed both installed packs remain enabled in Cemu's existing `settings.xml`; the quest experiment is neither installed nor enabled. The installer writes only that `graphicPacks/mh-cemu-enhancements` directory and never accesses MLC/save paths.
+The receipt contains the two pack tree hashes and the verified RPX hash. The lobby entry was already enabled in Cemu's existing `settings.xml`. To restore the intended FPS switch for this profile, the existing file was first backed up as `settings.xml.before-mh-cemu-enhancements-20260731-fps-enable`, then exactly one Lock 30 FPS `<Entry>` was added; XML parsing and catalog inspection confirm that both installed packs are enabled. The quest experiment is neither installed nor enabled. The installer itself writes only that `graphicPacks/mh-cemu-enhancements` directory and never accesses MLC/save paths.
 
 ## Profile-path RCA (2026-07-30)
 
@@ -30,4 +30,4 @@ The lobby and quest box packs are not `Runtime Verified`. The next lobby test mu
 
 ## Distribution
 
-`dist/mh-cemu-enhancements-0.1.3.zip` is deterministic, contains no game assets or tool cache, and is accompanied by its adjacent `.sha256` verification file.
+`dist/mh-cemu-enhancements-0.1.4.zip` is deterministic, contains no game assets or tool cache, and is accompanied by its adjacent `.sha256` verification file.

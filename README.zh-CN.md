@@ -65,7 +65,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 ## 补丁语义、兼容与联机
 
 - 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置。
-- 酒场候选包将选择器 `0x07` 引入 Cemu code cave，先建立家中完整箱子路径要求的 `r31 = 1` 上下文，再进入游戏内既有的完整家中箱子代码；安装前校验源指令、目标锚点和 RPX SHA-256。未在游戏内看到装备、护石与道具操作前，始终保持 `Runtime Experimental`。
+- 酒场候选包将受限 `sho_item` 的模式参数从 `1` 改为 `0`，语义来自对应 3DS Port Tanzia 模式位；安装前校验源指令、控制流锚点和 RPX SHA-256。未在游戏内看到装备、护石与道具操作前，始终保持 `Runtime Experimental`。
 - 任务补给箱/交纳箱补丁将两个**菜单资源分派**指向已有的家中完整箱子资源；它不是箱子模型替换，也不触碰存档。因为尚未进行隔离游戏内验证，保持 `Runtime Experimental`、默认关闭。
 - 联机建议只启用 **锁定 30 FPS**；两个箱子包都关闭。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。

@@ -47,32 +47,26 @@ The supplied Bilibili URL (`BV1XC4y1q74u`) could not be retrieved by the static 
 
 All instruction words below are big-endian words from the immutable RPX text section. The installer verifies the RPX SHA-256 and every source/anchor word before copying a PPC pack; Cemu additionally gates the patch group with `moduleMatches = 0x348600a0`.
 
-### Lobby restricted box -> full home-box construction path (Experimental)
+### Lobby restricted-box mode override (Experimental)
 
-The first candidate patched only `0x021bba90` with a branch into the middle of the home path. The second candidate copied six constructor-path instructions. Both were loaded and applied by Cemu while the restricted three-option menu remained. The deeper dispatcher trace identifies why: `0x021bb6c4` routes selector `0x07` to the restricted path, while the native full-home path first requires `r31 == 1` at `0x021bbe54`; the six-site candidate passed the caller's unknown `r31` through instead of establishing that full-home context. Both earlier candidates are superseded and are not gameplay success.
+The earlier branch, six-site substitution, and full-home code-cave candidate all loaded in Cemu while the restricted three-option menu remained. They are superseded and are not gameplay success. The valid 3DS reference supplied for Port Tanzia changes `0x008EA6D0` from ARM `0xE3A02001` (`MOV r2, #1`) to `0xE3A02000` (`MOV r2, #0`). In the original 3DS function, that argument is saved into the new UI state and selects a different mode-specific initialization path.
+
+The Wii U PPC target is derived independently from the restricted `sho_item` dispatch. Selector `0x07` reaches `uIDLobbyShoItemGet`; its setup loads `r9 = 1` at `0x021bbac0`, then calls the shared initializer at `0x021bbacc`. That initializer captures the value and writes it to the UI object state field at `0x021bb108`. The pack changes only that local mode argument to zero.
 
 | Role | Address | Original big-endian word | Candidate evidence / replacement |
 | --- | --- | --- | --- |
-| Restricted selector entry | `0x021bba78` | `0x386002a0` (`li r3, 0x2a0`) | Branch to `lobby_full_box_entry` in Cemu’s code cave |
-| Selector proof | `0x021bb6c4` | `0x480003b4` | Dispatcher selector `0x07` branches to `0x021bba78` |
-| Full-path context guard | `0x021bbe54` | `0x281f0001` | `cmplwi r31, 1` |
-| Full-path branch | `0x021bbe5c` | `0x41820098` | Branches to `0x021bbef4` only when `r31 == 1` |
-| Full-box allocation | `0x021bbef4` | `0x38600300` | Existing full-home path target |
-| Full-box allocation call | `0x021bbefc` | `0x48541005` | Existing full-home allocator |
-| Full-box constructor call | `0x021bbf0c` | `0x485411e5` | Existing `uIDLobbyMyhBox` constructor |
-| Full-box GUI resource | `0x021bbf28` | `0x300056f4` | `GUI\\lobby\\myh_box2_n` |
-
-The replacement has one patched RPX word plus a Cemu code cave:
+| Selector proof | `0x021bb6c4` | `0x480003b4` | Selector `0x07` branches to the restricted `sho_item` path |
+| Restricted UI allocation | `0x021bba78` | `0x386002a0` | Existing `uIDLobbyShoItemGet` construction path |
+| Restricted GUI resource | `0x021bbab0` | `0x30005664` | `GUI\\lobby\\sho_item` |
+| Mode preimage | `0x021bbac0` | `0x39200001` (`li r9, 1`) | Replaced by `li r9, 0` |
+| Shared initializer call | `0x021bbacc` | `0x4bfff6c5` | Transfers `r9` into the common UI initialization flow |
+| Mode-state write | `0x021bb108` | `0x53603432` | Inserts the transferred mode value into the UI object state field |
 
 ```asm
-0x021bba78 = b lobby_full_box_entry
-.origin = codecave
-lobby_full_box_entry:
-li r31, 1
-b 0x021bbef4
+0x021bbac0 = li r9, 0
 ```
 
-Cemu reserves code-cave memory in `0x01800000..0x01bfffff`; both branches are within PPC `BRANCH_S26` range and are resolved by Cemu after the code-cave address is allocated. Its real `PPCAssembler` accepted the source branch, `li r31, 1`, and the branch back into `0x021bbef4`. The target remains interaction/UI construction, never a chest model or save address. This candidate is **Runtime Experimental**, default-off, until in-game evidence shows equipment, talismans, and item actions.
+This is a single PPC mode-argument override, not a direct reuse of the ARM address or opcode. Cemu invalidates the recompiler range whenever a Graphic Pack instruction patch is applied. The candidate remains **Runtime Experimental**, default-off, until in-game evidence shows equipment, talismans, and item actions.
 
 ### Quest supply/delivery -> home resource dispatch (Experimental)
 

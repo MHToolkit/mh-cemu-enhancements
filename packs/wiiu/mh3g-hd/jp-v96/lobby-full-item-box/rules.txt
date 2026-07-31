@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lobby Full Item Box
 path = MH Cemu Enhancements/MH3G HD JP v96
-description = Experimental code-cave route to the full home item-box path with its required context. Default off pending in-game verification.
+description = Experimental restricted-item-box mode override derived from the matching 3DS Port Tanzia mode flag. Default off pending in-game verification.
 version = 7

@@ -157,7 +157,7 @@ class CatalogTests(unittest.TestCase):
                 include_experimental=False,
             )
 
-    def test_lobby_candidate_is_experimental_and_routes_through_full_home_context(self):
+    def test_lobby_candidate_is_experimental_and_flips_the_restricted_box_mode(self):
         result = self.tool.validate_repository(REPO)
         lobby = next(pack for pack in result.packs if pack["id"] == "mh3g-hd-jp-v96-lobby-full-item-box")
 
@@ -169,28 +169,22 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertEqual(
             {
-                0x021BBA78: 0x386002A0,
+                0x021BBAC0: 0x39200001,
             },
             {self.tool._number(item["address"]): self.tool._number(item["word"]) for item in lobby["preimages"]},
         )
         self.assertEqual(
             {
                 0x021BB6C4: 0x480003B4,
-                0x021BBE54: 0x281F0001,
-                0x021BBE5C: 0x41820098,
-                0x021BBEF4: 0x38600300,
-                0x021BBEFC: 0x48541005,
-                0x021BBF0C: 0x485411E5,
-                0x021BBF28: 0x300056F4,
+                0x021BBA78: 0x386002A0,
+                0x021BBAB0: 0x30005664,
+                0x021BBACC: 0x4BFFF6C5,
+                0x021BB108: 0x53603432,
             },
             {self.tool._number(item["address"]): self.tool._number(item["word"]) for item in lobby["anchors"]},
         )
         patch = (REPO / lobby["pack_dir"] / lobby["patch"]).read_text()
-        self.assertIn("0x021bba78 = b lobby_full_box_entry", patch)
-        self.assertIn(".origin = codecave", patch)
-        self.assertIn("lobby_full_box_entry:", patch)
-        self.assertIn("li r31, 1", patch)
-        self.assertIn("b 0x021bbef4", patch)
+        self.assertIn("0x021bbac0 = li r9, 0", patch)
 
     def test_fps_lock_records_the_confirmed_runtime_result(self):
         result = self.tool.validate_repository(REPO)
