@@ -221,7 +221,7 @@ def validate_repository(repo_root: Path) -> ValidationResult:
         packs.append(pack)
         required = {
             "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
-            "default_install", "pack_dir", "install_folder", "rules", "source", "license",
+            "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license",
         }
         missing = sorted(required - pack.keys())
         if missing:
@@ -247,6 +247,8 @@ def validate_repository(repo_root: Path) -> ValidationResult:
             errors.append(f"{manifest_rel}: unknown status {pack['status']!r}")
         if not isinstance(pack["default_install"], bool):
             errors.append(f"{manifest_rel}: default_install must be boolean")
+        if pack["availability"] not in {"available", "runtime-blocked"}:
+            errors.append(f"{manifest_rel}: unknown availability {pack['availability']!r}")
         if pack["status"] == "Runtime Experimental" and pack["default_install"]:
             errors.append(f"{manifest_rel}: experimental pack must default_install=false")
 
@@ -369,10 +371,17 @@ def select_packs(packs: Iterable[dict[str, Any]], selected_ids: list[str], inclu
     else:
         chosen = [pack for pack in packs if pack["default_install"]]
         if include_experimental:
-            chosen.extend(pack for pack in packs if pack["status"] == "Runtime Experimental")
+            chosen.extend(
+                pack
+                for pack in packs
+                if pack["status"] == "Runtime Experimental" and pack["availability"] == "available"
+            )
     experimental = [pack["id"] for pack in chosen if pack["status"] == "Runtime Experimental"]
     if experimental and not include_experimental:
         raise ValueError("experimental pack requires --include-experimental: " + ", ".join(experimental))
+    blocked = [pack["id"] for pack in chosen if pack["availability"] != "available"]
+    if blocked:
+        raise ValueError("pack is runtime-blocked pending further evidence: " + ", ".join(blocked))
     return chosen
 
 

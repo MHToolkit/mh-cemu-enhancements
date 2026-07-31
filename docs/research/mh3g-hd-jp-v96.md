@@ -73,7 +73,7 @@ li r31, 1
 b 0x021bbef4
 ```
 
-This redirects both verified restricted selectors to the existing complete home UI construction sequence; it does not change the physical chest model or save data. Cemu invalidates the recompiler range whenever a Graphic Pack instruction patch is applied. The candidate remains **Runtime Experimental**, default-off, until in-game evidence shows equipment, talismans, and item actions.
+This redirects both verified restricted selectors to the existing complete home UI construction sequence; it does not change the physical chest model or save data. It is now **retracted**: the Cemu 2.6 macOS runtime applied it with code cave `0x01800000-0x01800008`, then crashed before gameplay with `SIGBUS` / `EXC_BAD_ACCESS` at guest `0x017ffffc`, in the `PPCRecompiler` thread. The code cave must not be reused. The next candidate requires a runtime GDB trace of the original dispatcher call context, then a non-code-cave patch only if that trace proves a safe source instruction.
 
 ### Quest supply/delivery -> home resource dispatch (Experimental)
 

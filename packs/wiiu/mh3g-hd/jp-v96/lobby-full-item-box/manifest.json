@@ -8,6 +8,8 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
+  "availability": "runtime-blocked",
+  "availability_reason": "Cemu 2.6 macOS runtime crash: the dual-selector code-cave candidate caused SIGBUS/EXC_BAD_ACCESS in PPCRecompiler before gameplay. Do not install pending GDB selector tracing.",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box",
   "install_folder": "MH3G HD JP v96 - Lobby Full Item Box",
   "rules": "rules.txt",
@@ -67,5 +69,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "Experimental dual-selector redirect from both restricted lobby item-box constructors to the existing complete home item-box path with its required r31 = 1 context."
+  "summary": "Retracted dual-selector code-cave candidate. It remains retained only as crash evidence and is runtime-blocked pending GDB selector tracing."
 }

@@ -8,6 +8,7 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
+  "availability": "available",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-full-item-box-experimental",
   "install_folder": "MH3G HD JP v96 - Quest Full Item Box (Experimental)",
   "rules": "rules.txt",

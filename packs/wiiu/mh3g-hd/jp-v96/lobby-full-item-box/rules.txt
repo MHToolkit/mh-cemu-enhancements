@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lobby Full Item Box
 path = MH Cemu Enhancements/MH3G HD JP v96
-description = Experimental dual-selector redirect to the existing full home item-box path. Default off pending in-game verification.
+description = Retracted runtime-crashing candidate. Installation is blocked pending GDB selector tracing.
 version = 7

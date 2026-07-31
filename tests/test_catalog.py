@@ -132,7 +132,6 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
-                "mh3g-hd-jp-v96-lobby-full-item-box",
                 "mh3g-hd-jp-v96-quest-full-item-box-experimental",
             },
             {pack["id"] for pack in selected},
@@ -140,21 +139,17 @@ class CatalogTests(unittest.TestCase):
 
     def test_explicit_lobby_selection_requires_its_experimental_gate_and_excludes_quest(self):
         result = self.tool.validate_repository(REPO)
-        selected = self.tool.select_packs(
-            result.packs,
-            ["mh3g-hd-jp-v96-fps-lock-30", "mh3g-hd-jp-v96-lobby-full-item-box"],
-            include_experimental=True,
-        )
-
-        self.assertEqual(
-            {"mh3g-hd-jp-v96-fps-lock-30", "mh3g-hd-jp-v96-lobby-full-item-box"},
-            {pack["id"] for pack in selected},
-        )
         with self.assertRaises(ValueError):
             self.tool.select_packs(
                 result.packs,
                 ["mh3g-hd-jp-v96-lobby-full-item-box"],
                 include_experimental=False,
+            )
+        with self.assertRaisesRegex(ValueError, "runtime-blocked"):
+            self.tool.select_packs(
+                result.packs,
+                ["mh3g-hd-jp-v96-lobby-full-item-box"],
+                include_experimental=True,
             )
 
     def test_lobby_candidate_is_experimental_and_redirects_both_restricted_selectors(self):
@@ -163,6 +158,7 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", lobby["status"])
         self.assertFalse(lobby["default_install"])
+        self.assertEqual("runtime-blocked", lobby["availability"])
         self.assertEqual(
             {"mh3g-hd-jp-v96-fps-lock-30"},
             {pack["id"] for pack in self.tool.select_packs(result.packs, [], include_experimental=False)},

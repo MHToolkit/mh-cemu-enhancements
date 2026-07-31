@@ -4,7 +4,7 @@
   "type": "object",
   "required": [
     "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
-    "default_install", "pack_dir", "install_folder", "rules", "source", "license"
+    "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license"
   ],
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
@@ -16,6 +16,8 @@
     "update": { "type": "string" },
     "status": { "enum": ["Static Verified", "Runtime Experimental", "Runtime Verified"] },
     "default_install": { "type": "boolean" },
+    "availability": { "enum": ["available", "runtime-blocked"] },
+    "availability_reason": { "type": "string" },
     "pack_dir": { "type": "string" },
     "install_folder": { "type": "string" },
     "rules": { "type": "string" },
