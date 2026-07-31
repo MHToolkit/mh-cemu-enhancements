@@ -16,35 +16,25 @@
     {
       "address": "0x021bba78",
       "word": "0x386002a0",
-      "meaning": "Restricted lobby UI allocation size (0x2a0)."
-    },
-    {
-      "address": "0x021bba80",
-      "word": "0x48500f55",
-      "meaning": "Restricted lobby UI allocation call."
-    },
-    {
-      "address": "0x021bba90",
-      "word": "0x48501135",
-      "meaning": "Restricted lobby UI constructor call."
-    },
-    {
-      "address": "0x021bbaac",
-      "word": "0x90a1000c",
-      "meaning": "Restricted lobby constructor's null stack argument."
-    },
-    {
-      "address": "0x021bbab0",
-      "word": "0x30005664",
-      "meaning": "Restricted lobby GUI resource pointer low half for GUI\\lobby\\sho_item."
-    },
-    {
-      "address": "0x021bbac4",
-      "word": "0x7f0ac378",
-      "meaning": "Restricted lobby constructor's r24 context argument."
+      "meaning": "Restricted lobby selector 0x07 entry; replaced by a branch into the full-home context code cave."
     }
   ],
   "anchors": [
+    {
+      "address": "0x021bb6c4",
+      "word": "0x480003b4",
+      "meaning": "Selector 0x07 dispatch branch to the restricted lobby path at 0x021bba78."
+    },
+    {
+      "address": "0x021bbe54",
+      "word": "0x281f0001",
+      "meaning": "Existing full-home path guard: r31 must equal 1."
+    },
+    {
+      "address": "0x021bbe5c",
+      "word": "0x41820098",
+      "meaning": "Existing full-home path branch to 0x021bbef4 when r31 equals 1."
+    },
     {
       "address": "0x021bbef4",
       "word": "0x38600300",
@@ -61,19 +51,9 @@
       "meaning": "Home full-item-box constructor call."
     },
     {
-      "address": "0x021bbf14",
-      "word": "0x815b0004",
-      "meaning": "Home full-item-box constructor's r27+4 context argument."
-    },
-    {
       "address": "0x021bbf28",
       "word": "0x300056f4",
       "meaning": "Existing full-home GUI resource pointer low half for GUI\\lobby\\myh_box2_n."
-    },
-    {
-      "address": "0x021bbf2c",
-      "word": "0x93e1000c",
-      "meaning": "Home full-item-box constructor's r31 stack argument."
     }
   ],
   "source": {
@@ -82,5 +62,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "Experimental full construction-path substitution from the restricted lobby item box to the home full-item-box flow."
+  "summary": "Experimental code-cave route from lobby selector 0x07 to the existing full-home item-box path with its required r31=1 context."
 }
