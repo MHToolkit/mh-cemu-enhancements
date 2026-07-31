@@ -14,36 +14,51 @@
   "patch": "patch_lobby_full_item_box.asm",
   "preimages": [
     {
-      "address": "0x021bbac0",
-      "word": "0x39200001",
-      "meaning": "Restricted lobby item-box mode argument: li r9, 1. The pack replaces it with li r9, 0."
+      "address": "0x021bb6c4",
+      "word": "0x480003b4",
+      "meaning": "Selector 0x07 dispatch to the first restricted lobby item-box constructor."
+    },
+    {
+      "address": "0x021bb6c8",
+      "word": "0x48000434",
+      "meaning": "Selector 0x08 dispatch to the alternate restricted lobby item-box constructor."
     }
   ],
   "anchors": [
     {
-      "address": "0x021bb6c4",
-      "word": "0x480003b4",
-      "meaning": "Selector 0x07 dispatch branch to the restricted lobby path at 0x021bba78."
-    },
-    {
       "address": "0x021bba78",
       "word": "0x386002a0",
-      "meaning": "Restricted lobby uIDLobbyShoItemGet allocation begins here."
+      "meaning": "First restricted lobby item-box constructor allocates a 0x2a0-byte object."
     },
     {
-      "address": "0x021bbab0",
-      "word": "0x30005664",
-      "meaning": "Restricted lobby GUI resource pointer low half for GUI\\lobby\\sho_item."
+      "address": "0x021bbafc",
+      "word": "0x386002a0",
+      "meaning": "Alternate restricted lobby item-box constructor also allocates a 0x2a0-byte object."
     },
     {
-      "address": "0x021bbacc",
-      "word": "0x4bfff6c5",
-      "meaning": "Restricted lobby call into the shared UI initializer."
+      "address": "0x021bbe54",
+      "word": "0x281f0001",
+      "meaning": "Home-path guard requires r31 to equal 1."
     },
     {
-      "address": "0x021bb108",
-      "word": "0x53603432",
-      "meaning": "Shared initializer writes the r9-derived mode into the UI object state field."
+      "address": "0x021bbe5c",
+      "word": "0x41820098",
+      "meaning": "The r31 == 1 branch targets the complete home item-box constructor."
+    },
+    {
+      "address": "0x021bbef4",
+      "word": "0x38600300",
+      "meaning": "Complete home item-box constructor allocates a 0x300-byte object."
+    },
+    {
+      "address": "0x021bbf28",
+      "word": "0x300056f4",
+      "meaning": "Complete home item-box GUI resource pointer low half for GUI\\lobby\\myh_box2_n."
+    },
+    {
+      "address": "0x021bbf48",
+      "word": "0x4bfff249",
+      "meaning": "Complete home item-box constructor calls the shared UI initializer."
     }
   ],
   "source": {
@@ -52,5 +67,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "Experimental one-word override of the restricted lobby item-box mode argument, mapped from the matching 3DS Port Tanzia mode flag."
+  "summary": "Experimental dual-selector redirect from both restricted lobby item-box constructors to the existing complete home item-box path with its required r31 = 1 context."
 }

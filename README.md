@@ -43,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.3.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.5.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
@@ -65,7 +65,7 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 ## Compatibility and online use
 
 - The 30 FPS pack uses per-pack `vsyncFrequency = 30`, not a global Cemu setting.
-- The lobby candidate changes the restricted `sho_item` mode argument from `1` to `0`, following the equivalent 3DS Port Tanzia mode-flag semantics. Its exact source word and control-flow anchors are checked before installation. It remains `Runtime Experimental` until an in-game test shows equipment, talismans, and item actions.
+- The lobby candidate redirects both restricted `sho_item` selector entries through a Cemu code cave that establishes the complete home path's required `r31 = 1` context, then enters the game's existing complete home-box constructor. Its exact source words and control-flow anchors are checked before installation. It remains `Runtime Experimental` until an in-game test shows equipment, talismans, and item actions.
 - The quest patch substitutes the supply and delivery menu-resource dispatches with the existing home-box resource. It remains `Runtime Experimental` until isolated gameplay tests prove all actions and quest-state safety.
 - For multiplayer, enable **only Lock 30 FPS**. Leave both box packs disabled.
 - Never enable this JP v96 catalog against another title, region, update, RPX hash, or module checksum.
