@@ -7,7 +7,7 @@
 3. `verify-reference` accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared PPC preimage/anchor.
 4. Cemu 2.6's real `PPCAssembler` accepted all eight red-box instructions and all six new blue-control instructions without launching Cemu. The blue words are `3c601031`, `806344a0`, `7fc4f378`, `38a00000`, `4b92e30d` (`bl 0x021F0A8C` from `0x028C2780`), and `48000074` (`b 0x028C27F8` from `0x028C2784`). The prior red branch words remain `38800000`, `38a0000e`, `3c601031`, `806344a0`, `7fc4f378`, `38a00000`, `4b92e2b9`, and `48000020`.
 5. `ruff check scripts tests` and `git diff --check` passed.
-6. Two independent `0.1.13` package builds produced identical SHA-256 `111cf7e32c6d57adfb20d5ee386fac62e968dc9359575406418d48ef5273c7e3`. The archive has 29 files, includes all four packs, and contains no game asset or tool cache.
+6. Two independent `0.1.13` package builds produced identical SHA-256 values. The archive has 29 files, includes all four packs, and contains no game asset or tool cache; the final post-documentation digest is kept in the adjacent `.sha256` file to avoid embedding a self-referential archive hash in a packaged document.
 
 ## Runtime evidence / 运行时证据
 
@@ -30,19 +30,20 @@ Installed and enabled / 已安装并启用：
 
 - `MH3G HD JP v96 - Lobby Full Item Box`
 - `MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)`
+- `MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)`
 
 Installed but disabled / 已安装但未启用：
 
 - `MH3G HD JP v96 - Lock 30 FPS`
 
-After two fresh zero-process checks, the installer deployed all three catalog packs without changing their saved enable states: 30 FPS remains disabled, while Lobby and Quest remain enabled. The installed new red-box candidate matches repository SHA-256 `a377c2047623494c7bf9fab67d5a3eefc6860b0add9a74cca779c04a497a8dac`; its ASM includes the red-local `0x028C5838 = li r5, 0xe` prompt rewrite. The installed Lobby patch remains SHA-256 `86acd8733dab5aa5ccccc1cf767055a61751da8b7426aaa28502a30849a647e5`. A pre-edit settings backup exists at:
+After fresh zero-process checks before installation and settings mutation, the installer deployed all four catalog packs. It preserved the existing Lobby/Red enabled states and the disabled 30 FPS state; one exact `GraphicPack/Entry` was then added to enable only the new blue control. Repository and installed blue ASM both have SHA-256 `b021fc787469709ce696a5641c19255d161d24da0868243ef8f82923f54d073d`. The receipt records all four pack IDs and reference RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`. The pre-edit settings backup is:
 
 ```text
-/Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-red-box-20260801T170000
+/Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-blue-box-20260801T202514
 ```
 
-No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
+The backup SHA-256 is `91d1152275911cc15f09e37f13147de830f0337ff30abb06d29c6eecdc6e6a53`; the post-edit XML parses successfully and has SHA-256 `4d3358a3b6011e558bc5da64310147a7de066d3dca2013cb0332bf50a7b1ba0a`. Final read-only inspection reports all four packs installed, Lobby/Red/Blue enabled, and 30 FPS disabled. No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
 
 ## Distribution / 分发
 
-`dist/mh-cemu-enhancements-0.1.13.zip` is deterministic, contains all four catalog packs and no game asset or tool cache, and has adjacent SHA-256 file `dist/mh-cemu-enhancements-0.1.13.zip.sha256` containing `111cf7e32c6d57adfb20d5ee386fac62e968dc9359575406418d48ef5273c7e3`.
+`dist/mh-cemu-enhancements-0.1.13.zip` is deterministic, contains all four catalog packs and no game asset or tool cache, and has adjacent SHA-256 file `dist/mh-cemu-enhancements-0.1.13.zip.sha256` containing the final digest.
