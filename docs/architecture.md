@@ -14,6 +14,7 @@ packs/
         fps-lock-30/
         lobby-full-item-box/
         quest-delivery-full-item-box-experimental/
+        quest-blue-supply-box-full-item-box-control/
 ```
 
 The platform, canonical title, region, and update/version are path components, not repository-level assumptions. A future `mh4u-hd`, non-Monster-Hunter title, or another region can add its own platform/title/version leaf without changing the public scripts or schemas.
@@ -39,5 +40,6 @@ The platform, canonical title, region, and update/version are path components, n
 - The 30 FPS pack changes Cemu's per-pack `vsyncFrequency`; it does not write Cemu global settings.
 - Box work targets interaction/menu dispatch classes, never save contents or a visible chest model.
 - PPC patches may not install against a mismatching checksum or preimage/target anchor.
-- The red quest-delivery-box feature is Experimental and default-off; its blue supply-box sibling is outside the patch scope.
-- For online play, leave both box packs disabled. The 30 FPS pack is also default-off while its instability is unresolved.
+- The red quest-delivery-box feature is Experimental and default-off; its patch scope excludes the original blue branch.
+- The independent blue quest control is also Experimental and default-off. While enabled, it replaces only the shared all-quest blue confirmation block; it does not add boxes to quests or alter red, resources, prompts, models, maps, or quest data.
+- For online play, leave all item-box modification packs disabled. The 30 FPS pack is also default-off while its instability is unresolved.

@@ -11,10 +11,11 @@ It distributes no RPX, RPL, WUA, save, MLC, key, texture dump, or other game ass
 | Lock 30 FPS | `Runtime Experimental` | no | independent |
 | Lobby full item box | `Runtime Verified` | no | independent |
 | Quest red delivery box -> full item box | `Runtime Experimental` | no | independent |
+| Quest blue supply box -> full item box (control) | `Runtime Experimental` | no | independent |
 
 Target identity: Wii U title `0005000010104D00`, Japan update v96, RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`, Cemu patch module checksum `0x348600a0`.
 
-`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable, and the quest red-box redirect still awaits gameplay validation. All three packs remain opt-in by default.
+`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable, and repeated gameplay tests still showed an unusable crossed prompt on the quest red box. The new all-quest blue supply-box control remains gameplay-pending. All four packs remain opt-in by default.
 
 ## Validate and install
 
@@ -40,14 +41,21 @@ python3 scripts/mh-cemu-enhancements.py install \
   --pack mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental \
   --include-experimental
 
+# Explicitly install the all-quest blue supply-box control.
+python3 scripts/mh-cemu-enhancements.py install \
+  --cemu-root /absolute/path/to/cemu-data-root \
+  --reference-rpx /absolute/path/to/MH3G_Cafe.rpx \
+  --pack mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control \
+  --include-experimental
+
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.12.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.13.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
 
-`inspect` is read-only: it reports the resolved Graphic Pack directory, the applicable settings file, each pack's installation status, and its saved Cemu enable state. After installation, enable each desired pack in Cemu's Graphic Packs UI. The installer never changes Cemu's saved enable/disable choices, which keeps all three switches independent.
+`inspect` is read-only: it reports the resolved Graphic Pack directory, the applicable settings file, each pack's installation status, and its saved Cemu enable state. After installation, enable each desired pack in Cemu's Graphic Packs UI. The installer never changes Cemu's saved enable/disable choices, which keeps all four switches independent.
 
 ### macOS isolated profile launch
 
@@ -59,15 +67,16 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
   --cemu-app /absolute/path/Cemu.app
 ```
 
-Run the printed command manually, then open **Graphic Packs**, select the desired independent switches, and restart/reload the title. Keep the quest red-box experiment out of normal and multiplayer play; also leave 30 FPS disabled until its instability is understood.
+Run the printed command manually, then open **Graphic Packs**, select the desired independent switches, and restart/reload the title. Keep both quest-box experiments out of normal and multiplayer play; also leave 30 FPS disabled until its instability is understood.
 
 ## Compatibility and online use
 
 - The 30 FPS pack uses per-pack `vsyncFrequency = 30`, not a global Cemu setting. User testing was unstable, so it is default-off `Runtime Experimental`.
 - The lobby pack changes one Port Tanzia interaction instruction from restricted mode `r5 = 1` to full mode `r5 = 0` at shared initializer `0x021F0A8C`. It redirects no object and uses no branch or code cave. User gameplay verified the complete menu plus equipment, equipment-set, and talisman actions, so it is `Runtime Verified` while remaining opt-in.
 - The quest pack changes only the **red delivery box**. At `0x028C5824`, it uses supply eligibility selector `0` so the red-local prompt registration is not skipped in active quest states `5/7`; at `0x028C5838`, that same red-local call uses supply prompt selector `14` instead of the delivery-only crossed selector `15`. Static tracing proves this selector is resolved only to prompt visual/text and is not retained as the confirmation action. The red-only block at `0x028C27C4..0x028C27D8` therefore remains responsible for opening full item-box mode. The blue box's own registration, dispatch, and `GUI\\quest\\box` resource remain untouched; neither resource is replaced. It remains default-off `Runtime Experimental` pending gameplay validation.
-- Cemu displays independent leaves as `MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`, `Lobby Full Item Box`, and `Quest Red Delivery Box -> Full Item Box (Experimental)`.
-- Leave both box packs disabled for multiplayer. The 30 FPS pack is also not recommended until its instability is resolved.
+- The blue control pack covers every quest that already contains a blue supply box because all such boxes enter the shared selector-0 branch. It rewrites only `0x028C2770..0x028C2784` to call full item-box initializer `0x021F0A8C` in mode `0`, then rejoins at `0x028C27F8`. It does not change box resources, prompts, models, quest IDs, maps, or the red branch. This is a default-off `Runtime Experimental` control: blue success isolates the remaining fault to red object/action registration, while blue failure points to missing quest UI context.
+- Cemu displays independent leaves as `MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`, `Lobby Full Item Box`, `Quest Red Delivery Box -> Full Item Box (Experimental)`, and `Quest Blue Supply Box -> Full Item Box (Control)`.
+- Leave all item-box modification packs disabled for multiplayer. The 30 FPS pack is also not recommended until its instability is resolved.
 - Never enable this JP v96 catalog against another title, region, update, RPX hash, or module checksum.
 
 ## Evidence and format

@@ -102,6 +102,34 @@ The second runtime test confirmed that Cemu loaded that revision, yet red still 
 
 The eligibility and prompt rewrites are both inside the red-only world-object function. The in-place confirmation rewrite then calls the already-proven full item-box initializer with the current player in `r4` and full mode `r5 = 0`, skips delivery-only flag writes, and rejoins common cleanup. It uses no code cave and writes neither `0x021B0E90` nor `0x021B0F14`. The pack remains **Runtime Experimental / 运行时实验** and default-off until gameplay proves the red box, the unchanged blue box, menu exit/re-entry, and quest completion flow.
 
+### All-quest blue supply-box control (Experimental / 全任务蓝箱对照实验)
+
+Repeated gameplay still showed the crossed, unusable prompt on the patched red box. The next candidate is therefore a separate control on the already-usable blue supply box. Every quest blue box reaches the same selector-0 dispatch at `0x028C5E78` and falls through the shared interaction function into `0x028C2770`; there is no quest-ID or map-specific branch in this route. The control consequently covers every quest that already contains a blue supply box, while quests without one remain unchanged.
+
+红箱补丁经过多次实测仍显示带叉且不可用的提示，因此下一个候选改为独立的蓝箱对照。所有任务蓝箱统一从 `0x028C5E78` 以选择器 `0` 进入共享交互函数，并落入 `0x028C2770`；该路径没有任务 ID 或地图白名单。因此，对照包覆盖所有本来存在蓝色补给箱的任务，但不会向没有蓝箱的任务新增对象。
+
+| Role / 作用 | Address | Original word | Replacement / 目标 |
+| --- | --- | --- | --- |
+| Blue object state load / 蓝箱对象状态读取 | `0x028c2770` | `0x819e0e30` | `lis r3, 0x1031` |
+| Quest-global high / 原任务全局地址高位 | `0x028c2774` | `0x3d601008` | `lwz r3, 0x44a0(r3)` |
+| Supply state value / 原补给状态值 | `0x028c2778` | `0x39000001` | `mr r4, r30` |
+| Supply float state / 原补给浮点状态 | `0x028c277c` | `0xc00be204` | `li r5, 0` |
+| Supply mode argument / 原补给模式参数 | `0x028c2780` | `0x38800000` | `bl 0x021f0a8c` |
+| Supply state-byte store / 原补给状态字节写入 | `0x028c2784` | `0x990c0bae` | `b 0x028c27f8` |
+
+```asm
+0x028c2770 = lis r3, 0x1031
+0x028c2774 = lwz r3, 0x44a0(r3)
+0x028c2778 = mr r4, r30
+0x028c277c = li r5, 0
+0x028c2780 = bl 0x021f0a8c
+0x028c2784 = b 0x028c27f8
+```
+
+The rewrite calls the gameplay-proven item-box initializer with current player `r30` and full mode `0`, then rejoins common cleanup at `0x028C27F8`. The red branch starts separately at `0x028C27B4`, so both packs write disjoint addresses. The control uses no code cave and does not touch resource words `0x021B0E90`/`0x021B0F14`, prompt IDs `14`/`15`, object registration, models, maps, quest data, WUA, RPX, MLC, or save data.
+
+If blue opens the full menu, the initializer is viable inside quest UI context and the red failure is isolated to red object/action registration or state mapping. If blue also fails, further box-ID substitution is not justified; the next investigation must trace quest UI construction, owning state objects, and context dependencies. Until gameplay decides that control, this fourth pack remains default-off **Runtime Experimental / 运行时实验** and is not recommended for multiplayer.
+
 ## Runtime validation gate
 
 No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`; the quest red-box pack still requires the exact manifest identity, Cemu version, title update, RPX SHA-256, module checksum, enabled-pack set, red/blue box results, exit/re-entry, and quest completion outcome. Do not test the Experimental quest pack in multiplayer. The 30 FPS pack is also experimental after unstable user testing.
