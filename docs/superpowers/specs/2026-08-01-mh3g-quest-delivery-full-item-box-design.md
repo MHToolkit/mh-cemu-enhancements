@@ -40,8 +40,8 @@ No code cave is used. Neither the blue resource word at `0x021B0E90` nor the red
 
 ## 验证边界 / Verification boundary
 
-- 静态验证：精确 RPX SHA、`moduleMatches`、七个 preimage、资格函数与周边蓝/红分派锚点、PPCAssembler、仓库测试和可复现打包。
+- 静态验证：精确 RPX SHA、`moduleMatches`、八个 preimage、资格/提示函数与周边蓝/红分派锚点、PPCAssembler、仓库测试和可复现打包。
 - 运行时状态：安装后仍标记 `Runtime Experimental`，直到用户在任务中实测红箱、蓝箱以及退出/返回流程。
 
-- Static verification: exact RPX SHA, `moduleMatches`, seven preimages, eligibility-function and nearby blue/red dispatch anchors, PPCAssembler, repository tests, and reproducible packaging.
+- Static verification: exact RPX SHA, `moduleMatches`, eight preimages, eligibility/prompt-function and nearby blue/red dispatch anchors, PPCAssembler, repository tests, and reproducible packaging.
 - Runtime status remains `Runtime Experimental` after installation until gameplay confirms the red box, blue box, and exit/re-entry flows.

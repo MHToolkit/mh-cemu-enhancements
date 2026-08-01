@@ -20,6 +20,11 @@
       "meaning": "红箱提示生成原本使用交纳箱资格参数 1；补丁改用补给箱资格参数 0，使任务进行状态下仍可注册交互。 / Red prompt generation originally uses delivery eligibility 1; the patch uses supply eligibility 0 so interaction remains registered during active quest states."
     },
     {
+      "address": "0x028c5838",
+      "word": "0x38a0000f",
+      "meaning": "红箱原本注册交纳提示编号 15；补丁仅在红箱局部改用补给提示编号 14，以消除交纳专用红叉。 / Red originally registers delivery prompt ID 15; the patch locally uses supply prompt ID 14 for red so the delivery-only crossed prompt is removed."
+    },
+    {
       "address": "0x028c27c4",
       "word": "0x3fe01031",
       "meaning": "红色交纳箱路径加载交纳数据管理器地址的高半部。 / Red delivery path loads the delivery-data manager address high half."
@@ -51,6 +56,36 @@
     }
   ],
   "anchors": [
+    {
+      "address": "0x020f0628",
+      "word": "0x7cbd2b78",
+      "meaning": "提示构建器只把调用参数 r5 保存为本地提示资源编号。 / The prompt builder saves call argument r5 only as its local prompt-resource selector."
+    },
+    {
+      "address": "0x020f0698",
+      "word": "0x7fa5eb78",
+      "meaning": "模式 1 路径把该编号传给提示图文查询。 / Prompt mode 1 passes that selector to the prompt visual/text lookup."
+    },
+    {
+      "address": "0x020f069c",
+      "word": "0x38800002",
+      "meaning": "查询类型固定为提示图文类型 2。 / The lookup type is fixed to prompt visual/text type 2."
+    },
+    {
+      "address": "0x020f06a0",
+      "word": "0x4e800421",
+      "meaning": "虚调用返回编号对应的提示图文。 / The virtual lookup returns the visual/text associated with that selector."
+    },
+    {
+      "address": "0x020f06b8",
+      "word": "0x38a10008",
+      "meaning": "后续注册传入已解析的提示图文，而非原始编号。 / Subsequent registration receives the resolved prompt visual/text, not the original selector."
+    },
+    {
+      "address": "0x020f06c4",
+      "word": "0x4bfffef1",
+      "meaning": "提示条目由已解析图文创建，确认动作仍由对象状态机独立分派。 / The prompt entry is created from the resolved visual/text; confirmation remains independently dispatched by the object state machine."
+    },
     {
       "address": "0x0216b410",
       "word": "0x2c000008",
@@ -147,14 +182,14 @@
       "meaning": "非零资格结果会跳过红箱交互注册。 / A nonzero eligibility result skips red-box interaction registration."
     },
     {
-      "address": "0x028c5838",
-      "word": "0x38a0000f",
-      "meaning": "红箱保留专属交互编号 15，避免改写蓝箱行为。 / The red box retains interaction ID 15 so blue-box behavior is not rewritten."
+      "address": "0x028c583c",
+      "word": "0x38800001",
+      "meaning": "红箱继续使用与蓝箱相同的提示构建模式 1；只替换其本地提示编号。 / Red keeps the same prompt-builder mode 1 as blue; only its local prompt selector is replaced."
     },
     {
       "address": "0x028c5844",
       "word": "0x4bfcc8c1",
-      "meaning": "通过资格门后注册红箱专属交互。 / The red-only interaction is registered after the eligibility gate passes."
+      "meaning": "通过资格门后，红箱自己的调用点注册提示；蓝箱调用点不受影响。 / After the eligibility gate, the red-local call site registers the prompt; the blue call site is unaffected."
     },
     {
       "address": "0x028c5e78",
@@ -183,5 +218,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "红箱改用补给箱资格判定后重定向到模式 0 的完整道具箱；蓝色补给箱与交互编号保持原版。 / The red box uses supply-box eligibility before redirecting to full item-box mode 0; the blue supply box and its interaction ID stay original."
+  "summary": "红箱局部改用补给资格与提示后重定向到模式 0 的完整道具箱；蓝色补给箱保持原版。 / The red box locally uses supply eligibility and prompt semantics before redirecting to full item-box mode 0; the blue supply box stays original."
 }

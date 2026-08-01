@@ -81,13 +81,18 @@ Static cross-references expose two tail-dispatch stubs into shared interaction f
 
 静态交叉引用证明，共用交互函数 `0x028C26F0` 有两个尾分派入口：`0x028C5E78` 为蓝箱传 `r4 = 0`，`0x028C5E80` 为红箱传 `r4 = 1`。函数在 `0x028C2768` 比较该标志；只有非零的红箱路径进入 `0x028C27B4`，并在 `0x028C27CC` / `0x028C27D4` 构建交纳清单和交纳菜单。
 
-首次运行时测试显示红箱上方为带叉提示且无法进入上述确认分支，证明仅修改确认回调仍然太晚。向前回溯到 `0x028C5824`：红箱提示生成先以 `r4 = 1` 调用共用资格函数 `0x0216B3FC`。该函数在任务进行状态 `5/7` 比较这个参数；`1` 返回 `-1` 并让 `0x028C5830` 跳过红箱交互编号 `15` 的注册，而补给语义参数 `0` 返回允许值 `0`。因此新增的一字修复只把 `0x028C5824` 改为 `li r4, 0`。红箱仍使用独立编号 `15` 进入后续完整道具箱回调，蓝箱编号 `14` 及其行为不变。
+首次运行时测试显示红箱上方为带叉提示且无法进入上述确认分支，证明仅修改确认回调仍然太晚。向前回溯到 `0x028C5824`：红箱提示生成先以 `r4 = 1` 调用共用资格函数 `0x0216B3FC`。该函数在任务进行状态 `5/7` 比较这个参数；`1` 返回 `-1` 并让 `0x028C5830` 跳过提示注册，而补给语义参数 `0` 返回允许值 `0`。首个修订候选据此把 `0x028C5824` 改为 `li r4, 0`。
 
-The first runtime test showed a crossed red-box prompt and never reached the patched confirmation block, proving that confirmation-time redirection alone was too late. Backward tracing reaches `0x028C5824`, where red prompt generation calls shared eligibility function `0x0216B3FC` with `r4 = 1`. In active quest states `5/7`, selector `1` returns `-1`, causing `0x028C5830` to skip registration of red interaction ID `15`; supply selector `0` returns allowed value `0`. The added one-word fix therefore changes only `0x028C5824` to `li r4, 0`. Red keeps ID `15` for the later full-box callback, while blue ID `14` and its behavior remain unchanged.
+The first runtime test showed a crossed red-box prompt and never reached the patched confirmation block, proving that confirmation-time redirection alone was too late. Backward tracing reaches `0x028C5824`, where red prompt generation calls shared eligibility function `0x0216B3FC` with `r4 = 1`. In active quest states `5/7`, selector `1` returns `-1`, causing `0x028C5830` to skip prompt registration; supply selector `0` returns allowed value `0`. The first revised candidate therefore changed `0x028C5824` to `li r4, 0`.
+
+第二次运行时测试确认该修订补丁已由 Cemu 加载，但红箱仍显示红叉。这否定了“资格参数同时决定提示内容”的假设：资格参数只让代码到达 `0x028C5838`，而该处仍明确传入交纳提示编号 `15`。继续追入 `0x020F060C` 可见，参数 `r5` 仅在 `0x020F0698..0x020F06A0` 用于查询提示图文；从 `0x020F06B8` 起，注册器只接收查询结果，不再保留原始编号。因此新候选只在红箱自己的调用点把 `0x028C5838` 改为补给提示编号 `14`；这会替换红叉提示，却不会把蓝箱对象、蓝箱调用点或红箱后续确认分支改掉。
+
+The second runtime test confirmed that Cemu loaded that revision, yet red still displayed the crossed prompt. This disproves the assumption that the eligibility selector also controls prompt content: it only allows execution to reach `0x028C5838`, which still explicitly passes delivery prompt selector `15`. Tracing into `0x020F060C` shows that argument `r5` is used only at `0x020F0698..0x020F06A0` to resolve prompt visual/text; from `0x020F06B8` onward, registration receives only the resolved result and does not retain the original selector. The new candidate therefore changes only the red-local `0x028C5838` to supply prompt selector `14`. This replaces the crossed prompt without modifying the blue object, the blue call site, or the red confirmation branch.
 
 | Role / 作用 | Address | Original word | Replacement / 目标 |
 | --- | --- | --- | --- |
 | Red eligibility selector / 红箱资格参数 | `0x028c5824` | `0x38800001` | `li r4, 0` |
+| Red-local prompt selector / 红箱局部提示编号 | `0x028c5838` | `0x38a0000f` | `li r5, 0xe` |
 | UI manager high / UI 管理器高位 | `0x028c27c4` | `0x3fe01031` | `lis r3, 0x1031` |
 | UI manager load / UI 管理器读取 | `0x028c27c8` | `0x807f507c` | `lwz r3, 0x44a0(r3)` |
 | Delivery prepare call / 原交纳准备调用 | `0x028c27cc` | `0x4b8b75f1` | `mr r4, r30` |
@@ -95,7 +100,7 @@ The first runtime test showed a crossed red-box prompt and never reached the pat
 | Delivery menu call / 原交纳菜单调用 | `0x028c27d4` | `0x4b8b742d` | `bl 0x021f0a8c` |
 | Delivery result test / 原交纳结果检查 | `0x028c27d8` | `0x2c030000` | `b 0x028c27f8` |
 
-The eligibility rewrite gives only the red object supply-box availability semantics; the in-place confirmation rewrite then calls the already-proven full item-box initializer with the current player in `r4` and full mode `r5 = 0`, skips delivery-only flag writes, and rejoins common cleanup. It uses no code cave and writes neither `0x021B0E90` nor `0x021B0F14`. The pack remains **Runtime Experimental / 运行时实验** and default-off until gameplay proves the red box, the unchanged blue box, menu exit/re-entry, and quest completion flow.
+The eligibility and prompt rewrites are both inside the red-only world-object function. The in-place confirmation rewrite then calls the already-proven full item-box initializer with the current player in `r4` and full mode `r5 = 0`, skips delivery-only flag writes, and rejoins common cleanup. It uses no code cave and writes neither `0x021B0E90` nor `0x021B0F14`. The pack remains **Runtime Experimental / 运行时实验** and default-off until gameplay proves the red box, the unchanged blue box, menu exit/re-entry, and quest completion flow.
 
 ## Runtime validation gate
 
