@@ -14,13 +14,13 @@ The user confirmed that the 30 FPS switch took effect with the JP v96 title, so 
 
 The later accessor candidate also failed in gameplay: the live log proved the Lobby leaf was enabled and applied, but the screenshot still showed the restricted three-option menu. Cross-architecture follow-up decompressed the complete 3DS `.code` to the pinned expected SHA-256, mapped ARM initializer `0x005DEC70` to PPC initializer `0x021F0A8C` by matching mode storage and the `mode == 1 ? 3 : 6` state transition, and found the exact sibling PPC callers. The complete path passes `r5 = 0` at `0x027995F8`; the Port restricted path passes `r5 = 1` at `0x02799678`. The new one-word candidate changes only the latter to `li r5, 0`; no object redirect, code cave, or branch is used.
 
-After a zero-Cemu-process check, the installer placed the FPS and lobby packs into the user's normal Cemu profile used by an `-m`-only launch:
+After a zero-Cemu-process check, the installer placed the current `0.1.9` FPS and restricted-mode-override Lobby packs into the user's normal Cemu profile used by an `-m`-only launch:
 
 ```text
 /Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements/
 ```
 
-The receipt contains both pack tree hashes. XML parsing and catalog inspection confirm that FPS and Lobby are installed but retain their existing disabled settings entries; the quest experiment is neither installed nor enabled. The installer writes only `graphicPacks/mh-cemu-enhancements` and never accesses MLC/save paths.
+The receipt contains both pack tree hashes. XML parsing and catalog inspection confirm that FPS is installed and disabled, Lobby is installed and enabled, and the quest experiment is neither installed nor enabled. The installed Lobby patch contains `0x02799678 = li r5, 0` and has the same SHA-256 (`86acd8733dab5aa5ccccc1cf767055a61751da8b7426aaa28502a30849a647e5`) as the repository source. The installer writes only `graphicPacks/mh-cemu-enhancements` and never accesses MLC/save paths.
 
 ## Profile-path RCA (2026-07-30)
 
