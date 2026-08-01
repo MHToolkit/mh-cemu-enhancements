@@ -8,59 +8,63 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
-  "availability": "runtime-blocked",
-  "availability_reason": "Cemu 2.6 macOS runtime crash: the dual-selector code-cave candidate caused SIGBUS/EXC_BAD_ACCESS in PPCRecompiler before gameplay. Do not install pending GDB selector tracing.",
+  "availability": "available",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box",
   "install_folder": "MH3G HD JP v96 - Lobby Full Item Box",
   "rules": "rules.txt",
   "patch": "patch_lobby_full_item_box.asm",
   "preimages": [
     {
-      "address": "0x021bb6c4",
-      "word": "0x480003b4",
-      "meaning": "Selector 0x07 dispatch to the first restricted lobby item-box constructor."
-    },
-    {
-      "address": "0x021bb6c8",
-      "word": "0x48000434",
-      "meaning": "Selector 0x08 dispatch to the alternate restricted lobby item-box constructor."
+      "address": "0x021baff4",
+      "word": "0x806300b4",
+      "meaning": "IDLobby accessor returns the restricted selector-0x08 object from slot +0xB4 for logical UI ID 0x17."
     }
   ],
   "anchors": [
     {
-      "address": "0x021bba78",
-      "word": "0x386002a0",
-      "meaning": "First restricted lobby item-box constructor allocates a 0x2a0-byte object."
+      "address": "0x021b2af0",
+      "word": "0x38800008",
+      "meaning": "IDLobby initialization requests restricted factory selector 0x08."
     },
     {
-      "address": "0x021bbafc",
-      "word": "0x386002a0",
-      "meaning": "Alternate restricted lobby item-box constructor also allocates a 0x2a0-byte object."
+      "address": "0x021b2b00",
+      "word": "0x907f00b4",
+      "meaning": "The selector-0x08 restricted object is stored in IDLobby slot +0xB4."
     },
     {
-      "address": "0x021bbe54",
-      "word": "0x281f0001",
-      "meaning": "Home-path guard requires r31 to equal 1."
+      "address": "0x021b2bd0",
+      "word": "0x3880000e",
+      "meaning": "IDLobby initialization requests complete-home factory selector 0x0E."
     },
     {
-      "address": "0x021bbe5c",
-      "word": "0x41820098",
-      "meaning": "The r31 == 1 branch targets the complete home item-box constructor."
+      "address": "0x021b2be0",
+      "word": "0x907f00a8",
+      "meaning": "The selector-0x0E complete-home object is stored in IDLobby slot +0xA8."
     },
     {
-      "address": "0x021bbef4",
-      "word": "0x38600300",
-      "meaning": "Complete home item-box constructor allocates a 0x300-byte object."
+      "address": "0x021b2c78",
+      "word": "0x38800007",
+      "meaning": "IDLobby initialization requests the alternate restricted factory selector 0x07."
     },
     {
-      "address": "0x021bbf28",
-      "word": "0x300056f4",
-      "meaning": "Complete home item-box GUI resource pointer low half for GUI\\lobby\\myh_box2_n."
+      "address": "0x021b2c88",
+      "word": "0x907f00c4",
+      "meaning": "The selector-0x07 restricted object is stored in IDLobby slot +0xC4."
     },
     {
-      "address": "0x021bbf48",
-      "word": "0x4bfff249",
-      "meaning": "Complete home item-box constructor calls the shared UI initializer."
+      "address": "0x021bafa4",
+      "word": "0x28040017",
+      "meaning": "IDLobby accessor compares the requested logical UI ID with 0x17."
+    },
+    {
+      "address": "0x021bafa8",
+      "word": "0x4182003c",
+      "meaning": "Logical UI ID 0x17 branches to the restricted-slot return block at 0x021BAFE4."
+    },
+    {
+      "address": "0x021baff8",
+      "word": "0x4e800020",
+      "meaning": "The selected object is returned directly to the interaction caller."
     }
   ],
   "source": {
@@ -69,5 +73,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "Retracted dual-selector code-cave candidate. It remains retained only as crash evidence and is runtime-blocked pending GDB selector tracing."
+  "summary": "Experimental no-code-cave redirect: logical lobby UI ID 0x17 returns the already-created complete-home object from IDLobby slot +0xA8 instead of the restricted object at +0xB4."
 }

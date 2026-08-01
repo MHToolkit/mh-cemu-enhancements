@@ -47,33 +47,28 @@ The supplied Bilibili URL (`BV1XC4y1q74u`) could not be retrieved by the static 
 
 All instruction words below are big-endian words from the immutable RPX text section. The installer verifies the RPX SHA-256 and every source/anchor word before copying a PPC pack; Cemu additionally gates the patch group with `moduleMatches = 0x348600a0`.
 
-### Lobby restricted-box selector redirect (Experimental)
+### Lobby restricted-object accessor redirect (Experimental)
 
 The earlier branch, six-site substitution, full-home code-cave, and 3DS-informed `r9` candidates all loaded in Cemu while the restricted three-option menu remained. They are superseded and are not gameplay success. The valid 3DS reference supplied for Port Tanzia changes `0x008EA6D0` from ARM `0xE3A02001` (`MOV r2, #1`) to `0xE3A02000` (`MOV r2, #0`), but that ARM register cannot be mapped to a PPC register by position. The latest in-game screenshot proves that the PPC `li r9, 0` candidate also did not alter the menu.
 
-The PPC comparison explains why: both the first restricted path and the complete home path pass `r9 = 1` into their shared initializer. It is not the menu-class selector. The actual UI factory dispatch uses its `r4` selector as a jump-table index: selector `0x07` enters the first 0x2a0-byte restricted constructor and selector `0x08` enters the alternate 0x2a0-byte restricted constructor. The complete home handler tests `r31 == 1` and then enters the 0x300-byte home constructor at `0x021bbef4`.
+The PPC comparison explains why: both the first restricted path and the complete home path pass `r9 = 1` into their shared initializer. It is not the menu-class selector. The factory selectors also run while `sID::IDLobby` initializes its resident UI objects, not when the player opens a box. Redirecting those factory branches changed the object layout and the dual-selector code-cave candidate crashed Cemu before gameplay.
 
-| Role | Address | Original big-endian word | Candidate evidence / replacement |
+The correct layer is the `sID::IDLobby` virtual accessor at `0x021baf70` (vtable entry `+0x4c`). Initialization creates the selector-`0x08` restricted object in slot `+0xb4`, the selector-`0x0e` complete-home object in slot `+0xa8`, and the alternate selector-`0x07` restricted object in slot `+0xc4`. When the accessor receives logical UI ID `0x17`, its only object-return instruction is `0x021baff4 = lwz r3, 0xb4(r3)`. The replacement changes only that D-form displacement to `+0xa8`.
+
+| Role | Address | Original big-endian word | Evidence / replacement |
 | --- | --- | --- | --- |
-| First restricted selector | `0x021bb6c4` | `0x480003b4` | Selector `0x07` branches to `0x021bba78` |
-| Alternate restricted selector | `0x021bb6c8` | `0x48000434` | Selector `0x08` branches to `0x021bbafc` |
-| Restricted constructors | `0x021bba78`, `0x021bbafc` | `0x386002a0` | Both construct 0x2a0-byte restricted UI objects |
-| Home guard | `0x021bbe54` | `0x281f0001` | Full home route requires `r31 == 1` |
-| Home branch | `0x021bbe5c` | `0x41820098` | Required context branches to `0x021bbef4` |
-| Home constructor | `0x021bbef4` | `0x38600300` | Constructs the 0x300-byte full home UI object |
-| Home resource | `0x021bbf28` | `0x300056f4` | `GUI\\lobby\\myh_box2_n` |
+| Restricted slot `+0xb4` | `0x021b2af0`, `0x021b2b00` | `li r4, 0x08`; `stw r3, 0xb4(r31)` | Factory selector `0x08` is created once and stored |
+| Complete-home slot `+0xa8` | `0x021b2bd0`, `0x021b2be0` | `li r4, 0x0e`; `stw r3, 0xa8(r31)` | Complete-home object is already resident |
+| Alternate restricted slot `+0xc4` | `0x021b2c78`, `0x021b2c88` | `li r4, 0x07`; `stw r3, 0xc4(r31)` | Alternate restricted object remains untouched |
+| Logical-ID guard | `0x021bafa4`, `0x021bafa8` | `cmplwi r4, 0x17`; `beq 0x021bafe4` | Isolates the requested lobby interaction path |
+| Restricted-object return | `0x021baff4` | `0x806300b4` | Replace with `0x806300a8` (`lwz r3, 0xa8(r3)`) |
+| Return anchor | `0x021baff8` | `0x4e800020` | Returns the selected resident object directly |
 
 ```asm
-0x021bb6c4 = b lobby_full_box_entry
-0x021bb6c8 = b lobby_full_box_entry
-
-.origin = codecave
-lobby_full_box_entry:
-li r31, 1
-b 0x021bbef4
+0x021baff4 = lwz r3, 0x00a8(r3)
 ```
 
-This redirects both verified restricted selectors to the existing complete home UI construction sequence; it does not change the physical chest model or save data. It is now **retracted**: the Cemu 2.6 macOS runtime applied it with code cave `0x01800000-0x01800008`, then crashed before gameplay with `SIGBUS` / `EXC_BAD_ACCESS` at guest `0x017ffffc`, in the `PPCRecompiler` thread. The code cave must not be reused. The next candidate requires a runtime GDB trace of the original dispatcher call context, then a non-code-cave patch only if that trace proves a safe source instruction.
+This does not construct a different object, alter the physical chest model, or touch save data. It reuses the complete-home object that the unmodified game already created and changes only the object selected for logical UI ID `0x17`. The candidate is **Runtime Experimental**, default-off, and available only through explicit experimental opt-in until in-game evidence proves equipment, talismans, deposit/withdrawal, combine/sell, and clean restart behavior.
 
 ### Quest supply/delivery -> home resource dispatch (Experimental)
 

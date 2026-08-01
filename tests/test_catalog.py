@@ -132,6 +132,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
+                "mh3g-hd-jp-v96-lobby-full-item-box",
                 "mh3g-hd-jp-v96-quest-full-item-box-experimental",
             },
             {pack["id"] for pack in selected},
@@ -145,49 +146,50 @@ class CatalogTests(unittest.TestCase):
                 ["mh3g-hd-jp-v96-lobby-full-item-box"],
                 include_experimental=False,
             )
-        with self.assertRaisesRegex(ValueError, "runtime-blocked"):
-            self.tool.select_packs(
-                result.packs,
-                ["mh3g-hd-jp-v96-lobby-full-item-box"],
-                include_experimental=True,
-            )
+        selected = self.tool.select_packs(
+            result.packs,
+            ["mh3g-hd-jp-v96-lobby-full-item-box"],
+            include_experimental=True,
+        )
+        self.assertEqual(
+            {"mh3g-hd-jp-v96-lobby-full-item-box"},
+            {pack["id"] for pack in selected},
+        )
 
-    def test_lobby_candidate_is_experimental_and_redirects_both_restricted_selectors(self):
+    def test_lobby_candidate_redirects_restricted_accessor_without_a_code_cave(self):
         result = self.tool.validate_repository(REPO)
         lobby = next(pack for pack in result.packs if pack["id"] == "mh3g-hd-jp-v96-lobby-full-item-box")
 
         self.assertEqual("Runtime Experimental", lobby["status"])
         self.assertFalse(lobby["default_install"])
-        self.assertEqual("runtime-blocked", lobby["availability"])
+        self.assertEqual("available", lobby["availability"])
         self.assertEqual(
             {"mh3g-hd-jp-v96-fps-lock-30"},
             {pack["id"] for pack in self.tool.select_packs(result.packs, [], include_experimental=False)},
         )
         self.assertEqual(
             {
-                0x021BB6C4: 0x480003B4,
-                0x021BB6C8: 0x48000434,
+                0x021BAFF4: 0x806300B4,
             },
             {self.tool._number(item["address"]): self.tool._number(item["word"]) for item in lobby["preimages"]},
         )
         self.assertEqual(
             {
-                0x021BBA78: 0x386002A0,
-                0x021BBAFC: 0x386002A0,
-                0x021BBE54: 0x281F0001,
-                0x021BBE5C: 0x41820098,
-                0x021BBEF4: 0x38600300,
-                0x021BBF28: 0x300056F4,
-                0x021BBF48: 0x4BFFF249,
+                0x021B2AF0: 0x38800008,
+                0x021B2B00: 0x907F00B4,
+                0x021B2BD0: 0x3880000E,
+                0x021B2BE0: 0x907F00A8,
+                0x021B2C78: 0x38800007,
+                0x021B2C88: 0x907F00C4,
+                0x021BAFA4: 0x28040017,
+                0x021BAFA8: 0x4182003C,
+                0x021BAFF8: 0x4E800020,
             },
             {self.tool._number(item["address"]): self.tool._number(item["word"]) for item in lobby["anchors"]},
         )
         patch = (REPO / lobby["pack_dir"] / lobby["patch"]).read_text()
-        self.assertIn("0x021bb6c4 = b lobby_full_box_entry", patch)
-        self.assertIn("0x021bb6c8 = b lobby_full_box_entry", patch)
-        self.assertIn(".origin = codecave", patch)
-        self.assertIn("li r31, 1", patch)
-        self.assertIn("b 0x021bbef4", patch)
+        self.assertIn("0x021baff4 = lwz r3, 0x00a8(r3)", patch)
+        self.assertNotIn("codecave", patch.lower())
 
     def test_fps_lock_records_the_confirmed_runtime_result(self):
         result = self.tool.validate_repository(REPO)

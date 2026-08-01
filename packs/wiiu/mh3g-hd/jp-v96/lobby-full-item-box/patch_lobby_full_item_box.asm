@@ -1,9 +1,3 @@
 [MH3G HD JP v96]
 moduleMatches = 0x348600a0
-0x021bb6c4 = b lobby_full_box_entry
-0x021bb6c8 = b lobby_full_box_entry
-
-.origin = codecave
-lobby_full_box_entry:
-li r31, 1
-b 0x021bbef4
+0x021baff4 = lwz r3, 0x00a8(r3)

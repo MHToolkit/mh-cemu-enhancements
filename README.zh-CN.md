@@ -43,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.6.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.7.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -65,7 +65,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 ## 补丁语义、兼容与联机
 
 - 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置。
-- 当前酒场候选已撤回并标记为 `runtime-blocked`：Cemu 2.6 macOS 已加载其 code cave，但在进入游戏前于 `PPCRecompiler` 触发 `SIGBUS`。安装器会拒绝该候选，直到 GDB 运行时追踪确认真实的酒场 selector 与调用上下文。
+- 当前酒场候选只改一条 `sID::IDLobby` accessor 指令：逻辑 UI ID `0x17` 不再返回 `+0xB4` 中 selector `0x08` 的受限对象，而是返回 `+0xA8` 中已经创建好的家中完整箱子对象。它不使用分支或 code cave，仍保持默认关闭的 `Runtime Experimental`，等待游戏内功能与重启验证。
 - 任务补给箱/交纳箱补丁将两个**菜单资源分派**指向已有的家中完整箱子资源；它不是箱子模型替换，也不触碰存档。因为尚未进行隔离游戏内验证，保持 `Runtime Experimental`、默认关闭。
 - 联机建议只启用 **锁定 30 FPS**；两个箱子包都关闭。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。
