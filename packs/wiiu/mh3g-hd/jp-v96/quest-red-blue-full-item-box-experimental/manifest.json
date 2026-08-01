@@ -8,8 +8,7 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
-  "availability": "runtime-blocked",
-  "availability_reason": "异步 GDB 已证明两箱会到达完整仓库初始化器；即使再调用原生场景槽 6 初始化辅助函数 0x02141B8C 与虚函数 0x021BA8E8，任务场景仍因缺少大厅专用 GUI 资源图，在 0x0268AB84 对空布局对象解引用并崩溃。该候选只保留为不可安装的失败证据。 / Async GDB proved that both boxes reach the full-item-box initializer. Even after invoking native scene-slot-6 helper 0x02141B8C and virtual initializer 0x021BA8E8, the quest scene lacks the lobby-only GUI resource graph and crashes on a null layout-object dereference at 0x0268AB84. This candidate is retained only as non-installable failure evidence.",
+  "availability": "available",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-red-blue-full-item-box-experimental",
   "install_folder": "MH3G HD JP v96 - Quest Red & Blue Boxes - Full Item Box (Experimental)",
   "rules": "rules.txt",
@@ -269,5 +268,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "红蓝箱条件桥及其原生场景槽 6 生命周期已通过异步 GDB 追踪，但任务场景缺少大厅完整仓库依赖的 GUI 资源图并会崩溃；源码仅保留为 runtime-blocked 失败证据。 / Async GDB traced the red/blue bridge and native scene-slot-6 lifecycle, but the quest scene lacks the lobby full-item-box GUI resource graph and crashes; source is retained only as runtime-blocked failure evidence."
+  "summary": "所有任务中的红箱与蓝箱统一进入完整仓库初始化器，只有据点场景或完整仓库状态 6 才能通过逐帧调度门槛；等待单人实测。 / Both quest boxes enter the full-item-box initializer, while per-frame dispatch permits only the hub scene or explicit full-item-box state 6; awaiting single-player gameplay validation."
 }
