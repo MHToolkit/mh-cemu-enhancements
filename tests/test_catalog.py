@@ -156,7 +156,7 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
-    def test_include_experimental_skips_runtime_blocked_quest_packs(self):
+    def test_include_experimental_adds_fps_and_blue_dispatch_bridge(self):
         result = self.tool.validate_repository(REPO)
 
         selected = self.tool.select_packs(result.packs, [], include_experimental=True)
@@ -164,24 +164,30 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
+                "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
             },
             {pack["id"] for pack in selected},
         )
 
-    def test_runtime_blocked_quest_packs_cannot_be_selected_explicitly(self):
+    def test_runtime_blocked_red_pack_cannot_be_selected_explicitly(self):
         result = self.tool.validate_repository(REPO)
 
-        for pack_id in (
-            "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
-            "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
-        ):
-            with self.subTest(pack_id=pack_id):
-                with self.assertRaisesRegex(ValueError, "runtime-blocked"):
-                    self.tool.select_packs(
-                        result.packs,
-                        [pack_id],
-                        include_experimental=True,
-                    )
+        with self.assertRaisesRegex(ValueError, "runtime-blocked"):
+            self.tool.select_packs(
+                result.packs,
+                ["mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental"],
+                include_experimental=True,
+            )
+
+        selected = self.tool.select_packs(
+            result.packs,
+            ["mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"],
+            include_experimental=True,
+        )
+        self.assertEqual(
+            {"mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"},
+            {pack["id"] for pack in selected},
+        )
 
     def test_explicit_lobby_selection_is_verified_and_excludes_quest(self):
         result = self.tool.validate_repository(REPO)
@@ -328,11 +334,10 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", blue["status"])
         self.assertFalse(blue["default_install"])
-        self.assertEqual("runtime-blocked", blue["availability"])
-        self.assertIn("任务场景", blue["availability_reason"])
-        self.assertIn("quest scene", blue["availability_reason"])
+        self.assertEqual("available", blue["availability"])
         self.assertEqual(
             {
+                0x02219DF0: 0x4182007C,
                 0x028C2770: 0x819E0E30,
                 0x028C2774: 0x3D601008,
                 0x028C2778: 0x39000001,
@@ -351,6 +356,26 @@ class CatalogTests(unittest.TestCase):
                 0x021F0AF0: 0x2C1F0001,
                 0x021F0AF4: 0x38000006,
                 0x021F0AFC: 0x38000003,
+                0x0214E084: 0x480CBC8D,
+                0x0215165C: 0x89835350,
+                0x02151698: 0x480000B4,
+                0x0215174C: 0x4809F5BC,
+                0x021F0D08: 0x7C0802A6,
+                0x021F0D98: 0x981F0000,
+                0x021F0D9C: 0x4BF52485,
+                0x02219DDC: 0x859D4278,
+                0x02219DE0: 0x38800006,
+                0x02219DE4: 0x386C0340,
+                0x02219DE8: 0x4BF9E021,
+                0x02219DEC: 0x2C030000,
+                0x02219DF4: 0x819D0000,
+                0x02219DF8: 0x356C03D0,
+                0x02219DFC: 0x41820070,
+                0x02219E00: 0x892B0020,
+                0x02219E04: 0x2C090000,
+                0x02219E08: 0x40820064,
+                0x02219E4C: 0x7FE3FB78,
+                0x02219E50: 0x4BF3780D,
                 0x028C2768: 0x2C1F0000,
                 0x028C276C: 0x40820048,
                 0x028C27B4: 0x7FC3F378,
@@ -366,6 +391,7 @@ class CatalogTests(unittest.TestCase):
             },
         )
         patch = (REPO / blue["pack_dir"] / blue["patch"]).read_text()
+        self.assertIn("0x02219df0 = nop", patch)
         self.assertIn("0x028c2770 = lis r3, 0x1031", patch)
         self.assertIn("0x028c2774 = lwz r3, 0x44a0(r3)", patch)
         self.assertIn("0x028c2778 = mr r4, r30", patch)

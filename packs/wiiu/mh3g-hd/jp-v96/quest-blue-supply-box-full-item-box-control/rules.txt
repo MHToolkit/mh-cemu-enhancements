@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)
 path = MH Cemu Enhancements/MH3G HD JP v96/Quest Blue Supply Box -> Full Item Box (Control)
-description = 已阻断的蓝箱失败对照：按键后据点完整仓库菜单不会在任务场景打开。 / Blocked blue-box negative control: input does not open the hub full-item-box menu in a quest scene.
+description = 蓝箱完整仓库调度桥对照；任务场景单人实验。 / Blue-box full item-box dispatch-bridge control; single-player quest experiment.
 version = 7
