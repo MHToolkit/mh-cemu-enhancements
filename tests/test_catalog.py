@@ -36,7 +36,7 @@ class CatalogTests(unittest.TestCase):
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
                 "mh3g-hd-jp-v96-lobby-full-item-box",
-                "mh3g-hd-jp-v96-quest-full-item-box-experimental",
+                "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
             },
             {pack["id"] for pack in result.packs},
         )
@@ -52,7 +52,10 @@ class CatalogTests(unittest.TestCase):
         expected_paths = {
             "fps-lock-30": "MH Cemu Enhancements/MH3G HD JP v96/Lock 30 FPS",
             "lobby-full-item-box": "MH Cemu Enhancements/MH3G HD JP v96/Lobby Full Item Box",
-            "quest-full-item-box-experimental": "MH Cemu Enhancements/MH3G HD JP v96/Quest Full Item Box (Experimental)",
+            "quest-delivery-full-item-box-experimental": (
+                "MH Cemu Enhancements/MH3G HD JP v96/"
+                "Quest Red Delivery Box -> Full Item Box (Experimental)"
+            ),
         }
 
         for feature, expected_path in expected_paths.items():
@@ -73,11 +76,16 @@ class CatalogTests(unittest.TestCase):
         lobby_manifest = "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box/manifest.json"
         errors = validate_after(
             lobby_manifest,
-            lambda path: path.write_text(path.read_text().replace('"status": "Runtime Experimental"', '"status": "not-a-status"')),
+            lambda path: path.write_text(
+                path.read_text().replace('"status": "Runtime Verified"', '"status": "not-a-status"')
+            ),
         )
         self.assertTrue(any("unknown status" in error for error in errors))
 
-        quest_manifest = "packs/wiiu/mh3g-hd/jp-v96/quest-full-item-box-experimental/manifest.json"
+        quest_manifest = (
+            "packs/wiiu/mh3g-hd/jp-v96/"
+            "quest-delivery-full-item-box-experimental/manifest.json"
+        )
         errors = validate_after(
             quest_manifest,
             lambda path: path.write_text(path.read_text().replace('"default_install": false', '"default_install": true')),
@@ -112,7 +120,11 @@ class CatalogTests(unittest.TestCase):
         result = self.tool.validate_repository(REPO)
         with tempfile.TemporaryDirectory() as tmp:
             cemu_root = Path(tmp) / "cemu"
-            selected = self.tool.select_packs(result.packs, [], include_experimental=False)
+            selected = self.tool.select_packs(
+                result.packs,
+                ["mh3g-hd-jp-v96-lobby-full-item-box"],
+                include_experimental=False,
+            )
             unrelated = cemu_root / "graphicPacks" / "Unrelated Pack" / "rules.txt"
             unrelated.parent.mkdir(parents=True)
             unrelated.write_text("unrelated\n")
@@ -125,9 +137,11 @@ class CatalogTests(unittest.TestCase):
             self.assertEqual(1, len(backups))
             self.assertTrue((backups[0] / "user-file.txt").is_file())
             self.assertTrue(unrelated.is_file())
-            self.assertTrue((base / "MH3G HD JP v96 - Lock 30 FPS" / "rules.txt").is_file())
-            self.assertFalse((base / "MH3G HD JP v96 - Lobby Full Item Box").exists())
-            self.assertFalse((base / "MH3G HD JP v96 - Quest Full Item Box (Experimental)").exists())
+            self.assertTrue((base / "MH3G HD JP v96 - Lobby Full Item Box" / "rules.txt").is_file())
+            self.assertFalse((base / "MH3G HD JP v96 - Lock 30 FPS").exists())
+            self.assertFalse(
+                (base / "MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)").exists()
+            )
 
             self.tool.install(REPO, cemu_root, selected, reference_rpx=None, verify=False)
             self.assertTrue((base / ".install-receipt.json").is_file())
@@ -145,24 +159,17 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
-                "mh3g-hd-jp-v96-lobby-full-item-box",
-                "mh3g-hd-jp-v96-quest-full-item-box-experimental",
+                "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
             },
             {pack["id"] for pack in selected},
         )
 
-    def test_explicit_lobby_selection_requires_its_experimental_gate_and_excludes_quest(self):
+    def test_explicit_lobby_selection_is_verified_and_excludes_quest(self):
         result = self.tool.validate_repository(REPO)
-        with self.assertRaises(ValueError):
-            self.tool.select_packs(
-                result.packs,
-                ["mh3g-hd-jp-v96-lobby-full-item-box"],
-                include_experimental=False,
-            )
         selected = self.tool.select_packs(
             result.packs,
             ["mh3g-hd-jp-v96-lobby-full-item-box"],
-            include_experimental=True,
+            include_experimental=False,
         )
         self.assertEqual(
             {"mh3g-hd-jp-v96-lobby-full-item-box"},
@@ -173,11 +180,11 @@ class CatalogTests(unittest.TestCase):
         result = self.tool.validate_repository(REPO)
         lobby = next(pack for pack in result.packs if pack["id"] == "mh3g-hd-jp-v96-lobby-full-item-box")
 
-        self.assertEqual("Runtime Experimental", lobby["status"])
+        self.assertEqual("Runtime Verified", lobby["status"])
         self.assertFalse(lobby["default_install"])
         self.assertEqual("available", lobby["availability"])
         self.assertEqual(
-            {"mh3g-hd-jp-v96-fps-lock-30"},
+            set(),
             {pack["id"] for pack in self.tool.select_packs(result.packs, [], include_experimental=False)},
         )
         self.assertEqual(
@@ -204,18 +211,76 @@ class CatalogTests(unittest.TestCase):
         self.assertIn("0x02799678 = li r5, 0", patch)
         self.assertNotIn("codecave", patch.lower())
 
-    def test_fps_lock_records_the_confirmed_runtime_result(self):
+    def test_fps_lock_records_the_unstable_runtime_result(self):
         result = self.tool.validate_repository(REPO)
         fps = next(pack for pack in result.packs if pack["id"] == "mh3g-hd-jp-v96-fps-lock-30")
 
-        self.assertEqual("Runtime Verified", fps["status"])
-        self.assertTrue(fps["default_install"])
+        self.assertEqual("Runtime Experimental", fps["status"])
+        self.assertFalse(fps["default_install"])
+
+    def test_quest_red_delivery_box_redirect_is_narrow_and_fail_closed(self):
+        result = self.tool.validate_repository(REPO)
+        quest = next(
+            pack
+            for pack in result.packs
+            if pack["id"] == "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental"
+        )
+
+        self.assertEqual("Runtime Experimental", quest["status"])
+        self.assertFalse(quest["default_install"])
+        self.assertEqual("available", quest["availability"])
+        self.assertEqual(
+            {
+                0x028C27C4: 0x3FE01031,
+                0x028C27C8: 0x807F507C,
+                0x028C27CC: 0x4B8B75F1,
+                0x028C27D0: 0x807F507C,
+                0x028C27D4: 0x4B8B742D,
+                0x028C27D8: 0x2C030000,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in quest["preimages"]
+            },
+        )
+        self.assertEqual(
+            {
+                0x021F0AD0: 0x9BFC6E12,
+                0x021F0AF0: 0x2C1F0001,
+                0x021F0AF4: 0x38000006,
+                0x021F0AFC: 0x38000003,
+                0x028C2768: 0x2C1F0000,
+                0x028C276C: 0x40820048,
+                0x028C5E78: 0x38800000,
+                0x028C5E7C: 0x4BFFC874,
+                0x028C5E80: 0x38800001,
+                0x028C5E84: 0x4BFFC86C,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in quest["anchors"]
+            },
+        )
+        patch = (REPO / quest["pack_dir"] / quest["patch"]).read_text()
+        self.assertIn("0x028c27c4 = lis r3, 0x1031", patch)
+        self.assertIn("0x028c27c8 = lwz r3, 0x44a0(r3)", patch)
+        self.assertIn("0x028c27cc = mr r4, r30", patch)
+        self.assertIn("0x028c27d0 = li r5, 0", patch)
+        self.assertIn("0x028c27d4 = bl 0x021f0a8c", patch)
+        self.assertIn("0x028c27d8 = b 0x028c27f8", patch)
+        self.assertNotIn("0x021b0e90", patch.lower())
+        self.assertNotIn("0x021b0f14", patch.lower())
+        self.assertNotIn("codecave", patch.lower())
 
     def test_inspect_reports_installed_pack_that_is_not_enabled(self):
         result = self.tool.validate_repository(REPO)
         with tempfile.TemporaryDirectory() as tmp:
             cemu_root = Path(tmp) / "Library" / "Application Support" / "Nemessix Dev" / "cemu"
-            selected = self.tool.select_packs(result.packs, [], include_experimental=False)
+            selected = self.tool.select_packs(
+                result.packs,
+                ["mh3g-hd-jp-v96-fps-lock-30"],
+                include_experimental=True,
+            )
             self.tool.install(REPO, cemu_root, selected, reference_rpx=None, verify=False)
             self.assertTrue(
                 (
@@ -255,7 +320,11 @@ class CatalogTests(unittest.TestCase):
         result = self.tool.validate_repository(REPO)
         with tempfile.TemporaryDirectory() as tmp:
             cemu_root = Path(tmp) / "Library" / "Application Support" / "Nemessix Dev" / "cemu"
-            selected = self.tool.select_packs(result.packs, [], include_experimental=False)
+            selected = self.tool.select_packs(
+                result.packs,
+                ["mh3g-hd-jp-v96-lobby-full-item-box"],
+                include_experimental=False,
+            )
             legacy = cemu_root / "graphicPacks" / "mh-cemu-enhancements"
             legacy.mkdir(parents=True)
             (legacy / ".install-receipt.json").write_text("{}\n")
@@ -268,7 +337,7 @@ class CatalogTests(unittest.TestCase):
                     / "data"
                     / "graphicPacks"
                     / "mh-cemu-enhancements"
-                    / "MH3G HD JP v96 - Lock 30 FPS"
+                    / "MH3G HD JP v96 - Lobby Full Item Box"
                     / "rules.txt"
                 ).is_file()
             )

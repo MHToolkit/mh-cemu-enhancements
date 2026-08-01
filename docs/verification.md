@@ -1,35 +1,43 @@
-# Local verification record (2026-08-01)
+# Local verification record / 本地验证记录（2026-08-01）
 
-## Current static gates
+## Current static gates / 当前静态门槛
 
-1. `python3 -m unittest discover -s tests -v` — fifteen tests passed: manifest/schema validation, independent Cemu tree paths, negative validation gates, the lobby restricted-mode contract, RPX SHA-256 + PPC preimages/anchors, standard and isolated idempotent installation, exact Experimental selection/exclusion, isolated-profile inspection, isolated launch-command generation, legacy-path migration/uninstall, and reproducible asset-free archive construction.
-2. `python3 scripts/mh-cemu-enhancements.py validate` — three manifests accepted.
-3. `python3 scripts/mh-cemu-enhancements.py verify-reference --reference-rpx <pinned MH3G_Cafe.rpx>` — accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and all declared PPC words.
-4. Cemu's real PPCAssembler encodes `li r5, 0` as `0x38a00000`; the pack has no code cave or relocation. This static verification run did not start the Cemu app.
+1. `python3 -m unittest discover -s tests -v` — 16 tests passed. The suite covers manifest/schema validation, independent Cemu leaves, negative fail-closed gates, the lobby mode contract, the red-only quest control-flow contract, pinned RPX preimages/anchors, standard and isolated idempotent installation, explicit Experimental selection, profile inspection, legacy migration/uninstall, and reproducible asset-free packaging.
+2. `python3 scripts/mh-cemu-enhancements.py validate` — all three manifests accepted.
+3. `verify-reference` accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared PPC preimage/anchor.
+4. Cemu 2.6's real `PPCAssembler` accepted all six red-box instructions without launching Cemu. The four direct words are `3c601031`, `806344a0`, `7fc4f378`, and `38a00000`; branch relocations resolve to `4b92e2b9` (`bl 0x021F0A8C`) and `48000020` (`b 0x028C27F8`).
 5. `ruff check scripts tests` and `git diff --check` passed.
+6. Two independent package builds produced the same SHA-256; the current value is recorded in the adjacent distribution `.sha256` file.
 
-## Runtime evidence and current standard-profile installation
+## Runtime evidence / 运行时证据
 
-The user confirmed that the 30 FPS switch took effect with the JP v96 title, so the FPS manifest is now `Runtime Verified`. The lobby runs established the opposite result for the branch, six-site substitution, full-home code-cave, and 3DS-informed `li r9, 0` candidates: the standard-profile Cemu log records JP v96, `Set vsync frequency to 30`, and `Applying patch group 'MH3G HD JP v96'`, but the restricted three-option menu remained. The dual-selector replacement was worse: Cemu 2.6 macOS logged `Codecave: 01800000-01800008` and resolved `lobby_full_box_entry`, then crashed before gameplay with `SIGBUS` / `EXC_BAD_ACCESS` at guest `0x017ffffc`; macOS identifies the triggering thread as `PPCRecompiler`. That code-cave candidate remains retracted and is not gameplay success.
+- **Lobby / 大厅：** The current one-word `0x02799678 = li r5, 0` pack was tested by the user. The full menu appears, and equipment change, equipment sets, and talisman operations work. It is `Runtime Verified` while remaining default-off.
+- **30 FPS：** User testing was unstable. The pack is downgraded to default-off `Runtime Experimental`; hunting behavior was not tested.
+- **Quest red box / 任务红箱：** Static verification is complete, but no gameplay result exists yet. It remains default-off `Runtime Experimental`. The required gameplay check covers the red box opening the full menu, the blue supply box retaining its original menu, closing/reopening, and quest completion.
 
-The later accessor candidate also failed in gameplay: the live log proved the Lobby leaf was enabled and applied, but the screenshot still showed the restricted three-option menu. Cross-architecture follow-up decompressed the complete 3DS `.code` to the pinned expected SHA-256, mapped ARM initializer `0x005DEC70` to PPC initializer `0x021F0A8C` by matching mode storage and the `mode == 1 ? 3 : 6` state transition, and found the exact sibling PPC callers. The complete path passes `r5 = 0` at `0x027995F8`; the Port restricted path passes `r5 = 1` at `0x02799678`. The new one-word candidate changes only the latter to `li r5, 0`; no object redirect, code cave, or branch is used.
+Earlier lobby selector/resource/code-cave/accessor attempts are retained only as negative research history. They either left the restricted menu unchanged or, for the code-cave candidate, crashed in the PPC recompiler. None is part of the current installed or packaged source.
 
-After a zero-Cemu-process check, the installer placed the current `0.1.9` FPS and restricted-mode-override Lobby packs into the user's normal Cemu profile used by an `-m`-only launch:
+## Installed standard profile / 已安装标准配置
+
+The user's launch command supplies `-m` but no `NEMESSIX_CEMU_DATA_ROOT`, so Cemu scans the standard macOS profile rather than the isolated outer root. After two fresh zero-process checks, the installer wrote only:
 
 ```text
 /Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements/
 ```
 
-The receipt contains both pack tree hashes. XML parsing and catalog inspection confirm that FPS is installed and disabled, Lobby is installed and enabled, and the quest experiment is neither installed nor enabled. The installed Lobby patch contains `0x02799678 = li r5, 0` and has the same SHA-256 (`86acd8733dab5aa5ccccc1cf767055a61751da8b7426aaa28502a30849a647e5`) as the repository source. The installer writes only `graphicPacks/mh-cemu-enhancements` and never accesses MLC/save paths.
+Installed and enabled:
 
-## Profile-path RCA (2026-07-30)
+- `MH3G HD JP v96 - Lobby Full Item Box`
+- `MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)`
 
-The initial isolated deployment was not loadable for two independently verified reasons: it had been placed at the outer root's `graphicPacks/` directory while the bundled Cemu source scans `<NEMESSIX_CEMU_DATA_ROOT>/data/graphicPacks/`; and an `-m`-only launch still uses the standard macOS profile, because `-m` changes MLC rather than the Cemu user-data root. `inspect` and `isolated-launch-command` now make both states visible without launching Cemu or editing Cemu configuration. A receipted legacy isolated install migrates to the scanned `data/graphicPacks` location on reinstall and is also removed by uninstall.
+The unstable 30 FPS pack is not installed and is not enabled. XML parsing plus catalog `inspect` confirm both installed box packs are enabled. The installed red-box patch SHA-256 matches the repository source at `5cd41f7973d1b0c92a6a57d5f1347952db36a899498953ec8182f212f3f8c972`. A pre-edit settings backup exists at:
 
-## Outstanding runtime gate
+```text
+/Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-red-box-20260801T170000
+```
 
-The lobby and quest box packs are not `Runtime Verified`. The next lobby step is an in-game run with the new mode-override Lobby pack enabled and the unrelated Quest pack disabled. It must first prove the missing equipment/set/talisman menu entries appear, then verify those actions, item deposit/withdrawal, combine/sell, closing and reopening the menu, and a clean title restart. Multiplayer validation is out of scope; the online recommendation remains the 30 FPS pack only.
+No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
 
-## Distribution
+## Distribution / 分发
 
-`dist/mh-cemu-enhancements-0.1.9.zip` is deterministic across independent builds, contains no game assets or tool cache, and is accompanied by its adjacent `.sha256` verification file. Prior archives remain historical only and are not evidence for this candidate.
+`dist/mh-cemu-enhancements-0.1.10.zip` is deterministic, contains no game asset or tool cache, and has an adjacent `.sha256` verification file.

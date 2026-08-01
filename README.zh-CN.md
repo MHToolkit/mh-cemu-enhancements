@@ -8,13 +8,13 @@
 
 | 开关 | 状态 | 默认安装 | Cemu 中独立开关 |
 | --- | --- | --- | --- |
-| 锁定 30 FPS | `Runtime Verified` | 是 | 是 |
-| 集会所/酒场完整家中箱子 | `Runtime Experimental` | 否 | 是 |
-| 任务补给箱/交纳箱完整家中箱子 | `Runtime Experimental` | 否 | 是 |
+| 锁定 30 FPS | `Runtime Experimental` | 否 | 是 |
+| 集会所/酒场完整家中箱子 | `Runtime Verified` | 否 | 是 |
+| 任务红色交纳箱 -> 完整家中箱子 | `Runtime Experimental` | 否 | 是 |
 
 适用身份：Wii U Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、Cemu patch module checksum `0x348600a0`。
 
-`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。两个箱子包都明确是实验项，默认不安装。
+`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态；任务红箱仍等待游戏内验证。三项均默认不安装。
 
 ## 校验、安装、卸载、分发
 
@@ -22,28 +22,27 @@
 python3 scripts/mh-cemu-enhancements.py validate
 python3 scripts/mh-cemu-enhancements.py verify-reference --reference-rpx /绝对路径/MH3G_Cafe.rpx
 
-# 默认只安装锁定 30 FPS；不启动 Cemu，也不改 Cemu 的启用状态。
+# 当前没有默认安装项；不启动 Cemu，也不改 Cemu 的启用状态。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx
 
-# 显式选中酒场 Experimental 候选包，并同时安装锁定 30 FPS。
+# 显式安装已实测通过的大厅包。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-fps-lock-30 \
-  --pack mh3g-hd-jp-v96-lobby-full-item-box \
-  --include-experimental
+  --pack mh3g-hd-jp-v96-lobby-full-item-box
 
-# 在默认包之外追加全部默认关闭的 Experimental 包（酒场与任务箱）。
+# 显式安装任务红色交纳箱实验包；Experimental 必须显式解锁。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx \
+  --pack mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental \
   --include-experimental
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.9.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.10.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -60,15 +59,15 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
   --cemu-app /绝对路径/Cemu.app
 ```
 
-手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需开关，并重新载入/重启游戏。两个 Experimental 箱子包都不应用于日常或联机。
+手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需开关，并重新载入/重启游戏。任务红箱实验包不应用于日常或联机；30 FPS 包在稳定性结论出来前也保持关闭。
 
 ## 补丁语义、兼容与联机
 
-- 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置。
-- 当前酒场候选只改一条 Port Tanzia 交互指令：把传给共享箱子初始化函数 `0x021F0A8C` 的受限模式参数由 `r5 = 1` 改为游戏已有的完整模式 `r5 = 0`。该函数中的 `mode == 1 ? 3 : 6` 控制流与 3DS 已知有效补丁完全对应；它不替换箱子对象、不使用分支或 code cave，仍保持默认关闭的 `Runtime Experimental`，等待游戏内菜单与重启验证。
-- 任务补给箱/交纳箱补丁将两个**菜单资源分派**指向已有的家中完整箱子资源；它不是箱子模型替换，也不触碰存档。因为尚未进行隔离游戏内验证，保持 `Runtime Experimental`、默认关闭。
-- Cemu 中的独立叶子依次为：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`、`Lobby Full Item Box`、`Quest Full Item Box (Experimental)`。
-- 联机建议只启用 **锁定 30 FPS**；两个箱子包都关闭。
+- 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置；用户实测不稳定，因此保持 `Runtime Experimental`、默认关闭。
+- 大厅包只改一条 Port Tanzia 交互指令：把传给共享箱子初始化函数 `0x021F0A8C` 的受限模式参数由 `r5 = 1` 改为完整模式 `r5 = 0`。它不替换对象、不使用分支或 code cave，完整菜单、换装、装备组合与护石功能已经实测通过，标记为 `Runtime Verified`，但仍默认关闭。
+- 任务包只改**红色交纳箱**的确认交互：红箱专属分支在 `0x028C27C4..0x028C27D8` 原地调用完整道具箱模式并跳过交纳菜单标志。蓝色补给箱的 `r4 = 0` 分派和 `GUI\\quest\\box` 资源完全不改；红箱资源也不替换。该包保持 `Runtime Experimental`、默认关闭。
+- Cemu 中的独立叶子依次为：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`、`Lobby Full Item Box`、`Quest Red Delivery Box -> Full Item Box (Experimental)`。
+- 联机时关闭两个箱子包；30 FPS 包在稳定性结论出来前也不作为联机推荐。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。
 
 ## 证据与格式

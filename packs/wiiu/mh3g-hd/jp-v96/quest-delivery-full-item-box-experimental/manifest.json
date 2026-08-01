@@ -1,0 +1,107 @@
+{
+  "id": "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "availability": "available",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-delivery-full-item-box-experimental",
+  "install_folder": "MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)",
+  "rules": "rules.txt",
+  "patch": "patch_quest_delivery_full_item_box.asm",
+  "preimages": [
+    {
+      "address": "0x028c27c4",
+      "word": "0x3fe01031",
+      "meaning": "红色交纳箱路径加载交纳数据管理器地址的高半部。 / Red delivery path loads the delivery-data manager address high half."
+    },
+    {
+      "address": "0x028c27c8",
+      "word": "0x807f507c",
+      "meaning": "红色交纳箱路径读取交纳数据管理器。 / Red delivery path reads the delivery-data manager."
+    },
+    {
+      "address": "0x028c27cc",
+      "word": "0x4b8b75f1",
+      "meaning": "红色交纳箱原路径调用交纳清单准备函数。 / Original red path calls the delivery-list preparation routine."
+    },
+    {
+      "address": "0x028c27d0",
+      "word": "0x807f507c",
+      "meaning": "红色交纳箱原路径为交纳菜单重新读取管理器。 / Original red path reloads the manager for the delivery menu."
+    },
+    {
+      "address": "0x028c27d4",
+      "word": "0x4b8b742d",
+      "meaning": "红色交纳箱原路径调用交纳菜单构建函数。 / Original red path calls the delivery-menu builder."
+    },
+    {
+      "address": "0x028c27d8",
+      "word": "0x2c030000",
+      "meaning": "红色交纳箱原路径检查交纳菜单构建结果。 / Original red path checks the delivery-menu result."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x021f0ad0",
+      "word": "0x9bfc6e12",
+      "meaning": "完整/受限道具箱共用初始化器保存模式参数。 / Shared item-box initializer stores its mode argument."
+    },
+    {
+      "address": "0x021f0af0",
+      "word": "0x2c1f0001",
+      "meaning": "共用初始化器比较受限模式 1。 / Shared initializer compares restricted mode 1."
+    },
+    {
+      "address": "0x021f0af4",
+      "word": "0x38000006",
+      "meaning": "模式 0 使用完整道具箱菜单状态 6。 / Mode 0 selects full item-box menu state 6."
+    },
+    {
+      "address": "0x021f0afc",
+      "word": "0x38000003",
+      "meaning": "受限模式 1 使用菜单状态 3。 / Restricted mode 1 selects menu state 3."
+    },
+    {
+      "address": "0x028c2768",
+      "word": "0x2c1f0000",
+      "meaning": "箱子交互函数比较蓝箱/红箱标志。 / Box interaction compares the blue/red selector flag."
+    },
+    {
+      "address": "0x028c276c",
+      "word": "0x40820048",
+      "meaning": "非零标志只进入红色交纳箱分支。 / A nonzero selector enters only the red delivery branch."
+    },
+    {
+      "address": "0x028c5e78",
+      "word": "0x38800000",
+      "meaning": "蓝色补给箱分派固定传入标志 0。 / Blue supply dispatch passes selector 0."
+    },
+    {
+      "address": "0x028c5e7c",
+      "word": "0x4bffc874",
+      "meaning": "蓝色补给箱尾调用共用箱子交互函数。 / Blue supply dispatch tail-calls the shared box interaction."
+    },
+    {
+      "address": "0x028c5e80",
+      "word": "0x38800001",
+      "meaning": "红色交纳箱分派固定传入标志 1。 / Red delivery dispatch passes selector 1."
+    },
+    {
+      "address": "0x028c5e84",
+      "word": "0x4bffc86c",
+      "meaning": "红色交纳箱尾调用同一箱子交互函数。 / Red delivery dispatch tail-calls the same box interaction."
+    }
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "仅将任务内红色交纳箱重定向到模式 0 的完整道具箱；蓝色补给箱保持原版。 / Redirects only the red quest delivery box to full item-box mode 0; the blue supply box stays original."
+}

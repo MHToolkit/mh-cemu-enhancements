@@ -2,7 +2,7 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lock 30 FPS
 path = MH Cemu Enhancements/MH3G HD JP v96/Lock 30 FPS
-description = Per-pack 30 FPS lock. No game-code patch and no global Cemu setting change.
+description = 30 FPS 实测不稳定，默认关闭；不修改游戏代码或 Cemu 全局设置。 / Unstable in gameplay testing and disabled by default; no game-code or global Cemu setting changes.
 version = 7
 
 [Control]

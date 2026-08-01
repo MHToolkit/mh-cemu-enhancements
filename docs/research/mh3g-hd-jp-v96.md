@@ -47,7 +47,7 @@ The supplied Bilibili URL (`BV1XC4y1q74u`) could not be retrieved by the static 
 
 All instruction words below are big-endian words from the immutable RPX text section. The installer verifies the RPX SHA-256 and every source/anchor word before copying a PPC pack; Cemu additionally gates the patch group with `moduleMatches = 0x348600a0`.
 
-### Lobby restricted-mode override (Experimental)
+### Lobby restricted-mode override (Runtime Verified / 运行时已验证)
 
 The earlier branch, six-site substitution, full-home code-cave, 3DS-register-position `r9`, and resident-object accessor candidates all loaded in Cemu while the restricted three-option menu remained. They are superseded and are not gameplay success. The latest accessor run is especially conclusive: Cemu's log records module checksum `0x348600a0`, application of patch group `MH3G HD JP v96`, and activation of the Lobby leaf, while the screenshot still shows only deposit, withdrawal, and combine/sell.
 
@@ -69,17 +69,29 @@ The Wii U semantic counterpart is PPC function `0x021F0A8C`. It stores its third
 0x02799678 = li r5, 0
 ```
 
-This does not replace a UI object, construct a different object, alter the physical chest model, or touch save data. It changes one existing Port interaction argument from restricted mode to the game's own unrestricted mode. The candidate is **Runtime Experimental**, default-off, and available only through explicit experimental opt-in until in-game evidence proves equipment/set/talisman actions, deposit/withdrawal, combine/sell, closing and reopening, and a clean restart.
+This does not replace a UI object, construct a different object, alter the physical chest model, or touch save data. It changes one existing Port interaction argument from restricted mode to the game's own unrestricted mode. The user verified the complete menu plus equipment, equipment-set, and talisman actions in gameplay, so the pack is **Runtime Verified / 运行时已验证**. It remains default-off as an explicit opt-in.
 
-### Quest supply/delivery -> home resource dispatch (Experimental)
+### Quest red delivery box -> full item box (Experimental / 实验)
 
-| Menu source | Address | Original | Replacement | Destination |
-| --- | --- | --- | --- | --- |
-| Supply box | `0x021b0e90` | `0x300043f4` (`GUI\\quest\\box`) | `0x300056f4` | `GUI\\lobby\\myh_box2_n` |
-| Delivery box | `0x021b0f14` | `0x30004404` (`GUI\\quest\\cockpit\\que_delibox`) | `0x300056f4` | `GUI\\lobby\\myh_box2_n` |
+The earlier two-resource substitution was a false design: changing `0x021B0E90` and `0x021B0F14` swaps UI resource names but leaves the supply/delivery classes and interaction logic unchanged. It also violates the final scope because `0x021B0E90` belongs to the blue supply box. That candidate is removed.
 
-The shared target anchors are `0x021bbf1c = 0x3c001002` and `0x021bbf28 = 0x300056f4`. These two sites are menu-resource dispatch arguments in the quest interaction flow, not model or save-data addresses. The dispatch substitution is deliberately **Runtime Experimental**, default excluded from installation, until isolated in-game testing proves that every required home-box action works and that quest state remains sound.
+旧的双资源替换是错误设计：`0x021B0E90` 与 `0x021B0F14` 只改变 UI 资源名，不会改变补给/交纳类的交互逻辑，而且 `0x021B0E90` 属于明确不应修改的蓝色补给箱。该候选已移除。
+
+Static cross-references expose two tail-dispatch stubs into shared interaction function `0x028C26F0`: `0x028C5E78` passes selector `r4 = 0` for the blue supply box, while `0x028C5E80` passes `r4 = 1` for the red delivery box. The shared function compares that saved selector at `0x028C2768`; only the nonzero/red path reaches `0x028C27B4`, where calls at `0x028C27CC` and `0x028C27D4` prepare the delivery list and open the delivery menu.
+
+静态交叉引用证明，共用交互函数 `0x028C26F0` 有两个尾分派入口：`0x028C5E78` 为蓝箱传 `r4 = 0`，`0x028C5E80` 为红箱传 `r4 = 1`。函数在 `0x028C2768` 比较该标志；只有非零的红箱路径进入 `0x028C27B4`，并在 `0x028C27CC` / `0x028C27D4` 构建交纳清单和交纳菜单。
+
+| Role / 作用 | Address | Original word | Replacement / 目标 |
+| --- | --- | --- | --- |
+| UI manager high / UI 管理器高位 | `0x028c27c4` | `0x3fe01031` | `lis r3, 0x1031` |
+| UI manager load / UI 管理器读取 | `0x028c27c8` | `0x807f507c` | `lwz r3, 0x44a0(r3)` |
+| Delivery prepare call / 原交纳准备调用 | `0x028c27cc` | `0x4b8b75f1` | `mr r4, r30` |
+| Delivery manager reload / 原交纳管理器重读 | `0x028c27d0` | `0x807f507c` | `li r5, 0` |
+| Delivery menu call / 原交纳菜单调用 | `0x028c27d4` | `0x4b8b742d` | `bl 0x021f0a8c` |
+| Delivery result test / 原交纳结果检查 | `0x028c27d8` | `0x2c030000` | `b 0x028c27f8` |
+
+The in-place rewrite calls the already-proven full item-box initializer with the current player in `r4` and full mode `r5 = 0`, then skips delivery-only flag writes and rejoins the original common cleanup. It uses no code cave and writes neither `0x021B0E90` nor `0x021B0F14`. The pack remains **Runtime Experimental / 运行时实验** and default-off until gameplay proves the red box, the unchanged blue box, menu exit/re-entry, and quest completion flow.
 
 ## Runtime validation gate
 
-No Cemu process was launched for this research. To promote either box feature, record the exact manifest identity, Cemu version, title update, RPX SHA-256, module checksum, enabled pack set, and in-game result. Test the lobby and quest cases separately, then test a clean restart. Do not test the Experimental quest pack in multiplayer; the online recommendation remains 30 FPS only.
+No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`; the quest red-box pack still requires the exact manifest identity, Cemu version, title update, RPX SHA-256, module checksum, enabled-pack set, red/blue box results, exit/re-entry, and quest completion outcome. Do not test the Experimental quest pack in multiplayer. The 30 FPS pack is also experimental after unstable user testing.

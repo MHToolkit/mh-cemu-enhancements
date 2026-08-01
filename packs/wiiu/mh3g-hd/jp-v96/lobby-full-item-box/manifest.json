@@ -6,7 +6,7 @@
   "title_slug": "mh3g-hd",
   "region": "JP",
   "update": "v96",
-  "status": "Runtime Experimental",
+  "status": "Runtime Verified",
   "default_install": false,
   "availability": "available",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box",
@@ -73,5 +73,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "Experimental one-word semantic port of the known 3DS Port Tanzia patch: pass unrestricted mode 0 instead of restricted mode 1 to the shared box initializer."
+  "summary": "大厅换装、装备组合与护石功能已由用户实测通过。 / User gameplay verified lobby equipment, equipment-set, and talisman functions."
 }

@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lobby Full Item Box
 path = MH Cemu Enhancements/MH3G HD JP v96/Lobby Full Item Box
-description = Experimental one-word mode override: open the Port Tanzia box with the unrestricted box initializer mode. Default off pending in-game verification.
+description = 大厅完整道具箱已实测通过，默认仍关闭并按需启用。 / Lobby full item box is gameplay verified; it remains opt-in by default.
 version = 7
