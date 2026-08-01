@@ -43,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.7.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.8.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -52,7 +52,7 @@ python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancemen
 
 ### macOS 隔离 profile 启动
 
-提供的 Cemu build 只有在设置 `NEMESSIX_CEMU_DATA_ROOT` 时才会使用隔离 profile。从 Finder 等方式直接启动 `.app` 会落入标准 `~/Library/Application Support/Cemu` profile，因此看不到安装在隔离根的包。为避免混用 profile，先仅打印正确启动命令（不会启动 Cemu）：
+提供的 Cemu build 只有在设置 `NEMESSIX_CEMU_DATA_ROOT` 时才会使用隔离 profile。`-m` 只指定 MLC 目录，不会切换 Cemu 的用户数据/Graphic Packs profile；仅带 `-m` 启动时仍会落入标准 `~/Library/Application Support/Cemu` profile，因此看不到安装在隔离根的包。为避免混用 profile，先仅打印正确启动命令（不会启动 Cemu）：
 
 ```bash
 python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
@@ -67,6 +67,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 - 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置。
 - 当前酒场候选只改一条 `sID::IDLobby` accessor 指令：逻辑 UI ID `0x17` 不再返回 `+0xB4` 中 selector `0x08` 的受限对象，而是返回 `+0xA8` 中已经创建好的家中完整箱子对象。它不使用分支或 code cave，仍保持默认关闭的 `Runtime Experimental`，等待游戏内功能与重启验证。
 - 任务补给箱/交纳箱补丁将两个**菜单资源分派**指向已有的家中完整箱子资源；它不是箱子模型替换，也不触碰存档。因为尚未进行隔离游戏内验证，保持 `Runtime Experimental`、默认关闭。
+- Cemu 中的独立叶子依次为：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`、`Lobby Full Item Box`、`Quest Full Item Box (Experimental)`。
 - 联机建议只启用 **锁定 30 FPS**；两个箱子包都关闭。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。
 

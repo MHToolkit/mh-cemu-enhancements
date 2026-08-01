@@ -1,6 +1,6 @@
 [Definition]
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lobby Full Item Box
-path = MH Cemu Enhancements/MH3G HD JP v96
+path = MH Cemu Enhancements/MH3G HD JP v96/Lobby Full Item Box
 description = Experimental no-code-cave redirect from the restricted lobby object accessor to the existing complete-home object. Default off pending in-game verification.
 version = 7

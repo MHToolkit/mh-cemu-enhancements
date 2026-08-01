@@ -48,6 +48,19 @@ class CatalogTests(unittest.TestCase):
             schema["properties"]["status"]["enum"],
         )
 
+    def test_rules_paths_expose_each_pack_as_an_independent_cemu_leaf(self):
+        expected_paths = {
+            "fps-lock-30": "MH Cemu Enhancements/MH3G HD JP v96/Lock 30 FPS",
+            "lobby-full-item-box": "MH Cemu Enhancements/MH3G HD JP v96/Lobby Full Item Box",
+            "quest-full-item-box-experimental": "MH Cemu Enhancements/MH3G HD JP v96/Quest Full Item Box (Experimental)",
+        }
+
+        for feature, expected_path in expected_paths.items():
+            rules = (
+                REPO / "packs" / "wiiu" / "mh3g-hd" / "jp-v96" / feature / "rules.txt"
+            ).read_text()
+            self.assertIn(f"path = {expected_path}\n", rules)
+
     def test_validator_rejects_identity_status_and_ppc_gate_regressions(self):
         def validate_after(relative: str, edit):
             with tempfile.TemporaryDirectory() as tmp:

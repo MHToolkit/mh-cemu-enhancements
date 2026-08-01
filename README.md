@@ -43,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.7.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.8.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
@@ -52,7 +52,7 @@ Install writes only its owned Graphic Pack directory with a receipt. For a stand
 
 ### macOS isolated profile launch
 
-The supplied Cemu build uses the isolated profile **only** when `NEMESSIX_CEMU_DATA_ROOT` is present. Starting the `.app` normally (for example, from Finder) uses the standard `~/Library/Application Support/Cemu` profile and cannot see packs installed in the isolated root. To avoid mixing profiles, print the exact command without launching Cemu:
+The supplied Cemu build uses the isolated profile **only** when `NEMESSIX_CEMU_DATA_ROOT` is present. `-m` selects an MLC directory only; it does not change the Cemu user-data/Graphic Packs profile. Starting the `.app` normally (including with only `-m`) uses the standard `~/Library/Application Support/Cemu` profile and cannot see packs installed in the isolated root. To avoid mixing profiles, print the exact command without launching Cemu:
 
 ```bash
 python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
@@ -67,6 +67,7 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 - The 30 FPS pack uses per-pack `vsyncFrequency = 30`, not a global Cemu setting.
 - The current lobby candidate changes one `sID::IDLobby` accessor instruction: logical UI ID `0x17` returns the already-created complete-home object in slot `+0xA8` instead of the restricted selector-`0x08` object in slot `+0xB4`. It uses no branch or code cave and remains default-off `Runtime Experimental` pending in-game action and restart tests.
 - The quest patch substitutes the supply and delivery menu-resource dispatches with the existing home-box resource. It remains `Runtime Experimental` until isolated gameplay tests prove all actions and quest-state safety.
+- Cemu displays independent leaves as `MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`, `Lobby Full Item Box`, and `Quest Full Item Box (Experimental)`.
 - For multiplayer, enable **only Lock 30 FPS**. Leave both box packs disabled.
 - Never enable this JP v96 catalog against another title, region, update, RPX hash, or module checksum.
 
