@@ -25,12 +25,16 @@ The user's launch command supplies `-m` but no `NEMESSIX_CEMU_DATA_ROOT`, so Cem
 /Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements/
 ```
 
-Installed and enabled:
+Installed and enabled / 已安装并启用：
 
 - `MH3G HD JP v96 - Lobby Full Item Box`
 - `MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)`
 
-The unstable 30 FPS pack is not installed and is not enabled. The installed eligibility-only red-box patch has SHA-256 `2adfe52d19c47e625640da9c6b638f07a4da3c9dc06a86f4ab97bd9beb50c227` and was rejected by the second gameplay run. The new repository candidate has SHA-256 `a377c2047623494c7bf9fab67d5a3eefc6860b0add9a74cca779c04a497a8dac`; it has deliberately not replaced the installed file while Cemu is running. The installed Lobby patch remains SHA-256 `86acd8733dab5aa5ccccc1cf767055a61751da8b7426aaa28502a30849a647e5`. A pre-edit settings backup exists at:
+Installed but disabled / 已安装但未启用：
+
+- `MH3G HD JP v96 - Lock 30 FPS`
+
+After two fresh zero-process checks, the installer deployed all three catalog packs without changing their saved enable states: 30 FPS remains disabled, while Lobby and Quest remain enabled. The installed new red-box candidate matches repository SHA-256 `a377c2047623494c7bf9fab67d5a3eefc6860b0add9a74cca779c04a497a8dac`; its ASM includes the red-local `0x028C5838 = li r5, 0xe` prompt rewrite. The installed Lobby patch remains SHA-256 `86acd8733dab5aa5ccccc1cf767055a61751da8b7426aaa28502a30849a647e5`. A pre-edit settings backup exists at:
 
 ```text
 /Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-red-box-20260801T170000
