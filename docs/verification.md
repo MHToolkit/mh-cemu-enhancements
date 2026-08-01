@@ -2,12 +2,12 @@
 
 ## Current static gates / 当前静态门槛
 
-1. `python3 -m unittest discover -s tests -v` — 16 tests passed. The suite covers manifest/schema validation, independent Cemu leaves, negative fail-closed gates, the lobby mode contract, the red-only quest control-flow contract, pinned RPX preimages/anchors, standard and isolated idempotent installation, explicit Experimental selection, profile inspection, legacy migration/uninstall, and reproducible asset-free packaging.
-2. `python3 scripts/mh-cemu-enhancements.py validate` — all three manifests accepted.
+1. `python3 -m unittest discover -s tests -v` — 17 tests passed. The suite covers manifest/schema validation, four independent Cemu leaves, negative fail-closed gates, the lobby mode contract, the red-only quest contract, the all-quest blue selector-0 control contract, pinned RPX preimages/anchors, standard and isolated idempotent installation, explicit Experimental selection, profile inspection, legacy migration/uninstall, and reproducible asset-free packaging.
+2. `python3 scripts/mh-cemu-enhancements.py validate` — all four manifests accepted.
 3. `verify-reference` accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared PPC preimage/anchor.
-4. Cemu 2.6's real `PPCAssembler` accepted all eight red-box instructions without launching Cemu. The six direct words are `38800000` (red eligibility uses supply selector), `38a0000e` (red-local prompt uses supply selector 14), `3c601031`, `806344a0`, `7fc4f378`, and `38a00000`; branch relocations resolve to `4b92e2b9` (`bl 0x021F0A8C`) and `48000020` (`b 0x028C27F8`).
+4. Cemu 2.6's real `PPCAssembler` accepted all eight red-box instructions and all six new blue-control instructions without launching Cemu. The blue words are `3c601031`, `806344a0`, `7fc4f378`, `38a00000`, `4b92e30d` (`bl 0x021F0A8C` from `0x028C2780`), and `48000074` (`b 0x028C27F8` from `0x028C2784`). The prior red branch words remain `38800000`, `38a0000e`, `3c601031`, `806344a0`, `7fc4f378`, `38a00000`, `4b92e2b9`, and `48000020`.
 5. `ruff check scripts tests` and `git diff --check` passed.
-6. Two independent package builds produced the same SHA-256; the current value is recorded in the adjacent distribution `.sha256` file.
+6. Two independent `0.1.13` package builds produced identical SHA-256 `111cf7e32c6d57adfb20d5ee386fac62e968dc9359575406418d48ef5273c7e3`. The archive has 29 files, includes all four packs, and contains no game asset or tool cache.
 
 ## Runtime evidence / 运行时证据
 
@@ -45,4 +45,4 @@ No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file wa
 
 ## Distribution / 分发
 
-`dist/mh-cemu-enhancements-0.1.12.zip` is deterministic, contains no game asset or tool cache, and has an adjacent `.sha256` verification file containing the final digest.
+`dist/mh-cemu-enhancements-0.1.13.zip` is deterministic, contains all four catalog packs and no game asset or tool cache, and has adjacent SHA-256 file `dist/mh-cemu-enhancements-0.1.13.zip.sha256` containing `111cf7e32c6d57adfb20d5ee386fac62e968dc9359575406418d48ef5273c7e3`.
