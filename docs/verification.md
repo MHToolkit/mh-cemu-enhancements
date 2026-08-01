@@ -1,26 +1,47 @@
-# Local verification record / 本地验证记录（2026-08-01）
+# Local verification record / 本地验证记录（2026-08-02）
 
 ## Current static gates / 当前静态门槛
 
-1. `python3 -m unittest discover -s tests -v` — 18 tests passed. The suite covers manifest/schema validation, catalog identities, negative fail-closed gates, the lobby mode contract, the blocked red-only quest contract, the revised all-quest blue selector-0 dispatch-bridge contract, refusal of the `runtime-blocked` red candidate, pinned RPX preimages/anchors, standard and isolated idempotent installation, explicit Experimental selection, profile inspection, legacy migration/uninstall, and reproducible asset-free packaging.
-2. `python3 scripts/mh-cemu-enhancements.py validate` — all four manifests accepted.
+1. `python3 -m unittest discover -s tests -v` — 19 tests passed. The suite covers five catalog identities, schema validation, fail-closed legacy quest candidates, the combined red+blue conditional-gate contract, pinned RPX preimages/anchors, standard and isolated idempotent installation, explicit Experimental selection, inspection, migration/uninstall, and reproducible asset-free packaging.
+2. `python3 scripts/mh-cemu-enhancements.py validate` — all five manifests accepted.
 3. `verify-reference` accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared PPC preimage/anchor.
-4. Cemu 2.6's real `PPCAssembler` accepted all eight retained red-box instructions and all seven revised blue-control instructions without launching Cemu. The revised blue words are `60000000` (`nop` at `0x02219DF0`), `3c601031`, `806344a0`, `7fc4f378`, `38a00000`, `4b92e30d` (`bl 0x021F0A8C` from `0x028C2780`), and `48000074` (`b 0x028C27F8` from `0x028C2784`). The prior red branch words remain `38800000`, `38a0000e`, `3c601031`, `806344a0`, `7fc4f378`, `38a00000`, `4b92e2b9`, and `48000020`.
-5. `ruff check scripts tests` and `git diff --check` passed.
-6. Two independent `0.1.15` package builds produced identical SHA-256 values. The source archive retains all four catalog entries, including the blocked red negative-evidence directory and the revised blue experimental candidate, and contains no game asset or tool cache. The final digest is kept in the adjacent `.sha256` file to avoid embedding a self-referential archive hash in a packaged document.
+4. Cemu 2.6's real `PPCAssembler` accepted all fifteen fixed-address combined-pack instructions without launching Cemu or allocating a code cave:
+
+```text
+02219de0 800c0354 lwz r0, 0x354(r12)
+02219de4 2c000006 cmpwi r0, 6
+02219de8 41820010 beq 0x02219df8
+02219dec 881f5350 lbz r0, 0x5350(r31)
+02219df0 2c000006 cmpwi r0, 6
+02219df4 40820078 bne 0x02219e6c
+028c2770 3c601031 lis r3, 0x1031
+028c2774 806344a0 lwz r3, 0x44a0(r3)
+028c2778 7fc4f378 mr r4, r30
+028c277c 38a00000 li r5, 0
+028c2780 4b92e30d bl 0x021f0a8c
+028c2784 48000074 b 0x028c27f8
+028c5824 38800000 li r4, 0
+028c5838 38a0000e li r5, 0xe
+028c5e80 38800000 li r4, 0
+```
+
+5. The original helper at `0x021B7E08` was disassembled from the immutable RPX. Its body reads scene-object field `+0x14`, compares it with the request, returns a Boolean, and has no side effect. Because original `0x02219DDC` already loads the enclosing scene manager, direct `+0x354` is equivalent to the original `+0x340` object plus `+0x14` state field.
+6. `ruff check scripts tests` and `git diff --check` passed.
+7. Two independent `0.1.16` package builds produced identical SHA-256 values. The archive retains all five catalog entries, including both runtime-blocked negative-evidence directories, and contains no game asset or tool cache. The final digest is kept in the adjacent `.sha256` file.
 
 ## Runtime evidence / 运行时证据
 
-- **Lobby / 大厅：** The current one-word `0x02799678 = li r5, 0` pack was tested by the user. The full menu appears, and equipment change, equipment sets, and talisman operations work. It is `Runtime Verified` while remaining default-off.
-- **30 FPS：** User testing was unstable. The pack is downgraded to default-off `Runtime Experimental`; hunting behavior was not tested.
-- **Quest red box / 任务红箱：** The first gameplay run showed a crossed prompt and no red-box interaction. Later runs proved both the eligibility-only revision and the red-local supply-prompt revision were loaded, but the red box still displayed the crossed unusable interaction. This is a recorded runtime failure, not a verified redirect; the candidate is now `runtime-blocked`.
-- **Quest blue control / 任务蓝箱对照：** The first revision retained the native usable prompt, but pressing the interaction button produced no menu. Static follow-up showed that initializer `0x021F0A8C` only stores menu state while the per-frame path `0x0214E084 -> 0x02219D10 -> 0x0215165C` exits early outside hub scene-state `6`. The revised candidate removes only that early exit at `0x02219DF0`; it preserves the following manager-validity and busy-state guards, while state `6` in `0x0215165C` still routes to `0x021F0D08`. Static evidence and assembly verification pass, but whether the dispatcher can request the lobby resource during a quest is still **Gameplay Pending / 待实机验证**.
+- **Lobby / 大厅：** The one-word `0x02799678 = li r5, 0` pack was tested by the user. The full menu appears, and equipment change, equipment sets, and talisman operations work. It remains `Runtime Verified` and opt-in.
+- **30 FPS：** User testing was unstable; hunting behavior was not tested. It remains default-off `Runtime Experimental`.
+- **Old red candidate / 旧红箱候选：** Repeated gameplay retained a crossed unusable prompt despite verified eligibility, prompt-ID, and confirmation rewrites. It remains `runtime-blocked`.
+- **Unconditional blue bridge / 无条件蓝箱桥：** The title initially loaded with only Lobby active. Later log entries proved that Cemu hot-applied the blue patch during the running title. Neither box opened the full menu, and the quest-board dialogue became blank. Since the six box-trigger instructions cannot run from the quest board, unconditional `0x02219DF0 = nop` is the direct cross-UI corruption source. The candidate is now `runtime-blocked`.
+- **Combined conditional bridge / 红蓝统一条件桥：** Static, assembler, install, and configuration evidence pass. It converts red prompt/dispatch semantics to the shared blue path, sends both boxes to mode `0`, and dispatches outside the hub only when global UI state is exactly full-item-box state `6`. It is **Gameplay Pending / 待实机验证**, not `Runtime Verified`.
 
-Earlier lobby selector/resource/code-cave/accessor attempts are retained only as negative research history. They either left the restricted menu unchanged or, for the code-cave candidate, crashed in the PPC recompiler. None is part of the current installed or packaged source.
+Earlier lobby selector/resource/code-cave/accessor attempts remain negative research history. The Cemu `.origin = codecave` candidate mapped to guest `0x01800000` and crashed in the PPC recompiler; the new combined pack contains no relocation or code cave.
 
 ## Installed standard profile / 已安装标准配置
 
-The user's launch command supplies `-m` but no `NEMESSIX_CEMU_DATA_ROOT`, so Cemu scans the standard macOS profile rather than the isolated outer root. After two fresh zero-process checks, the installer wrote only:
+The user's launch command supplies `-m` but no `NEMESSIX_CEMU_DATA_ROOT`, so Cemu scans the standard macOS profile. After confirming zero Cemu processes, the installer wrote only:
 
 ```text
 /Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements/
@@ -29,20 +50,33 @@ The user's launch command supplies `-m` but no `NEMESSIX_CEMU_DATA_ROOT`, so Cem
 Installed and enabled / 已安装并启用：
 
 - `MH3G HD JP v96 - Lobby Full Item Box`
-- `MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)`
+- `MH3G HD JP v96 - Quest Red & Blue Boxes - Full Item Box (Experimental)`
 
 Installed but disabled / 已安装但未启用：
 
 - `MH3G HD JP v96 - Lock 30 FPS`
 
-After a fresh zero-process check, the installer replaced only its receipted owned directory with the three selectable packs: Lobby, 30 FPS, and the revised blue dispatch bridge. It used the immutable reference RPX and recorded SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`. The blocked red directory is absent from the installed tree. `settings.xml` contains enabled entries only for Lobby and the revised blue candidate; 30 FPS remains installed without an enabled entry, and the red candidate has no entry. The pre-edit settings backup is:
+Absent and disabled / 未安装且未启用：
+
+- `MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)`
+- `MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)`
+
+The installer used the immutable reference RPX and recorded SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`. The pre-edit settings backup is:
 
 ```text
-/Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-dispatch-bridge-20260801T143611Z
+/Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-combined-conditional-20260801T183643Z
 ```
 
-The backup SHA-256 is `f25be1ff360b19abccdfb040ea173ed023f749ce147326ded20d34760eb0e900`; the post-edit XML parses successfully and has SHA-256 `74326d8bdd41c7ba9149d3b20d8f8060dd5ef9feb7627b514ce711dda165f500`. Final read-only inspection reports Lobby installed/enabled, 30 FPS installed/disabled, red installed=false/enabled=false, and revised blue installed/enabled. The installed blue ASM matches the source with SHA-256 `61ec085abb34423a62a5afa6e87f4d6a462dfd325bd0b6ed432a8f3a81a94971`. No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
+The backup SHA-256 is `b716b1c4549e91bbdea2c6d7c0bffc20b2e2a7c0ace5182043258261d02efed6`; the post-edit XML parses successfully and has SHA-256 `3504dc3a6d63c5e75d0e47719de806b80e8aaca648a07eb8c493916176e6bc78`. The installed combined ASM matches its source with SHA-256 `5b17b4784261ad558b074ca2066af29990a7a1f245b1772856255a8eef47583e`. Receipt tree hashes are:
+
+```text
+Lobby      76225166f133acfa0ea11b8773a5f2d1fe2317c24529c01e54378fb221c33580
+30 FPS     1bb04434c49729455ab155494689338f4894b7e0946f7f899bde7c437508a257
+Combined   c9e6052708bed8bdd684bfa757afe52f17b33e1fe274def1a1bc6bd378f4d95d
+```
+
+No Cemu process was launched by the repository workflow, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
 
 ## Distribution / 分发
 
-`dist/mh-cemu-enhancements-0.1.15.zip` is deterministic, retains all four catalog entries as source evidence, contains no game asset or tool cache, and has adjacent SHA-256 file `dist/mh-cemu-enhancements-0.1.15.zip.sha256` containing the final digest. Runtime selection fails closed for the blocked red candidate; the revised blue candidate still requires explicit Experimental selection.
+`dist/mh-cemu-enhancements-0.1.16.zip` is deterministic, retains all five catalog entries as source evidence, contains no game asset or tool cache, and has adjacent SHA-256 file `dist/mh-cemu-enhancements-0.1.16.zip.sha256`. Runtime selection fails closed for both older quest candidates; the combined conditional bridge requires explicit Experimental selection.

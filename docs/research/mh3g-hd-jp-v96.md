@@ -154,12 +154,35 @@ Static follow-up established the first missing lifecycle handoff:
 4. `0x021B7E08` 只是把请求值与对象 `+0x14` 的当前值比较。这是明确的据点上下文门槛，不是箱子编号查询。
 5. 完整仓库使用据点类/资源 `uIDLobbyMyhBox` / `GUI\\lobby\\myh_box2_n`；任务箱使用 `uIDCockpitBox`、`uIDCockpitShareBox` 与 `GUI\\quest\\...`。这种类分离使调度桥必须保持实验状态，但静态证据还不能证明恢复分派后，处理器 `0x021F0D08` 是否能够自行请求所需的据点资源。
 
-The revised blue control now tests that exact handoff. It keeps the original mode-0 trigger and replaces `0x02219DF0 = beq 0x02219E6C` with `nop`. This does not overwrite the stored scene-state value; it only stops a failed scene comparison from exiting early. The following manager validity and `+0x3D0/+0x20` busy guards remain, and dispatcher state `0` returns immediately. The revision is `availability = available`, default-off **Runtime Experimental / 运行时实验**, single-player only, and still requires gameplay evidence. Red remains `runtime-blocked`.
+The unconditional bridge tested that handoff by retaining the mode-0 trigger and replacing `0x02219DF0 = beq 0x02219E6C` with `nop`. Cemu's log proved that the user hot-loaded the patch after title startup. Gameplay still produced no full item-box menu from either box and blanked the quest-board dialogue. The six box-trigger instructions cannot run from the quest board, so the only cross-UI modification—the unconditional scene-gate bypass—is the direct cause. Both older candidates are now `runtime-blocked`.
 
-修订版蓝箱对照现在专门验证这处衔接：保留原模式 `0` 触发器，并把 `0x02219DF0 = beq 0x02219E6C` 改为 `nop`。它不会覆盖保存的场景状态值，只是不再让失败的场景比较提前退出；后续管理器有效性与 `+0x3D0/+0x20` 忙碌保护仍然存在，调度器状态 `0` 也会立即返回。该修订版以 `availability = available`、默认关闭的 **Runtime Experimental / 运行时实验** 状态重新开放，仅限单人，仍需实测。红箱继续 `runtime-blocked`。
+无条件调度桥保留模式 `0` 触发器，并把 `0x02219DF0 = beq 0x02219E6C` 改成 `nop` 来验证这处衔接。Cemu 日志证明用户在标题启动后成功热加载了该补丁；实测仍无法从任一箱子打开完整仓库，并使任务看板对话框空白。六条箱子触发指令不可能从任务看板执行，因此唯一跨 UI 的修改——无条件绕过场景门槛——就是直接原因。两个旧候选现均为 `runtime-blocked`。
+
+### Combined red+blue conditional bridge / 红蓝统一条件调度桥
+
+The approved functional trade-off removes both native quest-box roles: red no longer delivers and blue no longer dispenses supplies. Red prompt eligibility and prompt ID are changed to supply semantics, and red wrapper `0x028C5E80` changes selector `1` to `0`. Both objects therefore enter the same shared blue branch at `0x028C2770`, which calls `0x021F0A8C(player, mode=0)`.
+
+已批准的功能取舍会移除两个任务箱的原生职责：红箱不再交纳，蓝箱不再领取补给。红箱提示资格与提示编号改用补给语义，红箱包装入口 `0x028C5E80` 也把选择器 `1` 改为 `0`，因此两个对象共同进入 `0x028C2770` 的蓝箱共享分支，并调用 `0x021F0A8C(player, mode=0)`。
+
+The scene comparator `0x021B7E08` is pure: it reads `object +0x14`, compares the requested state, returns a Boolean, and has no side effect. The combined pack can therefore replace its six-instruction call/test window without a code cave:
+
+场景比较函数 `0x021B7E08` 是纯函数：只读取 `object +0x14`、比较请求状态并返回布尔值，没有副作用。因此统一包可以不用 code cave，直接替换其六指令调用/检查窗口：
+
+```asm
+0x02219de0 = lwz r0, 0x354(r12)
+0x02219de4 = cmpwi r0, 6
+0x02219de8 = beq 0x02219df8
+0x02219dec = lbz r0, 0x5350(r31)
+0x02219df0 = cmpwi r0, 6
+0x02219df4 = bne 0x02219e6c
+```
+
+`r12` is still the scene manager loaded by original `0x02219DDC`; `+0x354` is the original `+0x340` object plus comparator field `+0x14`. Hub scene state `6` reaches the unchanged busy guards. Outside the hub, only explicit full-item-box global state `6` may reach them; quest board, HUD, pause, and other states return to the original skip target. Cemu 2.6's real assembler accepted all fifteen fixed-address replacements, and the patch contains no `.origin = codecave`. This is **Gameplay Pending / 待实机验证**, not runtime proof.
+
+`r12` 仍是原指令 `0x02219DDC` 读取的场景管理器；`+0x354` 等于原来的 `+0x340` 对象再加比较字段 `+0x14`。据点场景状态 `6` 进入未修改的忙碌保护；任务场景只有明确的全局完整仓库状态 `6` 才能进入，任务看板、HUD、暂停及其他状态都回到原跳过目标。Cemu 2.6 真实汇编器已接受全部十五条定址替换，补丁不含 `.origin = codecave`。该候选为 **Gameplay Pending / 待实机验证**，不是运行时成功证据。
 
 ## Runtime validation gate
 
-No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. Red remains `runtime-blocked`. The revised blue dispatch bridge is available but gameplay-pending `Runtime Experimental`; static and installation evidence must not promote it. The 30 FPS pack remains available but experimental after unstable user testing.
+No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. Both older quest candidates are `runtime-blocked`. The combined conditional bridge is available but gameplay-pending `Runtime Experimental`; static and installation evidence must not promote it. The 30 FPS pack remains available but experimental after unstable user testing.
 
-仓库验证流程没有启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。红箱继续 `runtime-blocked`。修订版蓝箱调度桥已开放但仍是等待实测的 `Runtime Experimental`；静态与安装证据不得把它升级。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。
+仓库验证流程没有启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。两个旧任务箱候选均为 `runtime-blocked`。红蓝统一条件桥已开放但仍是等待实测的 `Runtime Experimental`；静态与安装证据不得把它升级。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。

@@ -11,11 +11,12 @@ It distributes no RPX, RPL, WUA, save, MLC, key, texture dump, or other game ass
 | Lock 30 FPS | `Runtime Experimental` | `available` | no |
 | Lobby full item box | `Runtime Verified` | `available` | no |
 | Quest red delivery box -> full item box | `Runtime Experimental` | `runtime-blocked` | no |
-| Quest blue supply box -> full item box (dispatch-bridge control) | `Runtime Experimental` | `available` | no |
+| Quest blue supply box -> full item box (unconditional bridge control) | `Runtime Experimental` | `runtime-blocked` | no |
+| Quest red & blue boxes -> full item box (conditional bridge) | `Runtime Experimental` | `available` | no |
 
 Target identity: Wii U title `0005000010104D00`, Japan update v96, RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`, Cemu patch module checksum `0x348600a0`.
 
-`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable. Repeated red-box tests remained unusable. The first blue control accepted input without opening a menu; static tracing found its missing per-frame dispatch behind the hub scene-state gate. The revised blue control now adds that dispatch bridge and is available only as a gameplay-pending single-player experiment. Red remains `runtime-blocked`.
+`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable. Repeated red-box tests remained unusable. The unconditional blue dispatch bridge hot-loaded but still opened no menu and blanked the quest-board dialogue, so both old quest candidates are blocked. The new combined candidate routes both boxes through the shared mode-0 initializer and permits per-frame dispatch outside the hub only for explicit full-item-box state `6`; it remains gameplay-pending.
 
 ## Validate and install
 
@@ -34,19 +35,19 @@ python3 scripts/mh-cemu-enhancements.py install \
   --reference-rpx /absolute/path/to/MH3G_Cafe.rpx \
   --pack mh3g-hd-jp-v96-lobby-full-item-box
 
-# Install the revised blue dispatch-bridge control; Experimental must be explicit.
+# Install the combined red+blue conditional bridge; Experimental must be explicit.
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /absolute/path/to/cemu-data-root \
   --reference-rpx /absolute/path/to/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control \
+  --pack mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental \
   --include-experimental
 
-# Red remains runtime-blocked. Install 30 FPS explicitly with
+# Both old quest candidates remain runtime-blocked. Install 30 FPS explicitly with
 # --include-experimental if desired.
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.15.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.16.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
@@ -63,15 +64,16 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
   --cemu-app /absolute/path/Cemu.app
 ```
 
-Run the printed command manually, then open **Graphic Packs**, select the desired available switches, and restart/reload the title. The red experiment remains blocked. The blue dispatch bridge is single-player and gameplay-pending; leave 30 FPS disabled until its instability is understood.
+Run the printed command manually, then open **Graphic Packs**, select the desired available switches, and restart/reload the title. Both old quest experiments remain blocked. The combined conditional bridge is single-player and gameplay-pending; leave 30 FPS disabled until its instability is understood.
 
 ## Compatibility and online use
 
 - The 30 FPS pack uses per-pack `vsyncFrequency = 30`, not a global Cemu setting. User testing was unstable, so it is default-off `Runtime Experimental`.
 - The lobby pack changes one Port Tanzia interaction instruction from restricted mode `r5 = 1` to full mode `r5 = 0` at shared initializer `0x021F0A8C`. It redirects no object and uses no branch or code cave. User gameplay verified the complete menu plus equipment, equipment-set, and talisman actions, so it is `Runtime Verified` while remaining opt-in.
 - The red candidate changes only the **red delivery box**, but gameplay continued to show an unusable crossed prompt. It is retained for static history and is `runtime-blocked` from installation.
-- The first blue control reached the shared selector-0 branch and retained the normal prompt, but pressing the interaction button opened no menu. `0x021F0A8C` only stores state `6`; the sole dispatcher for that state was skipped by the hub scene-state check. The revised control keeps its six-instruction trigger and changes original `0x02219DF0 = beq 0x02219E6C` to `nop`, retaining the following manager and busy-state guards before `0x0215165C`. It is `Runtime Experimental`, available only for isolated single-player validation, and not a runtime-success claim.
-- Available Cemu leaves are `MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`, `Lobby Full Item Box`, and `Quest Blue Supply Box -> Full Item Box (Control)`. The catalog keeps red as non-installable negative evidence.
+- The unconditional blue bridge changed `0x02219DF0` to `nop`. Cemu proved it hot-loaded, but it still opened no item-box menu and blanked quest-board dialogue by exposing unrelated quest UI states to the lobby dispatcher. It is now `runtime-blocked`.
+- The combined candidate converts red prompt/dispatch semantics to the shared blue path, sends both boxes to initializer mode `0`, and replaces the original scene-helper window with an inline OR gate: hub scene state `6` or explicit global full-item-box state `6`. Every other quest UI state returns to the original skip target; the original busy guard remains. It uses no code cave and remains gameplay-pending `Runtime Experimental`.
+- Available Cemu leaves are `MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`, `Lobby Full Item Box`, and `Quest Red & Blue Boxes -> Full Item Box (Experimental)`. The catalog keeps both old quest candidates as non-installable negative evidence.
 - Leave all item-box modification packs disabled for multiplayer. The 30 FPS pack is also not recommended until its instability is resolved.
 - Never enable this JP v96 catalog against another title, region, update, RPX hash, or module checksum.
 

@@ -15,6 +15,7 @@ packs/
         lobby-full-item-box/
         quest-delivery-full-item-box-experimental/
         quest-blue-supply-box-full-item-box-control/
+        quest-red-blue-full-item-box-experimental/
 ```
 
 The platform, canonical title, region, and update/version are path components, not repository-level assumptions. A future `mh4u-hd`, non-Monster-Hunter title, or another region can add its own platform/title/version leaf without changing the public scripts or schemas.
@@ -45,7 +46,9 @@ Status records evidence maturity; `availability` independently controls whether 
 - Box work targets interaction/menu dispatch classes, never save contents or a visible chest model.
 - PPC patches may not install against a mismatching checksum or preimage/target anchor.
 - The red quest-delivery candidate excludes the original blue branch, but repeated gameplay remained unusable; it is `runtime-blocked`.
-- The first independent blue control confirmed that the initializer alone cannot produce a usable menu through the quest interaction path. The revised control adds a minimal per-frame dispatch bridge at `0x02219DF0`, retains the following manager/busy guards, and is available only as a default-off single-player `Runtime Experimental` candidate.
+- The independent blue control confirmed that the initializer alone cannot produce a usable menu. Its unconditional `0x02219DF0 = nop` bridge hot-loaded but blanked quest-board dialogue and still opened no item box, so it is also `runtime-blocked`.
+- The combined red+blue candidate unifies both objects at the shared selector-0 path and replaces the original helper-call window with an inline conditional gate. Only hub scene state `6` or explicit full-item-box UI state `6` reaches the untouched busy guards and dispatcher; it uses no code cave and remains default-off `Runtime Experimental`.
 - 红箱候选没有修改原版蓝箱分支，但多次实测仍不可用，因此标记为 `runtime-blocked`。
-- 第一版独立蓝箱对照证明，仅调用据点完整仓库初始化器不能通过任务交互链构造可用菜单。修订版在 `0x02219DF0` 增加最小逐帧调度桥，同时保留后续管理器/忙碌保护；它只作为默认关闭、仅限单人的 `Runtime Experimental` 候选重新开放。
+- 独立蓝箱对照证明，仅调用据点完整仓库初始化器不能产生可用菜单。它的无条件 `0x02219DF0 = nop` 调度桥虽然成功热加载，却导致任务看板对话框空白且仍不弹仓库，因此同样标记为 `runtime-blocked`。
+- 红蓝统一候选让两个对象共同进入选择器 `0` 路径，并在原辅助函数窗口内实现条件门槛。只有据点场景状态 `6` 或明确的完整仓库 UI 状态 `6` 才能进入未改动的忙碌保护与调度器；不使用 code cave，保持默认关闭的 `Runtime Experimental`。
 - For online play, leave all item-box modification packs disabled. The 30 FPS pack is also default-off while its instability is unresolved.
