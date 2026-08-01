@@ -30,7 +30,7 @@ Installed and enabled:
 - `MH3G HD JP v96 - Lobby Full Item Box`
 - `MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)`
 
-The unstable 30 FPS pack is not installed and is not enabled. XML parsing plus catalog `inspect` confirm both installed box packs are enabled. The currently installed first red-box candidate has SHA-256 `5cd41f7973d1b0c92a6a57d5f1347952db36a899498953ec8182f212f3f8c972`; it is superseded by repository source `2adfe52d19c47e625640da9c6b638f07a4da3c9dc06a86f4ab97bd9beb50c227` and must not be replaced until Cemu is fully exited. A pre-edit settings backup exists at:
+The unstable 30 FPS pack is not installed and is not enabled. After two zero-process checks, XML parsing plus catalog `inspect` confirm both installed box packs are enabled. The installed revised red-box patch now matches repository source SHA-256 `2adfe52d19c47e625640da9c6b638f07a4da3c9dc06a86f4ab97bd9beb50c227`; the installed Lobby patch likewise matches repository source SHA-256 `86acd8733dab5aa5ccccc1cf767055a61751da8b7426aaa28502a30849a647e5`. A pre-edit settings backup exists at:
 
 ```text
 /Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-red-box-20260801T170000
