@@ -1,0 +1,272 @@
+{
+  "id": "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "availability": "available",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-red-blue-full-item-box-experimental",
+  "install_folder": "MH3G HD JP v96 - Quest Red & Blue Boxes - Full Item Box (Experimental)",
+  "rules": "rules.txt",
+  "patch": "patch_quest_red_blue_full_item_box.asm",
+  "preimages": [
+    {
+      "address": "0x02219de0",
+      "word": "0x38800006",
+      "meaning": "原逻辑准备据点场景状态值 6；统一包从这里开始内联场景比较。 / Original logic prepares hub scene-state value 6; the combined pack starts its inline scene comparison here."
+    },
+    {
+      "address": "0x02219de4",
+      "word": "0x386c0340",
+      "meaning": "原逻辑计算场景状态对象 +0x340。 / Original logic derives the scene-state object at +0x340."
+    },
+    {
+      "address": "0x02219de8",
+      "word": "0x4bf9e021",
+      "meaning": "原逻辑调用纯比较函数 0x021B7E08。 / Original logic calls pure comparator 0x021B7E08."
+    },
+    {
+      "address": "0x02219dec",
+      "word": "0x2c030000",
+      "meaning": "原逻辑检查场景比较结果。 / Original logic tests the scene-comparison result."
+    },
+    {
+      "address": "0x02219df0",
+      "word": "0x4182007c",
+      "meaning": "原逻辑在非据点场景跳过状态调度；统一包改为只允许完整仓库状态 6。 / Original logic skips state dispatch outside the hub; the combined pack additionally permits only full-item-box state 6."
+    },
+    {
+      "address": "0x02219df4",
+      "word": "0x819d0000",
+      "meaning": "原逻辑重新读取场景管理器；内联比较已保留该指针，因此该槽改为条件跳过。 / Original logic reloads the scene manager; the inline comparison retains that pointer, so this slot becomes the conditional skip."
+    },
+    {
+      "address": "0x028c2770",
+      "word": "0x819e0e30",
+      "meaning": "蓝箱共享确认路径原本读取补给箱对象状态。 / The shared blue confirmation path originally reads supply-box object state."
+    },
+    {
+      "address": "0x028c2774",
+      "word": "0x3d601008",
+      "meaning": "蓝箱原路径加载任务状态全局地址高半部。 / The original blue path loads the high half of a quest-state global."
+    },
+    {
+      "address": "0x028c2778",
+      "word": "0x39000001",
+      "meaning": "蓝箱原路径准备补给箱状态值 1。 / The original blue path prepares supply-box state value 1."
+    },
+    {
+      "address": "0x028c277c",
+      "word": "0xc00be204",
+      "meaning": "蓝箱原路径读取补给交互浮点状态。 / The original blue path reads floating-point supply interaction state."
+    },
+    {
+      "address": "0x028c2780",
+      "word": "0x38800000",
+      "meaning": "蓝箱原路径准备补给模式参数。 / The original blue path prepares its supply-mode argument."
+    },
+    {
+      "address": "0x028c2784",
+      "word": "0x990c0bae",
+      "meaning": "蓝箱原路径写入补给对象状态字节。 / The original blue path writes a supply-object state byte."
+    },
+    {
+      "address": "0x028c5824",
+      "word": "0x38800001",
+      "meaning": "红箱提示资格原本使用交纳语义 1；统一包改为补给语义 0。 / Red prompt eligibility originally uses delivery semantics 1; the combined pack changes it to supply semantics 0."
+    },
+    {
+      "address": "0x028c5838",
+      "word": "0x38a0000f",
+      "meaning": "红箱原本注册交纳提示 15；统一包改用可交互补给提示 14。 / Red originally registers delivery prompt 15; the combined pack uses usable supply prompt 14."
+    },
+    {
+      "address": "0x028c5e80",
+      "word": "0x38800001",
+      "meaning": "红箱分派原本传入选择器 1；统一包改为 0，使其进入蓝箱共享路径。 / Red dispatch originally passes selector 1; the combined pack changes it to 0 so it enters the shared blue path."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x0215165c",
+      "word": "0x89835350",
+      "meaning": "菜单状态调度器读取全局 UI 状态。 / The menu-state dispatcher reads the global UI state."
+    },
+    {
+      "address": "0x02151698",
+      "word": "0x480000b4",
+      "meaning": "状态 6 分派到完整仓库跳板。 / State 6 dispatches to the full-item-box trampoline."
+    },
+    {
+      "address": "0x0215174c",
+      "word": "0x4809f5bc",
+      "meaning": "状态 6 跳板进入完整仓库处理器。 / The state-6 trampoline enters the full-item-box handler."
+    },
+    {
+      "address": "0x021b7e14",
+      "word": "0x81830014",
+      "meaning": "原场景比较函数读取对象 +0x14 当前状态。 / The original scene comparator reads current state at object +0x14."
+    },
+    {
+      "address": "0x021b7e18",
+      "word": "0x7c806278",
+      "meaning": "场景比较函数用异或比较请求值。 / The scene comparator XORs the requested value."
+    },
+    {
+      "address": "0x021b7e1c",
+      "word": "0x7c0b0034",
+      "meaning": "场景比较函数把比较结果规范化。 / The scene comparator normalizes its comparison result."
+    },
+    {
+      "address": "0x021b7e20",
+      "word": "0x5560d97e",
+      "meaning": "场景比较函数继续生成布尔结果。 / The scene comparator continues producing a Boolean result."
+    },
+    {
+      "address": "0x021b7e24",
+      "word": "0x7c030378",
+      "meaning": "场景比较函数把布尔值放入返回寄存器。 / The scene comparator places the Boolean in the return register."
+    },
+    {
+      "address": "0x021b7e28",
+      "word": "0x4e800020",
+      "meaning": "场景比较函数直接返回，无副作用。 / The scene comparator returns directly without side effects."
+    },
+    {
+      "address": "0x021f0ad0",
+      "word": "0x9bfc6e12",
+      "meaning": "共享初始化器保存完整/受限模式。 / The shared initializer stores full/restricted mode."
+    },
+    {
+      "address": "0x021f0af0",
+      "word": "0x2c1f0001",
+      "meaning": "共享初始化器比较受限模式 1。 / The shared initializer compares restricted mode 1."
+    },
+    {
+      "address": "0x021f0af4",
+      "word": "0x38000006",
+      "meaning": "模式 0 选择完整仓库状态 6。 / Mode 0 selects full-item-box state 6."
+    },
+    {
+      "address": "0x021f0afc",
+      "word": "0x38000003",
+      "meaning": "模式 1 选择受限仓库状态 3。 / Mode 1 selects restricted item-box state 3."
+    },
+    {
+      "address": "0x021f0d08",
+      "word": "0x7c0802a6",
+      "meaning": "完整仓库逐帧处理器入口。 / Full-item-box per-frame handler entry."
+    },
+    {
+      "address": "0x02219dd8",
+      "word": "0x3fa01031",
+      "meaning": "原更新函数加载场景管理器全局地址高半部。 / The original updater loads the scene-manager global high half."
+    },
+    {
+      "address": "0x02219ddc",
+      "word": "0x859d4278",
+      "meaning": "保留的原指令读取场景管理器并更新 r29。 / The retained original instruction reads the scene manager and updates r29."
+    },
+    {
+      "address": "0x02219df8",
+      "word": "0x356c03d0",
+      "meaning": "原忙碌保护计算管理器 +0x3D0。 / The original busy guard derives manager +0x3D0."
+    },
+    {
+      "address": "0x02219dfc",
+      "word": "0x41820070",
+      "meaning": "忙碌对象无效时跳过调度。 / Dispatch is skipped when the busy object is invalid."
+    },
+    {
+      "address": "0x02219e00",
+      "word": "0x892b0020",
+      "meaning": "读取忙碌对象 +0x20 标志。 / Read the busy flag at object +0x20."
+    },
+    {
+      "address": "0x02219e04",
+      "word": "0x2c090000",
+      "meaning": "比较忙碌标志。 / Compare the busy flag."
+    },
+    {
+      "address": "0x02219e08",
+      "word": "0x40820064",
+      "meaning": "非零忙碌标志跳过调度。 / A nonzero busy flag skips dispatch."
+    },
+    {
+      "address": "0x02219e4c",
+      "word": "0x7fe3fb78",
+      "meaning": "把全局 UI 管理器传给状态调度器。 / Pass the global UI manager to the state dispatcher."
+    },
+    {
+      "address": "0x02219e50",
+      "word": "0x4bf3780d",
+      "meaning": "逐帧调用菜单状态调度器。 / Call the menu-state dispatcher each frame."
+    },
+    {
+      "address": "0x028c2768",
+      "word": "0x2c1f0000",
+      "meaning": "共享交互比较蓝/红选择器。 / The shared interaction compares the blue/red selector."
+    },
+    {
+      "address": "0x028c276c",
+      "word": "0x40820048",
+      "meaning": "非零选择器进入原红箱分支。 / A nonzero selector enters the original red branch."
+    },
+    {
+      "address": "0x028c27f8",
+      "word": "0x3d201008",
+      "meaning": "统一完整仓库请求返回共享收尾路径。 / The unified full-item-box request rejoins common cleanup."
+    },
+    {
+      "address": "0x028c5828",
+      "word": "0x4b8a5bd5",
+      "meaning": "红箱提示调用共享资格函数。 / Red prompt registration calls shared eligibility."
+    },
+    {
+      "address": "0x028c582c",
+      "word": "0x2c030000",
+      "meaning": "红箱提示要求允许结果 0。 / Red prompt registration requires allowed result 0."
+    },
+    {
+      "address": "0x028c5830",
+      "word": "0x40820018",
+      "meaning": "资格失败时跳过红箱提示。 / Eligibility failure skips the red prompt."
+    },
+    {
+      "address": "0x028c583c",
+      "word": "0x38800001",
+      "meaning": "红箱继续使用提示构建模式 1。 / Red keeps prompt-builder mode 1."
+    },
+    {
+      "address": "0x028c5844",
+      "word": "0x4bfcc8c1",
+      "meaning": "红箱本地调用点注册已替换的提示。 / The red-local call site registers the replaced prompt."
+    },
+    {
+      "address": "0x028c5e78",
+      "word": "0x38800000",
+      "meaning": "蓝箱分派原生选择器为 0。 / Native blue dispatch selector is 0."
+    },
+    {
+      "address": "0x028c5e7c",
+      "word": "0x4bffc874",
+      "meaning": "蓝箱尾调用共享交互函数。 / Blue tail-calls the shared interaction."
+    },
+    {
+      "address": "0x028c5e84",
+      "word": "0x4bffc86c",
+      "meaning": "红箱修改选择器后仍尾调用同一共享函数。 / Red still tail-calls the same shared interaction after selector replacement."
+    }
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "所有任务中的红箱与蓝箱统一进入完整仓库初始化器，只有据点场景或完整仓库状态 6 才能通过逐帧调度门槛；等待单人实测。 / Both quest boxes enter the full-item-box initializer, while per-frame dispatch permits only the hub scene or explicit full-item-box state 6; awaiting single-player gameplay validation."
+}

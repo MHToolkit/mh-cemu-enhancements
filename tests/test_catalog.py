@@ -38,6 +38,7 @@ class CatalogTests(unittest.TestCase):
                 "mh3g-hd-jp-v96-lobby-full-item-box",
                 "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
                 "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
+                "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
             },
             {pack["id"] for pack in result.packs},
         )
@@ -60,6 +61,10 @@ class CatalogTests(unittest.TestCase):
             "quest-blue-supply-box-full-item-box-control": (
                 "MH Cemu Enhancements/MH3G HD JP v96/"
                 "Quest Blue Supply Box -> Full Item Box (Control)"
+            ),
+            "quest-red-blue-full-item-box-experimental": (
+                "MH Cemu Enhancements/MH3G HD JP v96/"
+                "Quest Red & Blue Boxes -> Full Item Box (Experimental)"
             ),
         }
 
@@ -156,7 +161,7 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
-    def test_include_experimental_adds_fps_and_blue_dispatch_bridge(self):
+    def test_include_experimental_adds_fps_and_combined_quest_pack(self):
         result = self.tool.validate_repository(REPO)
 
         selected = self.tool.select_packs(result.packs, [], include_experimental=True)
@@ -164,12 +169,12 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
-                "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
+                "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
             },
             {pack["id"] for pack in selected},
         )
 
-    def test_runtime_blocked_red_pack_cannot_be_selected_explicitly(self):
+    def test_old_quest_candidates_are_runtime_blocked(self):
         result = self.tool.validate_repository(REPO)
 
         with self.assertRaisesRegex(ValueError, "runtime-blocked"):
@@ -179,15 +184,12 @@ class CatalogTests(unittest.TestCase):
                 include_experimental=True,
             )
 
-        selected = self.tool.select_packs(
-            result.packs,
-            ["mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"],
-            include_experimental=True,
-        )
-        self.assertEqual(
-            {"mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"},
-            {pack["id"] for pack in selected},
-        )
+        with self.assertRaisesRegex(ValueError, "runtime-blocked"):
+            self.tool.select_packs(
+                result.packs,
+                ["mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"],
+                include_experimental=True,
+            )
 
     def test_explicit_lobby_selection_is_verified_and_excludes_quest(self):
         result = self.tool.validate_repository(REPO)
@@ -334,7 +336,9 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", blue["status"])
         self.assertFalse(blue["default_install"])
-        self.assertEqual("available", blue["availability"])
+        self.assertEqual("runtime-blocked", blue["availability"])
+        self.assertIn("任务看板", blue["availability_reason"])
+        self.assertIn("quest board", blue["availability_reason"])
         self.assertEqual(
             {
                 0x02219DF0: 0x4182007C,
@@ -402,6 +406,106 @@ class CatalogTests(unittest.TestCase):
         self.assertNotIn("0x021b0f14", patch.lower())
         self.assertNotIn("0x028c27c4", patch.lower())
         self.assertNotIn("quest id", patch.lower())
+        self.assertNotIn("codecave", patch.lower())
+
+    def test_quest_red_blue_combined_pack_is_conditionally_gated(self):
+        result = self.tool.validate_repository(REPO)
+        combined = next(
+            pack
+            for pack in result.packs
+            if pack["id"] == "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental"
+        )
+
+        self.assertEqual("Runtime Experimental", combined["status"])
+        self.assertFalse(combined["default_install"])
+        self.assertEqual("available", combined["availability"])
+        self.assertIn("任务", combined["summary"])
+        self.assertIn("quest", combined["summary"].lower())
+        self.assertEqual(
+            {
+                0x02219DE0: 0x38800006,
+                0x02219DE4: 0x386C0340,
+                0x02219DE8: 0x4BF9E021,
+                0x02219DEC: 0x2C030000,
+                0x02219DF0: 0x4182007C,
+                0x02219DF4: 0x819D0000,
+                0x028C2770: 0x819E0E30,
+                0x028C2774: 0x3D601008,
+                0x028C2778: 0x39000001,
+                0x028C277C: 0xC00BE204,
+                0x028C2780: 0x38800000,
+                0x028C2784: 0x990C0BAE,
+                0x028C5824: 0x38800001,
+                0x028C5838: 0x38A0000F,
+                0x028C5E80: 0x38800001,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in combined["preimages"]
+            },
+        )
+        self.assertEqual(
+            {
+                0x0215165C: 0x89835350,
+                0x02151698: 0x480000B4,
+                0x0215174C: 0x4809F5BC,
+                0x021B7E14: 0x81830014,
+                0x021B7E18: 0x7C806278,
+                0x021B7E1C: 0x7C0B0034,
+                0x021B7E20: 0x5560D97E,
+                0x021B7E24: 0x7C030378,
+                0x021B7E28: 0x4E800020,
+                0x021F0AD0: 0x9BFC6E12,
+                0x021F0AF0: 0x2C1F0001,
+                0x021F0AF4: 0x38000006,
+                0x021F0AFC: 0x38000003,
+                0x021F0D08: 0x7C0802A6,
+                0x02219DD8: 0x3FA01031,
+                0x02219DDC: 0x859D4278,
+                0x02219DF8: 0x356C03D0,
+                0x02219DFC: 0x41820070,
+                0x02219E00: 0x892B0020,
+                0x02219E04: 0x2C090000,
+                0x02219E08: 0x40820064,
+                0x02219E4C: 0x7FE3FB78,
+                0x02219E50: 0x4BF3780D,
+                0x028C2768: 0x2C1F0000,
+                0x028C276C: 0x40820048,
+                0x028C27F8: 0x3D201008,
+                0x028C5828: 0x4B8A5BD5,
+                0x028C582C: 0x2C030000,
+                0x028C5830: 0x40820018,
+                0x028C583C: 0x38800001,
+                0x028C5844: 0x4BFCC8C1,
+                0x028C5E78: 0x38800000,
+                0x028C5E7C: 0x4BFFC874,
+                0x028C5E84: 0x4BFFC86C,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in combined["anchors"]
+            },
+        )
+        patch = (REPO / combined["pack_dir"] / combined["patch"]).read_text()
+        for instruction in (
+            "0x02219de0 = lwz r0, 0x354(r12)",
+            "0x02219de4 = cmpwi r0, 6",
+            "0x02219de8 = beq 0x02219df8",
+            "0x02219dec = lbz r0, 0x5350(r31)",
+            "0x02219df0 = cmpwi r0, 6",
+            "0x02219df4 = bne 0x02219e6c",
+            "0x028c2770 = lis r3, 0x1031",
+            "0x028c2774 = lwz r3, 0x44a0(r3)",
+            "0x028c2778 = mr r4, r30",
+            "0x028c277c = li r5, 0",
+            "0x028c2780 = bl 0x021f0a8c",
+            "0x028c2784 = b 0x028c27f8",
+            "0x028c5824 = li r4, 0",
+            "0x028c5838 = li r5, 0xe",
+            "0x028c5e80 = li r4, 0",
+        ):
+            self.assertIn(instruction, patch)
+        self.assertNotIn("0x02219df0 = nop", patch.lower())
         self.assertNotIn("codecave", patch.lower())
 
     def test_inspect_reports_installed_pack_that_is_not_enabled(self):
