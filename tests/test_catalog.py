@@ -161,35 +161,31 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
-    def test_include_experimental_adds_fps_and_combined_quest_pack(self):
+    def test_include_experimental_adds_only_installable_experimental_packs(self):
         result = self.tool.validate_repository(REPO)
 
         selected = self.tool.select_packs(result.packs, [], include_experimental=True)
 
         self.assertEqual(
-            {
-                "mh3g-hd-jp-v96-fps-lock-30",
-                "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
-            },
+            {"mh3g-hd-jp-v96-fps-lock-30"},
             {pack["id"] for pack in selected},
         )
 
-    def test_old_quest_candidates_are_runtime_blocked(self):
+    def test_all_quest_full_item_box_candidates_are_runtime_blocked(self):
         result = self.tool.validate_repository(REPO)
 
-        with self.assertRaisesRegex(ValueError, "runtime-blocked"):
-            self.tool.select_packs(
-                result.packs,
-                ["mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental"],
-                include_experimental=True,
-            )
-
-        with self.assertRaisesRegex(ValueError, "runtime-blocked"):
-            self.tool.select_packs(
-                result.packs,
-                ["mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"],
-                include_experimental=True,
-            )
+        for pack_id in (
+            "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
+            "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
+            "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
+        ):
+            with self.subTest(pack_id=pack_id):
+                with self.assertRaisesRegex(ValueError, "runtime-blocked"):
+                    self.tool.select_packs(
+                        result.packs,
+                        [pack_id],
+                        include_experimental=True,
+                    )
 
     def test_explicit_lobby_selection_is_verified_and_excludes_quest(self):
         result = self.tool.validate_repository(REPO)
@@ -408,7 +404,7 @@ class CatalogTests(unittest.TestCase):
         self.assertNotIn("quest id", patch.lower())
         self.assertNotIn("codecave", patch.lower())
 
-    def test_quest_red_blue_combined_pack_is_conditionally_gated(self):
+    def test_quest_red_blue_combined_pack_retains_runtime_rejection_evidence(self):
         result = self.tool.validate_repository(REPO)
         combined = next(
             pack
@@ -418,7 +414,10 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", combined["status"])
         self.assertFalse(combined["default_install"])
-        self.assertEqual("available", combined["availability"])
+        self.assertEqual("runtime-blocked", combined["availability"])
+        self.assertIn("0x02141B8C", combined["availability_reason"])
+        self.assertIn("0x0268AB84", combined["availability_reason"])
+        self.assertIn("GUI", combined["availability_reason"])
         self.assertIn("任务", combined["summary"])
         self.assertIn("quest", combined["summary"].lower())
         self.assertEqual(

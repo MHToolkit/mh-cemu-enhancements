@@ -47,8 +47,8 @@ Status records evidence maturity; `availability` independently controls whether 
 - PPC patches may not install against a mismatching checksum or preimage/target anchor.
 - The red quest-delivery candidate excludes the original blue branch, but repeated gameplay remained unusable; it is `runtime-blocked`.
 - The independent blue control confirmed that the initializer alone cannot produce a usable menu. Its unconditional `0x02219DF0 = nop` bridge hot-loaded but blanked quest-board dialogue and still opened no item box, so it is also `runtime-blocked`.
-- The combined red+blue candidate unifies both objects at the shared selector-0 path and replaces the original helper-call window with an inline conditional gate. Only hub scene state `6` or explicit full-item-box UI state `6` reaches the untouched busy guards and dispatcher; it uses no code cave and remains default-off `Runtime Experimental`.
+- The combined red+blue candidate unifies both objects at the shared selector-0 path and replaces the original helper-call window with an inline conditional gate. Asynchronous GDB subsequently proved the complete native slot-6 lifecycle reaches a null lobby-GUI layout dereference at `0x0268AB84` in quest context. The source remains reproducible evidence, but installation fails closed as `runtime-blocked`.
 - 红箱候选没有修改原版蓝箱分支，但多次实测仍不可用，因此标记为 `runtime-blocked`。
 - 独立蓝箱对照证明，仅调用据点完整仓库初始化器不能产生可用菜单。它的无条件 `0x02219DF0 = nop` 调度桥虽然成功热加载，却导致任务看板对话框空白且仍不弹仓库，因此同样标记为 `runtime-blocked`。
-- 红蓝统一候选让两个对象共同进入选择器 `0` 路径，并在原辅助函数窗口内实现条件门槛。只有据点场景状态 `6` 或明确的完整仓库 UI 状态 `6` 才能进入未改动的忙碌保护与调度器；不使用 code cave，保持默认关闭的 `Runtime Experimental`。
+- 红蓝统一候选让两个对象共同进入选择器 `0` 路径，并在原辅助函数窗口内实现条件门槛。后续异步 GDB 已证明完整原生槽 6 生命周期在任务场景会因大厅 GUI 布局为空而于 `0x0268AB84` 解引用崩溃。源码保留作可复现证据，但安装按 `runtime-blocked` 失败关闭。
 - For online play, leave all item-box modification packs disabled. The 30 FPS pack is also default-off while its instability is unresolved.

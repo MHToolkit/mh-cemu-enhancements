@@ -177,12 +177,30 @@ The scene comparator `0x021B7E08` is pure: it reads `object +0x14`, compares the
 0x02219df4 = bne 0x02219e6c
 ```
 
-`r12` is still the scene manager loaded by original `0x02219DDC`; `+0x354` is the original `+0x340` object plus comparator field `+0x14`. Hub scene state `6` reaches the unchanged busy guards. Outside the hub, only explicit full-item-box global state `6` may reach them; quest board, HUD, pause, and other states return to the original skip target. Cemu 2.6's real assembler accepted all fifteen fixed-address replacements, and the patch contains no `.origin = codecave`. This is **Gameplay Pending / 待实机验证**, not runtime proof.
+`r12` is still the scene manager loaded by original `0x02219DDC`; `+0x354` is the original `+0x340` object plus comparator field `+0x14`. Hub scene state `6` reaches the unchanged busy guards. Outside the hub, only explicit full-item-box global state `6` may reach them; quest board, HUD, pause, and other states return to the original skip target. Cemu 2.6's real assembler accepted all fifteen fixed-address replacements, and the patch contains no `.origin = codecave`. These facts establish the static candidate only; the runtime trace below rejects it.
 
-`r12` 仍是原指令 `0x02219DDC` 读取的场景管理器；`+0x354` 等于原来的 `+0x340` 对象再加比较字段 `+0x14`。据点场景状态 `6` 进入未修改的忙碌保护；任务场景只有明确的全局完整仓库状态 `6` 才能进入，任务看板、HUD、暂停及其他状态都回到原跳过目标。Cemu 2.6 真实汇编器已接受全部十五条定址替换，补丁不含 `.origin = codecave`。该候选为 **Gameplay Pending / 待实机验证**，不是运行时成功证据。
+`r12` 仍是原指令 `0x02219DDC` 读取的场景管理器；`+0x354` 等于原来的 `+0x340` 对象再加比较字段 `+0x14`。据点场景状态 `6` 进入未修改的忙碌保护；任务场景只有明确的全局完整仓库状态 `6` 才能进入，任务看板、HUD、暂停及其他状态都回到原跳过目标。Cemu 2.6 真实汇编器已接受全部十五条定址替换，补丁不含 `.origin = codecave`。这些事实只能成立静态候选；下述运行时追踪已否定它。
+
+### Asynchronous GDB lifecycle trace / 异步 GDB 生命周期追踪
+
+Non-blocking GDB RSP traces first proved that a blue-box interaction reaches patched trigger `0x028C2770` and initializer `0x021F0A8C` with the correct UI manager, current player, and mode `0`. Manager fields changed to global state `6`, active flag `1`, and full-menu substate `6`. The hub updater `0x02219DE0`, dispatcher `0x0215165C`, and handler `0x021F0D08` were never scheduled by the quest scene. An ephemeral guest-RAM call to handler `0x021F0D08` reached scene request `0x02143220(sceneManager, 1, 0)`, but still produced no menu.
+
+非阻塞 GDB RSP 追踪首先证明：蓝箱交互会以正确的 UI 管理器、当前玩家与模式 `0` 到达补丁触发点 `0x028C2770` 和初始化器 `0x021F0A8C`。管理器字段也确实变为全局状态 `6`、活动标志 `1`、完整菜单子状态 `6`。但任务场景不会调度据点更新器 `0x02219DE0`、状态分派器 `0x0215165C` 与处理器 `0x021F0D08`。在 guest RAM 中临时直调 `0x021F0D08` 后，追踪到场景请求 `0x02143220(sceneManager, 1, 0)`，仍没有菜单。
+
+The next trace constructed scene slot 6 through factory `0x0213FDDC`; constructor `0x021B9BE0` stored it at `sceneManager + 0x4C`, and full-item object setup `0x021BD1B4` ran, yet no UI appeared. A clean title-start trace then identified the missing native lifecycle exactly: helper `0x02141B8C(sceneManager, r5=0, r6=0x00040000)` creates slot 6 and invokes its vtable `+0x44`, entering virtual initializer `0x021BA8E8(slot6, r5=0, r6=0x00040000, r7=6)`.
+
+下一轮追踪通过工厂 `0x0213FDDC` 构造场景槽 6；构造函数 `0x021B9BE0` 把对象写到 `sceneManager + 0x4C`，完整仓库对象初始化 `0x021BD1B4` 也已执行，但 UI 仍未出现。随后在干净标题启动过程中抓到缺失的原生生命周期：辅助函数 `0x02141B8C(sceneManager, r5=0, r6=0x00040000)` 会创建槽 6，再调用其 vtable `+0x44`，进入虚函数初始化 `0x021BA8E8(slot6, r5=0, r6=0x00040000, r7=6)`。
+
+The final guest-RAM experiment reproduced that complete native sequence inside a quest, then called the full-box initializer and handler. Slot 6 was populated with GUI resource pointers, object setup completed, the scene request completed, and next-frame slot-6 update `0x021B9E70` ran. Cemu then received signal 10: a GUI layout/widget lookup returned null and `0x0268AB84 = lwz r3, 0xFC(r3)` dereferenced it. This is definitive evidence that the quest scene lacks the lobby-only layout/resource graph required by `uIDLobbyMyhBox`; it is not a box ID, red/blue selector, mode, or dispatcher defect.
+
+最终 guest RAM 实验在任务中完整复现上述原生顺序，再调用完整仓库初始化器与处理器。场景槽 6 已填入 GUI 资源指针，对象初始化完成，场景请求完成，下一帧槽 6 更新 `0x021B9E70` 也已执行；随后 Cemu 收到 signal 10：GUI 布局/控件查询返回空值，`0x0268AB84 = lwz r3, 0xFC(r3)` 对其解引用。该证据明确说明任务场景缺少 `uIDLobbyMyhBox` 依赖的大厅专用布局/资源图；问题不是箱子编号、红蓝选择器、模式或少一次分派。
+
+Porting that GUI graph would require a quest-native replacement scene with resource loading, input ownership, rendering layers, teardown, and multiplayer auditing—well beyond a safe fixed-address Graphic Pack. Per the approved fallback, all quest full-item-box candidates are `runtime-blocked`. The experimental assembly remains only as reproducible negative evidence and must not be installed.
+
+若继续实现，就需要在任务中移植或重建一套原生替代场景，并处理资源加载、输入归属、渲染层、销毁流程与联机审计；这已经超出安全定址 Graphic Pack 的范围。按已批准的回退方案，所有任务完整仓库候选均标记为 `runtime-blocked`。实验汇编只保留为可复现的负面证据，不得安装。
 
 ## Runtime validation gate
 
-No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. Both older quest candidates are `runtime-blocked`. The combined conditional bridge is available but gameplay-pending `Runtime Experimental`; static and installation evidence must not promote it. The 30 FPS pack remains available but experimental after unstable user testing.
+Repository-only verification does not launch Cemu. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. All three quest candidates are `runtime-blocked`; asynchronous GDB runtime evidence rejects the combined bridge even though its static contract remains valid. The 30 FPS pack remains available but experimental after unstable user testing.
 
-仓库验证流程没有启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。两个旧任务箱候选均为 `runtime-blocked`。红蓝统一条件桥已开放但仍是等待实测的 `Runtime Experimental`；静态与安装证据不得把它升级。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。
+纯仓库验证流程不会启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。三个任务箱候选均为 `runtime-blocked`；红蓝统一桥虽然静态契约成立，但已被异步 GDB 运行时证据否定。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。
