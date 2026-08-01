@@ -47,28 +47,29 @@ The supplied Bilibili URL (`BV1XC4y1q74u`) could not be retrieved by the static 
 
 All instruction words below are big-endian words from the immutable RPX text section. The installer verifies the RPX SHA-256 and every source/anchor word before copying a PPC pack; Cemu additionally gates the patch group with `moduleMatches = 0x348600a0`.
 
-### Lobby restricted-object accessor redirect (Experimental)
+### Lobby restricted-mode override (Experimental)
 
-The earlier branch, six-site substitution, full-home code-cave, and 3DS-informed `r9` candidates all loaded in Cemu while the restricted three-option menu remained. They are superseded and are not gameplay success. The valid 3DS reference supplied for Port Tanzia changes `0x008EA6D0` from ARM `0xE3A02001` (`MOV r2, #1`) to `0xE3A02000` (`MOV r2, #0`), but that ARM register cannot be mapped to a PPC register by position. The latest in-game screenshot proves that the PPC `li r9, 0` candidate also did not alter the menu.
+The earlier branch, six-site substitution, full-home code-cave, 3DS-register-position `r9`, and resident-object accessor candidates all loaded in Cemu while the restricted three-option menu remained. They are superseded and are not gameplay success. The latest accessor run is especially conclusive: Cemu's log records module checksum `0x348600a0`, application of patch group `MH3G HD JP v96`, and activation of the Lobby leaf, while the screenshot still shows only deposit, withdrawal, and combine/sell.
 
-The PPC comparison explains why: both the first restricted path and the complete home path pass `r9 = 1` into their shared initializer. It is not the menu-class selector. The factory selectors also run while `sID::IDLobby` initializes its resident UI objects, not when the player opens a box. Redirecting those factory branches changed the object layout and the dual-selector code-cave candidate crashed Cemu before gameplay.
+The valid 3DS reference supplied for Port Tanzia changes `0x008EA6D0` from ARM `0xE3A02001` (`MOV r2, #1`) to `0xE3A02000` (`MOV r2, #0`). The complete extracted 3DS `.code` was reverse-LZSS decompressed to SHA-256 `3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77`. Disassembly proves that this is the third argument to ARM function `0x005DEC70`, not a menu count or UI factory selector. That function stores the argument as a mode byte and selects state value `3` when the mode equals `1`, otherwise value `6`.
 
-The correct layer is the `sID::IDLobby` virtual accessor at `0x021baf70` (vtable entry `+0x4c`). Initialization creates the selector-`0x08` restricted object in slot `+0xb4`, the selector-`0x0e` complete-home object in slot `+0xa8`, and the alternate selector-`0x07` restricted object in slot `+0xc4`. When the accessor receives logical UI ID `0x17`, its only object-return instruction is `0x021baff4 = lwz r3, 0xb4(r3)`. The replacement changes only that D-form displacement to `+0xa8`.
+The Wii U semantic counterpart is PPC function `0x021F0A8C`. It stores its third PPC argument (`r5`) at object offset `+0x6E12`, performs the same `mode == 1` comparison, and writes the same `3` versus `6` state values. There are exactly two direct PPC callers. The sibling complete-box path at `0x027995F8` passes `r5 = 0`; the Port Tanzia restricted path at `0x02799678` passes `r5 = 1`; both immediately call `0x021F0A8C`. This argument/data-flow match is the cross-architecture mapping that the old register-position guess lacked.
 
-| Role | Address | Original big-endian word | Evidence / replacement |
+| Role | Address | Original big-endian word | Evidence |
 | --- | --- | --- | --- |
-| Restricted slot `+0xb4` | `0x021b2af0`, `0x021b2b00` | `li r4, 0x08`; `stw r3, 0xb4(r31)` | Factory selector `0x08` is created once and stored |
-| Complete-home slot `+0xa8` | `0x021b2bd0`, `0x021b2be0` | `li r4, 0x0e`; `stw r3, 0xa8(r31)` | Complete-home object is already resident |
-| Alternate restricted slot `+0xc4` | `0x021b2c78`, `0x021b2c88` | `li r4, 0x07`; `stw r3, 0xc4(r31)` | Alternate restricted object remains untouched |
-| Logical-ID guard | `0x021bafa4`, `0x021bafa8` | `cmplwi r4, 0x17`; `beq 0x021bafe4` | Isolates the requested lobby interaction path |
-| Restricted-object return | `0x021baff4` | `0x806300b4` | Replace with `0x806300a8` (`lwz r3, 0xa8(r3)`) |
-| Return anchor | `0x021baff8` | `0x4e800020` | Returns the selected resident object directly |
+| Store mode | `0x021f0ad0` | `0x9bfc6e12` | `stb r31, 0x6e12(r28)` stores the third argument |
+| Mode test | `0x021f0af0` | `0x2c1f0001` | `cmpwi r31, 1` |
+| Unrestricted value | `0x021f0af4` | `0x38000006` | Defaults to state value `6` |
+| Restricted override | `0x021f0af8`, `0x021f0afc` | `bne +8`; `li r0, 3` | Mode `1` changes the state value to `3` |
+| State store | `0x021f0b00` | `0xb01d000c` | Stores the selected state into the shared box state |
+| Complete caller | `0x027995f8`, `0x02799600` | `li r5, 0`; `bl 0x021f0a8c` | Existing unrestricted call |
+| Port caller | `0x02799678`, `0x02799680` | `li r5, 1`; `bl 0x021f0a8c` | Patch the mode argument only |
 
 ```asm
-0x021baff4 = lwz r3, 0x00a8(r3)
+0x02799678 = li r5, 0
 ```
 
-This does not construct a different object, alter the physical chest model, or touch save data. It reuses the complete-home object that the unmodified game already created and changes only the object selected for logical UI ID `0x17`. The candidate is **Runtime Experimental**, default-off, and available only through explicit experimental opt-in until in-game evidence proves equipment, talismans, deposit/withdrawal, combine/sell, and clean restart behavior.
+This does not replace a UI object, construct a different object, alter the physical chest model, or touch save data. It changes one existing Port interaction argument from restricted mode to the game's own unrestricted mode. The candidate is **Runtime Experimental**, default-off, and available only through explicit experimental opt-in until in-game evidence proves equipment/set/talisman actions, deposit/withdrawal, combine/sell, closing and reopening, and a clean restart.
 
 ### Quest supply/delivery -> home resource dispatch (Experimental)
 

@@ -43,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.8.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.9.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
@@ -65,7 +65,7 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 ## Compatibility and online use
 
 - The 30 FPS pack uses per-pack `vsyncFrequency = 30`, not a global Cemu setting.
-- The current lobby candidate changes one `sID::IDLobby` accessor instruction: logical UI ID `0x17` returns the already-created complete-home object in slot `+0xA8` instead of the restricted selector-`0x08` object in slot `+0xB4`. It uses no branch or code cave and remains default-off `Runtime Experimental` pending in-game action and restart tests.
+- The current lobby candidate changes one Port Tanzia interaction instruction: the restricted-mode argument passed to shared box initializer `0x021F0A8C` becomes the game's existing full mode (`r5 = 1` to `r5 = 0`). The initializer's `mode == 1 ? 3 : 6` control flow matches the known-good 3DS patch semantically. It redirects no object, uses no branch or code cave, and remains default-off `Runtime Experimental` pending in-game menu/action and restart tests.
 - The quest patch substitutes the supply and delivery menu-resource dispatches with the existing home-box resource. It remains `Runtime Experimental` until isolated gameplay tests prove all actions and quest-state safety.
 - Cemu displays independent leaves as `MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`, `Lobby Full Item Box`, and `Quest Full Item Box (Experimental)`.
 - For multiplayer, enable **only Lock 30 FPS**. Leave both box packs disabled.

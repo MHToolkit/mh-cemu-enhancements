@@ -15,56 +15,56 @@
   "patch": "patch_lobby_full_item_box.asm",
   "preimages": [
     {
-      "address": "0x021baff4",
-      "word": "0x806300b4",
-      "meaning": "IDLobby accessor returns the restricted selector-0x08 object from slot +0xB4 for logical UI ID 0x17."
+      "address": "0x02799678",
+      "word": "0x38a00001",
+      "meaning": "The Port Tanzia interaction passes box mode 1 in PPC argument r5; the pack changes it to unrestricted mode 0."
     }
   ],
   "anchors": [
     {
-      "address": "0x021b2af0",
-      "word": "0x38800008",
-      "meaning": "IDLobby initialization requests restricted factory selector 0x08."
+      "address": "0x021f0ad0",
+      "word": "0x9bfc6e12",
+      "meaning": "The shared box initializer stores its third PPC argument as the mode byte at object offset +0x6E12."
     },
     {
-      "address": "0x021b2b00",
-      "word": "0x907f00b4",
-      "meaning": "The selector-0x08 restricted object is stored in IDLobby slot +0xB4."
+      "address": "0x021f0af0",
+      "word": "0x2c1f0001",
+      "meaning": "The shared box initializer compares the mode argument with restricted mode 1."
     },
     {
-      "address": "0x021b2bd0",
-      "word": "0x3880000e",
-      "meaning": "IDLobby initialization requests complete-home factory selector 0x0E."
+      "address": "0x021f0af4",
+      "word": "0x38000006",
+      "meaning": "The unrestricted path begins with menu-state value 6."
     },
     {
-      "address": "0x021b2be0",
-      "word": "0x907f00a8",
-      "meaning": "The selector-0x0E complete-home object is stored in IDLobby slot +0xA8."
+      "address": "0x021f0af8",
+      "word": "0x40820008",
+      "meaning": "Modes other than 1 keep the unrestricted value 6."
     },
     {
-      "address": "0x021b2c78",
-      "word": "0x38800007",
-      "meaning": "IDLobby initialization requests the alternate restricted factory selector 0x07."
+      "address": "0x021f0afc",
+      "word": "0x38000003",
+      "meaning": "Restricted mode 1 replaces the menu-state value with 3."
     },
     {
-      "address": "0x021b2c88",
-      "word": "0x907f00c4",
-      "meaning": "The selector-0x07 restricted object is stored in IDLobby slot +0xC4."
+      "address": "0x021f0b00",
+      "word": "0xb01d000c",
+      "meaning": "The selected unrestricted/restricted menu-state value is stored in the shared box state."
     },
     {
-      "address": "0x021bafa4",
-      "word": "0x28040017",
-      "meaning": "IDLobby accessor compares the requested logical UI ID with 0x17."
+      "address": "0x027995f8",
+      "word": "0x38a00000",
+      "meaning": "The sibling full-box interaction already passes unrestricted mode 0 to the same initializer."
     },
     {
-      "address": "0x021bafa8",
-      "word": "0x4182003c",
-      "meaning": "Logical UI ID 0x17 branches to the restricted-slot return block at 0x021BAFE4."
+      "address": "0x02799600",
+      "word": "0x4ba5748d",
+      "meaning": "The sibling full-box interaction calls the shared box initializer at 0x021F0A8C."
     },
     {
-      "address": "0x021baff8",
-      "word": "0x4e800020",
-      "meaning": "The selected object is returned directly to the interaction caller."
+      "address": "0x02799680",
+      "word": "0x4ba5740d",
+      "meaning": "The Port Tanzia interaction calls the same shared box initializer immediately after the patched mode argument."
     }
   ],
   "source": {
@@ -73,5 +73,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "Experimental no-code-cave redirect: logical lobby UI ID 0x17 returns the already-created complete-home object from IDLobby slot +0xA8 instead of the restricted object at +0xB4."
+  "summary": "Experimental one-word semantic port of the known 3DS Port Tanzia patch: pass unrestricted mode 0 instead of restricted mode 1 to the shared box initializer."
 }

@@ -43,7 +43,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.8.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.9.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -65,7 +65,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 ## 补丁语义、兼容与联机
 
 - 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置。
-- 当前酒场候选只改一条 `sID::IDLobby` accessor 指令：逻辑 UI ID `0x17` 不再返回 `+0xB4` 中 selector `0x08` 的受限对象，而是返回 `+0xA8` 中已经创建好的家中完整箱子对象。它不使用分支或 code cave，仍保持默认关闭的 `Runtime Experimental`，等待游戏内功能与重启验证。
+- 当前酒场候选只改一条 Port Tanzia 交互指令：把传给共享箱子初始化函数 `0x021F0A8C` 的受限模式参数由 `r5 = 1` 改为游戏已有的完整模式 `r5 = 0`。该函数中的 `mode == 1 ? 3 : 6` 控制流与 3DS 已知有效补丁完全对应；它不替换箱子对象、不使用分支或 code cave，仍保持默认关闭的 `Runtime Experimental`，等待游戏内菜单与重启验证。
 - 任务补给箱/交纳箱补丁将两个**菜单资源分派**指向已有的家中完整箱子资源；它不是箱子模型替换，也不触碰存档。因为尚未进行隔离游戏内验证，保持 `Runtime Experimental`、默认关闭。
 - Cemu 中的独立叶子依次为：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`、`Lobby Full Item Box`、`Quest Full Item Box (Experimental)`。
 - 联机建议只启用 **锁定 30 FPS**；两个箱子包都关闭。

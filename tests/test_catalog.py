@@ -169,7 +169,7 @@ class CatalogTests(unittest.TestCase):
             {pack["id"] for pack in selected},
         )
 
-    def test_lobby_candidate_redirects_restricted_accessor_without_a_code_cave(self):
+    def test_lobby_candidate_maps_restricted_box_mode_to_full_mode(self):
         result = self.tool.validate_repository(REPO)
         lobby = next(pack for pack in result.packs if pack["id"] == "mh3g-hd-jp-v96-lobby-full-item-box")
 
@@ -182,26 +182,26 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertEqual(
             {
-                0x021BAFF4: 0x806300B4,
+                0x02799678: 0x38A00001,
             },
             {self.tool._number(item["address"]): self.tool._number(item["word"]) for item in lobby["preimages"]},
         )
         self.assertEqual(
             {
-                0x021B2AF0: 0x38800008,
-                0x021B2B00: 0x907F00B4,
-                0x021B2BD0: 0x3880000E,
-                0x021B2BE0: 0x907F00A8,
-                0x021B2C78: 0x38800007,
-                0x021B2C88: 0x907F00C4,
-                0x021BAFA4: 0x28040017,
-                0x021BAFA8: 0x4182003C,
-                0x021BAFF8: 0x4E800020,
+                0x021F0AD0: 0x9BFC6E12,
+                0x021F0AF0: 0x2C1F0001,
+                0x021F0AF4: 0x38000006,
+                0x021F0AF8: 0x40820008,
+                0x021F0AFC: 0x38000003,
+                0x021F0B00: 0xB01D000C,
+                0x027995F8: 0x38A00000,
+                0x02799600: 0x4BA5748D,
+                0x02799680: 0x4BA5740D,
             },
             {self.tool._number(item["address"]): self.tool._number(item["word"]) for item in lobby["anchors"]},
         )
         patch = (REPO / lobby["pack_dir"] / lobby["patch"]).read_text()
-        self.assertIn("0x021baff4 = lwz r3, 0x00a8(r3)", patch)
+        self.assertIn("0x02799678 = li r5, 0", patch)
         self.assertNotIn("codecave", patch.lower())
 
     def test_fps_lock_records_the_confirmed_runtime_result(self):
