@@ -45,7 +45,7 @@ Status records evidence maturity; `availability` independently controls whether 
 - Box work targets interaction/menu dispatch classes, never save contents or a visible chest model.
 - PPC patches may not install against a mismatching checksum or preimage/target anchor.
 - The red quest-delivery candidate excludes the original blue branch, but repeated gameplay remained unusable; it is `runtime-blocked`.
-- The independent blue control confirmed that the hub full-item-box initializer cannot produce a usable menu through the quest interaction path. Its follow-on dispatcher is gated by hub scene state `6`, so this candidate is also `runtime-blocked` rather than exposed as a Cemu switch.
+- The first independent blue control confirmed that the initializer alone cannot produce a usable menu through the quest interaction path. The revised control adds a minimal per-frame dispatch bridge at `0x02219DF0`, retains the following manager/busy guards, and is available only as a default-off single-player `Runtime Experimental` candidate.
 - 红箱候选没有修改原版蓝箱分支，但多次实测仍不可用，因此标记为 `runtime-blocked`。
-- 独立蓝箱对照证明，据点完整仓库初始化器无法通过任务交互链构造可用菜单；其后续调度还受据点场景状态 `6` 限制，因此同样标记为 `runtime-blocked`，不再暴露为 Cemu 可安装开关。
+- 第一版独立蓝箱对照证明，仅调用据点完整仓库初始化器不能通过任务交互链构造可用菜单。修订版在 `0x02219DF0` 增加最小逐帧调度桥，同时保留后续管理器/忙碌保护；它只作为默认关闭、仅限单人的 `Runtime Experimental` 候选重新开放。
 - For online play, leave all item-box modification packs disabled. The 30 FPS pack is also default-off while its instability is unresolved.
