@@ -10,6 +10,9 @@
     },
     {
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-delivery-full-item-box-experimental/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-blue-supply-box-full-item-box-control/manifest.json"
     }
   ]
 }

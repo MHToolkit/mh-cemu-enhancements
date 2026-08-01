@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)
+path = MH Cemu Enhancements/MH3G HD JP v96/Quest Blue Supply Box -> Full Item Box (Control)
+description = 全任务蓝色补给箱完整道具箱对照；不改红箱。 / All-quest blue supply-box full item-box control; red is untouched.
+version = 7

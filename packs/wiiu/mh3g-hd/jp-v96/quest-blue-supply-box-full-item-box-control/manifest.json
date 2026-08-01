@@ -1,0 +1,117 @@
+{
+  "id": "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "availability": "available",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-blue-supply-box-full-item-box-control",
+  "install_folder": "MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)",
+  "rules": "rules.txt",
+  "patch": "patch_quest_blue_supply_full_item_box.asm",
+  "preimages": [
+    {
+      "address": "0x028c2770",
+      "word": "0x819e0e30",
+      "meaning": "蓝箱确认路径原本读取补给箱对象状态。 / The original blue confirmation path reads supply-box object state."
+    },
+    {
+      "address": "0x028c2774",
+      "word": "0x3d601008",
+      "meaning": "蓝箱确认路径原本加载任务状态全局地址的高半部。 / The original blue path loads the high half of a quest-state global address."
+    },
+    {
+      "address": "0x028c2778",
+      "word": "0x39000001",
+      "meaning": "蓝箱确认路径原本准备补给箱状态值 1。 / The original blue path prepares supply-box state value 1."
+    },
+    {
+      "address": "0x028c277c",
+      "word": "0xc00be204",
+      "meaning": "蓝箱确认路径原本读取任务补给交互使用的浮点状态。 / The original blue path reads floating-point state used by quest supply interaction."
+    },
+    {
+      "address": "0x028c2780",
+      "word": "0x38800000",
+      "meaning": "蓝箱确认路径原本准备补给模式参数 0。 / The original blue path prepares supply-mode argument 0."
+    },
+    {
+      "address": "0x028c2784",
+      "word": "0x990c0bae",
+      "meaning": "蓝箱确认路径原本写入补给箱对象状态字节。 / The original blue path writes a supply-box object-state byte."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x021f0ad0",
+      "word": "0x9bfc6e12",
+      "meaning": "完整/受限道具箱共用初始化器保存模式参数。 / The shared full/restricted item-box initializer stores its mode argument."
+    },
+    {
+      "address": "0x021f0af0",
+      "word": "0x2c1f0001",
+      "meaning": "共用初始化器比较受限模式 1。 / The shared initializer compares restricted mode 1."
+    },
+    {
+      "address": "0x021f0af4",
+      "word": "0x38000006",
+      "meaning": "模式 0 使用完整道具箱菜单状态 6。 / Mode 0 selects full item-box menu state 6."
+    },
+    {
+      "address": "0x021f0afc",
+      "word": "0x38000003",
+      "meaning": "受限模式 1 使用菜单状态 3。 / Restricted mode 1 selects menu state 3."
+    },
+    {
+      "address": "0x028c2768",
+      "word": "0x2c1f0000",
+      "meaning": "共享交互函数比较蓝箱/红箱选择器；零值为蓝箱。 / The shared interaction compares the blue/red selector; zero selects blue."
+    },
+    {
+      "address": "0x028c276c",
+      "word": "0x40820048",
+      "meaning": "非零选择器跳到红箱分支，蓝箱继续进入本包覆盖块。 / A nonzero selector branches to red, while blue falls through into this pack's rewrite."
+    },
+    {
+      "address": "0x028c27b4",
+      "word": "0x7fc3f378",
+      "meaning": "红箱专属路径从这里开始，位于蓝箱覆盖范围之外。 / The red-only path starts here, outside the blue rewrite."
+    },
+    {
+      "address": "0x028c27f8",
+      "word": "0x3d201008",
+      "meaning": "蓝箱完整道具箱调用完成后回到共享收尾路径。 / The blue full item-box call rejoins common cleanup here."
+    },
+    {
+      "address": "0x028c5e78",
+      "word": "0x38800000",
+      "meaning": "所有任务的蓝色补给箱分派固定传入选择器 0。 / The shared all-quest blue supply dispatch passes selector 0."
+    },
+    {
+      "address": "0x028c5e7c",
+      "word": "0x4bffc874",
+      "meaning": "蓝箱分派尾调用共享箱子交互函数。 / Blue dispatch tail-calls the shared box interaction."
+    },
+    {
+      "address": "0x028c5e80",
+      "word": "0x38800001",
+      "meaning": "红色交纳箱分派固定传入选择器 1。 / Red delivery dispatch passes selector 1."
+    },
+    {
+      "address": "0x028c5e84",
+      "word": "0x4bffc86c",
+      "meaning": "红箱分派尾调用同一共享函数，证明其独立路径保持存在。 / Red dispatch tail-calls the same function, proving its separate path remains present."
+    }
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "覆盖全任务共享蓝箱确认路径并打开模式 0 的完整道具箱；红箱与任务数据保持不变。 / Redirect the shared all-quest blue confirmation path to full item-box mode 0 while leaving red and quest data unchanged."
+}
