@@ -37,6 +37,7 @@ class CatalogTests(unittest.TestCase):
                 "mh3g-hd-jp-v96-fps-lock-30",
                 "mh3g-hd-jp-v96-lobby-full-item-box",
                 "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
+                "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
             },
             {pack["id"] for pack in result.packs},
         )
@@ -55,6 +56,10 @@ class CatalogTests(unittest.TestCase):
             "quest-delivery-full-item-box-experimental": (
                 "MH Cemu Enhancements/MH3G HD JP v96/"
                 "Quest Red Delivery Box -> Full Item Box (Experimental)"
+            ),
+            "quest-blue-supply-box-full-item-box-control": (
+                "MH Cemu Enhancements/MH3G HD JP v96/"
+                "Quest Blue Supply Box -> Full Item Box (Control)"
             ),
         }
 
@@ -160,6 +165,7 @@ class CatalogTests(unittest.TestCase):
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
                 "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
+                "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
             },
             {pack["id"] for pack in selected},
         )
@@ -295,6 +301,64 @@ class CatalogTests(unittest.TestCase):
         self.assertIn("0x028c27d8 = b 0x028c27f8", patch)
         self.assertNotIn("0x021b0e90", patch.lower())
         self.assertNotIn("0x021b0f14", patch.lower())
+        self.assertNotIn("codecave", patch.lower())
+
+    def test_quest_blue_supply_box_control_is_global_and_isolated(self):
+        result = self.tool.validate_repository(REPO)
+        blue = next(
+            pack
+            for pack in result.packs
+            if pack["id"] == "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control"
+        )
+
+        self.assertEqual("Runtime Experimental", blue["status"])
+        self.assertFalse(blue["default_install"])
+        self.assertEqual("available", blue["availability"])
+        self.assertEqual(
+            {
+                0x028C2770: 0x819E0E30,
+                0x028C2774: 0x3D601008,
+                0x028C2778: 0x39000001,
+                0x028C277C: 0xC00BE204,
+                0x028C2780: 0x38800000,
+                0x028C2784: 0x990C0BAE,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in blue["preimages"]
+            },
+        )
+        self.assertEqual(
+            {
+                0x021F0AD0: 0x9BFC6E12,
+                0x021F0AF0: 0x2C1F0001,
+                0x021F0AF4: 0x38000006,
+                0x021F0AFC: 0x38000003,
+                0x028C2768: 0x2C1F0000,
+                0x028C276C: 0x40820048,
+                0x028C27B4: 0x7FC3F378,
+                0x028C27F8: 0x3D201008,
+                0x028C5E78: 0x38800000,
+                0x028C5E7C: 0x4BFFC874,
+                0x028C5E80: 0x38800001,
+                0x028C5E84: 0x4BFFC86C,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in blue["anchors"]
+            },
+        )
+        patch = (REPO / blue["pack_dir"] / blue["patch"]).read_text()
+        self.assertIn("0x028c2770 = lis r3, 0x1031", patch)
+        self.assertIn("0x028c2774 = lwz r3, 0x44a0(r3)", patch)
+        self.assertIn("0x028c2778 = mr r4, r30", patch)
+        self.assertIn("0x028c277c = li r5, 0", patch)
+        self.assertIn("0x028c2780 = bl 0x021f0a8c", patch)
+        self.assertIn("0x028c2784 = b 0x028c27f8", patch)
+        self.assertNotIn("0x021b0e90", patch.lower())
+        self.assertNotIn("0x021b0f14", patch.lower())
+        self.assertNotIn("0x028c27c4", patch.lower())
+        self.assertNotIn("quest id", patch.lower())
         self.assertNotIn("codecave", patch.lower())
 
     def test_inspect_reports_installed_pack_that_is_not_enabled(self):
