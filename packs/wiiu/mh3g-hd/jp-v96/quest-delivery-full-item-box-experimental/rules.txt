@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)
 path = MH Cemu Enhancements/MH3G HD JP v96/Quest Red Delivery Box -> Full Item Box (Experimental)
-description = 仅把任务内红色交纳箱改为完整道具箱；蓝色补给箱保持原版。 / Redirect only the red quest delivery box to the full item box; keep the blue supply box original.
+description = 红箱按补给箱资格判定并打开完整道具箱；蓝色补给箱保持原版。 / Use supply-box eligibility for the red box and open the full item box; keep the blue supply box original.
 version = 7

@@ -15,6 +15,11 @@
   "patch": "patch_quest_delivery_full_item_box.asm",
   "preimages": [
     {
+      "address": "0x028c5824",
+      "word": "0x38800001",
+      "meaning": "红箱提示生成原本使用交纳箱资格参数 1；补丁改用补给箱资格参数 0，使任务进行状态下仍可注册交互。 / Red prompt generation originally uses delivery eligibility 1; the patch uses supply eligibility 0 so interaction remains registered during active quest states."
+    },
+    {
       "address": "0x028c27c4",
       "word": "0x3fe01031",
       "meaning": "红色交纳箱路径加载交纳数据管理器地址的高半部。 / Red delivery path loads the delivery-data manager address high half."
@@ -47,6 +52,46 @@
   ],
   "anchors": [
     {
+      "address": "0x0216b410",
+      "word": "0x2c000008",
+      "meaning": "共用资格函数拒绝任务状态 8。 / The shared eligibility function rejects quest state 8."
+    },
+    {
+      "address": "0x0216b418",
+      "word": "0x2c000003",
+      "meaning": "共用资格函数单独识别任务状态 3。 / The shared eligibility function handles quest state 3 separately."
+    },
+    {
+      "address": "0x0216b428",
+      "word": "0x2c000005",
+      "meaning": "共用资格函数识别任务进行状态 5。 / The shared eligibility function recognizes active quest state 5."
+    },
+    {
+      "address": "0x0216b430",
+      "word": "0x2c000007",
+      "meaning": "共用资格函数识别任务进行状态 7。 / The shared eligibility function recognizes active quest state 7."
+    },
+    {
+      "address": "0x0216b438",
+      "word": "0x2c040000",
+      "meaning": "状态 5/7 下比较补给语义参数 0 与交纳语义参数 1。 / In states 5/7, the function distinguishes supply selector 0 from delivery selector 1."
+    },
+    {
+      "address": "0x0216b43c",
+      "word": "0x4182000c",
+      "meaning": "补给语义参数 0 跳到允许结果。 / Supply selector 0 branches to the allowed result."
+    },
+    {
+      "address": "0x0216b440",
+      "word": "0x3860ffff",
+      "meaning": "交纳语义在状态 5/7 返回 -1，导致红叉与交互注册被跳过。 / Delivery semantics return -1 in states 5/7, producing the crossed prompt and skipping interaction registration."
+    },
+    {
+      "address": "0x0216b448",
+      "word": "0x38600000",
+      "meaning": "补给语义在状态 5/7 返回允许结果 0。 / Supply semantics return the allowed result 0 in states 5/7."
+    },
+    {
       "address": "0x021f0ad0",
       "word": "0x9bfc6e12",
       "meaning": "完整/受限道具箱共用初始化器保存模式参数。 / Shared item-box initializer stores its mode argument."
@@ -67,6 +112,16 @@
       "meaning": "受限模式 1 使用菜单状态 3。 / Restricted mode 1 selects menu state 3."
     },
     {
+      "address": "0x028a97dc",
+      "word": "0x38a0000e",
+      "meaning": "原版蓝色补给箱继续注册独立交互编号 14。 / The original blue supply box continues to register independent interaction ID 14."
+    },
+    {
+      "address": "0x028a97e8",
+      "word": "0x4bfe891d",
+      "meaning": "蓝色补给箱交互注册调用保持不变。 / The blue supply-box interaction registration call remains unchanged."
+    },
+    {
       "address": "0x028c2768",
       "word": "0x2c1f0000",
       "meaning": "箱子交互函数比较蓝箱/红箱标志。 / Box interaction compares the blue/red selector flag."
@@ -75,6 +130,31 @@
       "address": "0x028c276c",
       "word": "0x40820048",
       "meaning": "非零标志只进入红色交纳箱分支。 / A nonzero selector enters only the red delivery branch."
+    },
+    {
+      "address": "0x028c5828",
+      "word": "0x4b8a5bd5",
+      "meaning": "红箱提示生成调用共用资格函数；只有其参数由 1 改为 0。 / Red prompt generation calls the shared eligibility function; only its argument changes from 1 to 0."
+    },
+    {
+      "address": "0x028c582c",
+      "word": "0x2c030000",
+      "meaning": "红箱提示生成要求资格函数返回允许值 0。 / Red prompt generation requires the eligibility function to return allowed value 0."
+    },
+    {
+      "address": "0x028c5830",
+      "word": "0x40820018",
+      "meaning": "非零资格结果会跳过红箱交互注册。 / A nonzero eligibility result skips red-box interaction registration."
+    },
+    {
+      "address": "0x028c5838",
+      "word": "0x38a0000f",
+      "meaning": "红箱保留专属交互编号 15，避免改写蓝箱行为。 / The red box retains interaction ID 15 so blue-box behavior is not rewritten."
+    },
+    {
+      "address": "0x028c5844",
+      "word": "0x4bfcc8c1",
+      "meaning": "通过资格门后注册红箱专属交互。 / The red-only interaction is registered after the eligibility gate passes."
     },
     {
       "address": "0x028c5e78",
@@ -103,5 +183,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "仅将任务内红色交纳箱重定向到模式 0 的完整道具箱；蓝色补给箱保持原版。 / Redirects only the red quest delivery box to full item-box mode 0; the blue supply box stays original."
+  "summary": "红箱改用补给箱资格判定后重定向到模式 0 的完整道具箱；蓝色补给箱与交互编号保持原版。 / The red box uses supply-box eligibility before redirecting to full item-box mode 0; the blue supply box and its interaction ID stay original."
 }

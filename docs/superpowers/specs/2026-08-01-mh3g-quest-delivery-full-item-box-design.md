@@ -13,16 +13,18 @@ Redirect only the red quest delivery box in MH3G HD JP v96 to the full home item
 - `0x028C2768` 对该标志作分支；只有红箱进入 `0x028C27B4`。
 - 红箱原路径在 `0x028C27CC` / `0x028C27D4` 调用交纳清单构建与交纳菜单逻辑。
 - 完整道具箱统一初始化器为 `0x021F0A8C`，且 `r5 = 0` 选择完整菜单模式。
+- 运行时红叉证明确认分支之前还有资格门：`0x028C5824` 以交纳参数 `1` 调用 `0x0216B3FC`，任务状态 `5/7` 返回 `-1` 并跳过红箱交互注册；参数 `0` 使用补给箱语义并返回允许值 `0`。
 
 - `0x028C5E78` enters `0x028C26F0` with `r4 = 0`: blue supply-box path.
 - `0x028C5E80` enters it with `r4 = 1`: red delivery-box path.
 - `0x028C2768` branches on that flag; only the red box reaches `0x028C27B4`.
 - The original red path calls delivery-list and delivery-menu logic at `0x028C27CC` / `0x028C27D4`.
 - `0x021F0A8C` is the shared item-box initializer; `r5 = 0` selects full-menu mode.
+- The runtime crossed prompt proves an earlier eligibility gate: `0x028C5824` calls `0x0216B3FC` with delivery selector `1`, which returns `-1` in quest states `5/7` and skips red interaction registration; selector `0` uses supply semantics and returns allowed value `0`.
 
 ## 补丁设计 / Patch design
 
-在红箱专属块 `0x028C27C4..0x028C27D8` 内原地写入六条指令：
+先把红箱资格判定点 `0x028C5824` 的参数由 `1` 改为 `0`，使其按补给箱规则注册交互；随后在红箱专属块 `0x028C27C4..0x028C27D8` 内原地写入六条指令：
 
 1. 读取完整道具箱初始化器需要的全局 UI 管理器；
 2. 将当前玩家对象 `r30` 作为第二参数；
@@ -30,16 +32,16 @@ Redirect only the red quest delivery box in MH3G HD JP v96 to the full home item
 4. 调用 `0x021F0A8C`；
 5. 跳过原红箱的交纳状态标志写入，回到共同收尾路径 `0x028C27F8`。
 
-The six-instruction in-place rewrite loads the UI manager, passes the current player (`r30`), selects mode `0`, calls `0x021F0A8C`, and skips delivery-only flag writes before rejoining the common cleanup path at `0x028C27F8`.
+First, the one-word rewrite at `0x028C5824` changes eligibility selector `1` to `0`, making only the red box register under supply-box availability rules. The six-instruction in-place rewrite then loads the UI manager, passes the current player (`r30`), selects mode `0`, calls `0x021F0A8C`, and skips delivery-only flag writes before rejoining the common cleanup path at `0x028C27F8`.
 
-不使用 code cave，不改 `0x021B0E90`（蓝箱资源），也不改 `0x021B0F14`（红箱资源）。补丁只改变红箱确认交互后的运行时分派。
+不使用 code cave，不改 `0x021B0E90`（蓝箱资源），也不改 `0x021B0F14`（红箱资源）。红箱仍保留专属交互编号 `15`，蓝箱编号 `14` 完全不改；这样既能复用补给箱资格规则，也不会把蓝箱一起重定向。
 
-No code cave is used. Neither the blue resource word at `0x021B0E90` nor the red resource word at `0x021B0F14` is changed; only the red box's confirmation-time dispatch is redirected.
+No code cave is used. Neither the blue resource word at `0x021B0E90` nor the red resource word at `0x021B0F14` is changed. Red retains independent interaction ID `15`, while blue ID `14` is untouched; this reuses supply eligibility without redirecting the blue box.
 
 ## 验证边界 / Verification boundary
 
-- 静态验证：精确 RPX SHA、`moduleMatches`、六个 preimage、周边蓝/红分派锚点、PPCAssembler、仓库测试和可复现打包。
+- 静态验证：精确 RPX SHA、`moduleMatches`、七个 preimage、资格函数与周边蓝/红分派锚点、PPCAssembler、仓库测试和可复现打包。
 - 运行时状态：安装后仍标记 `Runtime Experimental`，直到用户在任务中实测红箱、蓝箱以及退出/返回流程。
 
-- Static verification: exact RPX SHA, `moduleMatches`, six preimages, nearby blue/red dispatch anchors, PPCAssembler, repository tests, and reproducible packaging.
+- Static verification: exact RPX SHA, `moduleMatches`, seven preimages, eligibility-function and nearby blue/red dispatch anchors, PPCAssembler, repository tests, and reproducible packaging.
 - Runtime status remains `Runtime Experimental` after installation until gameplay confirms the red box, blue box, and exit/re-entry flows.

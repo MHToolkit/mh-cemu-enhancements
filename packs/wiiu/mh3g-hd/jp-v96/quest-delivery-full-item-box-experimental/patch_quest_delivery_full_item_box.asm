@@ -1,5 +1,6 @@
 [MH3G HD JP v96]
 moduleMatches = 0x348600a0
+0x028c5824 = li r4, 0
 0x028c27c4 = lis r3, 0x1031
 0x028c27c8 = lwz r3, 0x44a0(r3)
 0x028c27cc = mr r4, r30

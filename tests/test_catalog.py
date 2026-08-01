@@ -231,6 +231,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual("available", quest["availability"])
         self.assertEqual(
             {
+                0x028C5824: 0x38800001,
                 0x028C27C4: 0x3FE01031,
                 0x028C27C8: 0x807F507C,
                 0x028C27CC: 0x4B8B75F1,
@@ -245,12 +246,27 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertEqual(
             {
+                0x0216B410: 0x2C000008,
+                0x0216B418: 0x2C000003,
+                0x0216B428: 0x2C000005,
+                0x0216B430: 0x2C000007,
+                0x0216B438: 0x2C040000,
+                0x0216B43C: 0x4182000C,
+                0x0216B440: 0x3860FFFF,
+                0x0216B448: 0x38600000,
                 0x021F0AD0: 0x9BFC6E12,
                 0x021F0AF0: 0x2C1F0001,
                 0x021F0AF4: 0x38000006,
                 0x021F0AFC: 0x38000003,
+                0x028A97DC: 0x38A0000E,
+                0x028A97E8: 0x4BFE891D,
                 0x028C2768: 0x2C1F0000,
                 0x028C276C: 0x40820048,
+                0x028C5828: 0x4B8A5BD5,
+                0x028C582C: 0x2C030000,
+                0x028C5830: 0x40820018,
+                0x028C5838: 0x38A0000F,
+                0x028C5844: 0x4BFCC8C1,
                 0x028C5E78: 0x38800000,
                 0x028C5E7C: 0x4BFFC874,
                 0x028C5E80: 0x38800001,
@@ -262,6 +278,7 @@ class CatalogTests(unittest.TestCase):
             },
         )
         patch = (REPO / quest["pack_dir"] / quest["patch"]).read_text()
+        self.assertIn("0x028c5824 = li r4, 0", patch)
         self.assertIn("0x028c27c4 = lis r3, 0x1031", patch)
         self.assertIn("0x028c27c8 = lwz r3, 0x44a0(r3)", patch)
         self.assertIn("0x028c27cc = mr r4, r30", patch)
