@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)
 path = MH Cemu Enhancements/MH3G HD JP v96/Quest Red Delivery Box -> Full Item Box (Experimental)
-description = 红箱局部改用补给资格与提示并打开完整道具箱；蓝色补给箱保持原版。 / Locally use supply eligibility and prompt semantics for red, then open the full item box; keep the blue supply box original.
+description = 已阻断的红箱失败研究：任务场景无法复用据点完整仓库生命周期。 / Blocked red-box negative research: the quest scene cannot reuse the hub full-item-box lifecycle.
 version = 7

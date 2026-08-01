@@ -156,7 +156,7 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
-    def test_include_experimental_adds_experimental_packs_to_defaults(self):
+    def test_include_experimental_skips_runtime_blocked_quest_packs(self):
         result = self.tool.validate_repository(REPO)
 
         selected = self.tool.select_packs(result.packs, [], include_experimental=True)
@@ -164,11 +164,24 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
-                "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
-                "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
             },
             {pack["id"] for pack in selected},
         )
+
+    def test_runtime_blocked_quest_packs_cannot_be_selected_explicitly(self):
+        result = self.tool.validate_repository(REPO)
+
+        for pack_id in (
+            "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
+            "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
+        ):
+            with self.subTest(pack_id=pack_id):
+                with self.assertRaisesRegex(ValueError, "runtime-blocked"):
+                    self.tool.select_packs(
+                        result.packs,
+                        [pack_id],
+                        include_experimental=True,
+                    )
 
     def test_explicit_lobby_selection_is_verified_and_excludes_quest(self):
         result = self.tool.validate_repository(REPO)
@@ -234,7 +247,9 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", quest["status"])
         self.assertFalse(quest["default_install"])
-        self.assertEqual("available", quest["availability"])
+        self.assertEqual("runtime-blocked", quest["availability"])
+        self.assertIn("任务场景", quest["availability_reason"])
+        self.assertIn("quest scene", quest["availability_reason"])
         self.assertEqual(
             {
                 0x028C5824: 0x38800001,
@@ -313,7 +328,9 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", blue["status"])
         self.assertFalse(blue["default_install"])
-        self.assertEqual("available", blue["availability"])
+        self.assertEqual("runtime-blocked", blue["availability"])
+        self.assertIn("任务场景", blue["availability_reason"])
+        self.assertIn("quest scene", blue["availability_reason"])
         self.assertEqual(
             {
                 0x028C2770: 0x819E0E30,

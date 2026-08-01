@@ -35,11 +35,17 @@ The platform, canonical title, region, and update/version are path components, n
 | `Runtime Experimental` | The pack intentionally remains disabled by default and needs isolated gameplay validation. |
 | `Runtime Verified` | A recorded in-game test proves the documented behavior for the exact manifest identity. |
 
+Status records evidence maturity; `availability` independently controls whether the installer may deploy a pack. `available` entries may be selected subject to their status gate. `runtime-blocked` entries remain in the catalog as reproducible negative evidence, but selection fails closed even when `--include-experimental` is supplied.
+
+状态用于记录证据成熟度；`availability` 独立决定安装器是否允许部署。`available` 条目仍需满足对应状态门槛；`runtime-blocked` 条目只作为可复核的失败证据留在 catalog，即使传入 `--include-experimental` 也会拒绝选择。
+
 ## Safety and compatibility / 安全与兼容
 
 - The 30 FPS pack changes Cemu's per-pack `vsyncFrequency`; it does not write Cemu global settings.
 - Box work targets interaction/menu dispatch classes, never save contents or a visible chest model.
 - PPC patches may not install against a mismatching checksum or preimage/target anchor.
-- The red quest-delivery-box feature is Experimental and default-off; its patch scope excludes the original blue branch.
-- The independent blue quest control is also Experimental and default-off. While enabled, it replaces only the shared all-quest blue confirmation block; it does not add boxes to quests or alter red, resources, prompts, models, maps, or quest data.
+- The red quest-delivery candidate excludes the original blue branch, but repeated gameplay remained unusable; it is `runtime-blocked`.
+- The independent blue control confirmed that the hub full-item-box initializer cannot produce a usable menu through the quest interaction path. Its follow-on dispatcher is gated by hub scene state `6`, so this candidate is also `runtime-blocked` rather than exposed as a Cemu switch.
+- 红箱候选没有修改原版蓝箱分支，但多次实测仍不可用，因此标记为 `runtime-blocked`。
+- 独立蓝箱对照证明，据点完整仓库初始化器无法通过任务交互链构造可用菜单；其后续调度还受据点场景状态 `6` 限制，因此同样标记为 `runtime-blocked`，不再暴露为 Cemu 可安装开关。
 - For online play, leave all item-box modification packs disabled. The 30 FPS pack is also default-off while its instability is unresolved.

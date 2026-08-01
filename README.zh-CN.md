@@ -6,16 +6,16 @@
 
 ## 首批：MH3G HD 日版 v96
 
-| 开关 | 状态 | 默认安装 | Cemu 中独立开关 |
+| 开关 | 状态 | 可用性 | 默认安装 |
 | --- | --- | --- | --- |
-| 锁定 30 FPS | `Runtime Experimental` | 否 | 是 |
-| 集会所/酒场完整家中箱子 | `Runtime Verified` | 否 | 是 |
-| 任务红色交纳箱 -> 完整家中箱子 | `Runtime Experimental` | 否 | 是 |
-| 任务蓝色补给箱 -> 完整家中箱子（对照） | `Runtime Experimental` | 否 | 是 |
+| 锁定 30 FPS | `Runtime Experimental` | `available` | 否 |
+| 集会所/酒场完整家中箱子 | `Runtime Verified` | `available` | 否 |
+| 任务红色交纳箱 -> 完整家中箱子 | `Runtime Experimental` | `runtime-blocked` | 否 |
+| 任务蓝色补给箱 -> 完整家中箱子（对照） | `Runtime Experimental` | `runtime-blocked` | 否 |
 
 适用身份：Wii U Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、Cemu patch module checksum `0x348600a0`。
 
-`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态；任务红箱经过多次实测仍显示不可用红叉。新增的全任务蓝色补给箱对照仍等待游戏内验证。四项均默认不安装。
+`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务红箱多次实测仍不可用，原本可以正常提示和交互的蓝箱对照在按键后也完全没有菜单。静态追踪进一步证明完整道具箱依赖据点专属场景状态调度链。因此两个任务箱候选只保留为失败研究证据，标记为 `runtime-blocked`，安装器会拒绝安装。
 
 ## 校验、安装、卸载、分发
 
@@ -34,28 +34,17 @@ python3 scripts/mh-cemu-enhancements.py install \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx \
   --pack mh3g-hd-jp-v96-lobby-full-item-box
 
-# 显式安装任务红色交纳箱实验包；Experimental 必须显式解锁。
-python3 scripts/mh-cemu-enhancements.py install \
-  --cemu-root /绝对路径/cemu-data-root \
-  --reference-rpx /绝对路径/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental \
-  --include-experimental
-
-# 显式安装全任务蓝色补给箱对照包；Experimental 必须显式解锁。
-python3 scripts/mh-cemu-enhancements.py install \
-  --cemu-root /绝对路径/cemu-data-root \
-  --reference-rpx /绝对路径/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control \
-  --include-experimental
+# 两个任务箱候选已经 runtime-blocked，不能再显式选择。
+# 如仍需安装 30 FPS，须显式选择并加 --include-experimental。
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.13.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.14.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
 
-`inspect` 为只读诊断：它输出解析后的 Graphic Pack 目录、对应 settings 文件、每个 pack 的安装状态以及 Cemu 保存的启用状态。安装完成后，在 Cemu 的 **Graphic Packs** UI 逐项启用；安装器不写 Cemu 的已启用状态，因此三项始终是独立开关。
+`inspect` 为只读诊断：它输出解析后的 Graphic Pack 目录、对应 settings 文件、每个 catalog 条目的安装状态以及 Cemu 保存的启用状态。安装完成后，只在 Cemu 的 **Graphic Packs** UI 启用需要的可用包；安装器不会自行改变 Cemu 保存的启用状态。
 
 ### macOS 隔离 profile 启动
 
@@ -67,15 +56,15 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
   --cemu-app /绝对路径/Cemu.app
 ```
 
-手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需开关，并重新载入/重启游戏。两个任务箱实验包不应用于日常或联机；30 FPS 包在稳定性结论出来前也保持关闭。
+手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需的可用开关，并重新载入/重启游戏。两个已经阻断的任务箱实验包不再安装；30 FPS 包在稳定性结论出来前保持关闭。
 
 ## 补丁语义、兼容与联机
 
 - 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置；用户实测不稳定，因此保持 `Runtime Experimental`、默认关闭。
 - 大厅包只改一条 Port Tanzia 交互指令：把传给共享箱子初始化函数 `0x021F0A8C` 的受限模式参数由 `r5 = 1` 改为完整模式 `r5 = 0`。它不替换对象、不使用分支或 code cave，完整菜单、换装、装备组合与护石功能已经实测通过，标记为 `Runtime Verified`，但仍默认关闭。
-- 任务包只改**红色交纳箱**：先在 `0x028C5824` 改用补给资格参数 `0`，让任务进行状态 `5/7` 不再跳过红箱自己的提示注册；再在同一个红箱调用点 `0x028C5838` 把交纳专用红叉提示编号 `15` 改为补给提示编号 `14`。静态追踪已证明该编号只解析为提示图文，不会被保留为确认动作；实际确认仍由红箱专属分支 `0x028C27C4..0x028C27D8` 原地打开完整道具箱。蓝色补给箱自身的注册、分派与 `GUI\\quest\\box` 资源完全不改；两种箱子的资源均不替换。该包保持 `Runtime Experimental`、默认关闭。
-- 蓝箱对照包覆盖所有本来存在蓝色补给箱的任务，因为这些对象统一进入选择器为 `0` 的共享路径。它只把 `0x028C2770..0x028C2784` 原地改为用模式 `0` 调用完整道具箱初始化器 `0x021F0A8C`，然后在 `0x028C27F8` 回到共同收尾；不改箱子资源、提示、模型、任务 ID、地图或红箱分支。该包默认关闭并保持 `Runtime Experimental`：蓝箱成功说明后续应集中处理红箱对象/动作注册；蓝箱也失败则应调查任务 UI 上下文。
-- Cemu 中的独立叶子依次为：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`、`Lobby Full Item Box`、`Quest Red Delivery Box -> Full Item Box (Experimental)`、`Quest Blue Supply Box -> Full Item Box (Control)`。
+- 红箱候选只改**红色交纳箱**，但实机仍持续显示不可用红叉。该候选保留作静态失败历史，并以 `runtime-blocked` 阻止安装。
+- 蓝箱对照已经进入所有任务共用的选择器 `0` 分支并保留正常提示，但按交互键后没有菜单。`0x021F0A8C` 只写入状态 `6`；该状态唯一的后续分派受 `0x021B7E08` 限制，要求据点场景状态也为 `6`。据点 `uIDLobbyMyhBox` 与任务 `uIDCockpitBox` / `uIDCockpitShareBox` 是不同生命周期。要在任务中强行复用它，需要补齐资源构造、逐帧状态、输入、渲染和关闭恢复，不是继续替换箱子编号即可完成。因此蓝箱候选也标记为 `runtime-blocked`。
+- 当前 Cemu 只安装两个可用的独立叶子：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS` 与 `Lobby Full Item Box`。两个任务箱候选只在 catalog 中保留为不可安装的失败证据。
 - 联机时关闭全部道具箱修改包；30 FPS 包在稳定性结论出来前也不作为联机推荐。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。
 

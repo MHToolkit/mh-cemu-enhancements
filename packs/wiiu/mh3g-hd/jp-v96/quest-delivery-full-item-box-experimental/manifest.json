@@ -8,7 +8,8 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
-  "availability": "available",
+  "availability": "runtime-blocked",
+  "availability_reason": "红箱与原生可交互蓝箱的运行时对照均无法在任务场景 / quest scene 中打开完整道具箱；该菜单依赖据点专属 UI 状态调度链，当前补丁不再提供安装。 / Runtime tests of both the red box and the normally interactive blue control failed to open the full item box in a quest scene; the menu depends on a hub-only UI state-dispatch chain, so this patch is no longer installable.",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-delivery-full-item-box-experimental",
   "install_folder": "MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)",
   "rules": "rules.txt",
@@ -218,5 +219,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "红箱局部改用补给资格与提示后重定向到模式 0 的完整道具箱；蓝色补给箱保持原版。 / The red box locally uses supply eligibility and prompt semantics before redirecting to full item-box mode 0; the blue supply box stays original."
+  "summary": "红箱与蓝箱对照均无法在任务场景启动据点完整仓库生命周期；保留为不可安装的失败证据。 / Both red and blue controls failed to start the hub full-item-box lifecycle in a quest scene; retained as non-installable negative evidence."
 }

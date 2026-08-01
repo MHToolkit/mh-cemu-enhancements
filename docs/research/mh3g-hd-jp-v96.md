@@ -100,7 +100,9 @@ The second runtime test confirmed that Cemu loaded that revision, yet red still 
 | Delivery menu call / 原交纳菜单调用 | `0x028c27d4` | `0x4b8b742d` | `bl 0x021f0a8c` |
 | Delivery result test / 原交纳结果检查 | `0x028c27d8` | `0x2c030000` | `b 0x028c27f8` |
 
-The eligibility and prompt rewrites are both inside the red-only world-object function. The in-place confirmation rewrite then calls the already-proven full item-box initializer with the current player in `r4` and full mode `r5 = 0`, skips delivery-only flag writes, and rejoins common cleanup. It uses no code cave and writes neither `0x021B0E90` nor `0x021B0F14`. The pack remains **Runtime Experimental / 运行时实验** and default-off until gameplay proves the red box, the unchanged blue box, menu exit/re-entry, and quest completion flow.
+The eligibility and prompt rewrites are both inside the red-only world-object function. The in-place confirmation rewrite then calls the already-proven full item-box initializer with the current player in `r4` and full mode `r5 = 0`, skips delivery-only flag writes, and rejoins common cleanup. It uses no code cave and writes neither `0x021B0E90` nor `0x021B0F14`. Later gameplay and the blue control disproved the candidate at runtime; the final blocked disposition is recorded below.
+
+资格与提示改写都位于红箱专属世界对象函数内。原地确认改写以当前玩家作为 `r4`、完整模式 `r5 = 0` 调用已经验证的完整仓库初始化器，跳过交纳专属标志写入，再回到共同收尾路径。它不使用 code cave，也不写入 `0x021B0E90` 或 `0x021B0F14`。后续实测与蓝箱对照已在运行时否定该候选；最终阻断结论见下文。
 
 ### All-quest blue supply-box control (Experimental / 全任务蓝箱对照实验)
 
@@ -128,8 +130,36 @@ Repeated gameplay still showed the crossed, unusable prompt on the patched red b
 
 The rewrite calls the gameplay-proven item-box initializer with current player `r30` and full mode `0`, then rejoins common cleanup at `0x028C27F8`. The red branch starts separately at `0x028C27B4`, so both packs write disjoint addresses. The control uses no code cave and does not touch resource words `0x021B0E90`/`0x021B0F14`, prompt IDs `14`/`15`, object registration, models, maps, quest data, WUA, RPX, MLC, or save data.
 
-If blue opens the full menu, the initializer is viable inside quest UI context and the red failure is isolated to red object/action registration or state mapping. If blue also fails, further box-ID substitution is not justified; the next investigation must trace quest UI construction, owning state objects, and context dependencies. Until gameplay decides that control, this fourth pack remains default-off **Runtime Experimental / 运行时实验** and is not recommended for multiplayer.
+If blue opens the full menu, the initializer is viable inside quest UI context and the red failure is isolated to red object/action registration or state mapping. If blue also fails, further box-ID substitution is not justified; the next investigation must trace quest UI construction, owning state objects, and context dependencies.
+
+### Quest-scene runtime result and final RCA / 任务场景实测与最终根因
+
+The blue control retained its native usable prompt, but pressing the interaction button produced no menu. The red candidate also remained crossed and unusable. Cemu's fresh log confirmed that both patch groups were applied for RPX hash `8cb62099` and module checksum `0x348600A0`, so this is a runtime behavior failure rather than an installation/profile mismatch.
+
+蓝箱对照保留了原生可用提示，但按下交互键后没有弹出任何菜单；红箱候选也仍然显示红叉且不可用。Cemu 新鲜日志确认两个 patch group 均已针对 RPX hash `8cb62099`、module checksum `0x348600A0` 应用，因此这是运行时行为失败，不是安装目录或 profile 错误。
+
+Static follow-up established the missing lifecycle:
+
+1. `0x021F0A8C` stores the current player at manager `+0x6E20`, mode at `+0x6E12`, full-menu substate `6` at `+0x6E1C`, global state `6` at `+0x5350`, and active flag `1` at `+0x5358`. It does not construct a `uIDLobbyMyhBox` UI object.
+2. State dispatcher `0x0215165C` is the only direct route from global state `6` to handler `0x021F0D08`.
+3. Its only direct caller is `0x02219E50`. Before that call, `0x02219DE8` invokes `0x021B7E08` on the scene-state object at global `0x10314278 + 0x340` and requires scene-state value `6`; failure branches around the dispatcher.
+4. `0x021B7E08` simply compares the requested value with the object's current value at `+0x14`. This is a real hub-context gate, not a box-number lookup.
+5. The full box uses lobby class/resource `uIDLobbyMyhBox` / `GUI\\lobby\\myh_box2_n`, while quest boxes use `uIDCockpitBox`, `uIDCockpitShareBox`, and `GUI\\quest\\...`. They are separate construction, update, input, render, and teardown lifecycles.
+
+后续静态追踪确认缺失的是整套生命周期：
+
+1. `0x021F0A8C` 只把当前玩家写入管理器 `+0x6E20`、模式写入 `+0x6E12`、完整菜单子状态 `6` 写入 `+0x6E1C`、全局状态 `6` 写入 `+0x5350`，并把活动标志 `1` 写入 `+0x5358`；它不会构造 `uIDLobbyMyhBox` UI 对象。
+2. 状态调度器 `0x0215165C` 是全局状态 `6` 进入处理器 `0x021F0D08` 的唯一直接路径。
+3. 它唯一的直接调用点是 `0x02219E50`。调用前，`0x02219DE8` 会用全局 `0x10314278 + 0x340` 的场景状态对象调用 `0x021B7E08`，并要求当前场景状态等于 `6`；不满足就直接绕过调度器。
+4. `0x021B7E08` 只是把请求值与对象 `+0x14` 的当前值比较。这是明确的据点上下文门槛，不是箱子编号查询。
+5. 完整仓库使用据点类/资源 `uIDLobbyMyhBox` / `GUI\\lobby\\myh_box2_n`；任务箱使用 `uIDCockpitBox`、`uIDCockpitShareBox` 与 `GUI\\quest\\...`。二者的构造、逐帧更新、输入、渲染和销毁生命周期相互独立。
+
+Bypassing one branch would still leave the lobby UI object/resource lifecycle absent and would globally spoof scene state. That is a high-risk code-injection project, not a narrow Graphic Pack substitution. Both quest candidates are therefore retained as **Runtime Experimental / 运行时实验** evidence but changed to `availability = runtime-blocked`; the installer refuses them even with `--include-experimental`.
+
+只绕过一个分支仍然缺少据点 UI 对象/资源生命周期，而且会全局伪造场景状态。这属于高风险代码注入工程，不再是窄范围 Graphic Pack 替换。因此两个任务箱候选继续以 **Runtime Experimental / 运行时实验** 保留证据，但其 `availability` 改为 `runtime-blocked`；即使传入 `--include-experimental`，安装器也会拒绝安装。
 
 ## Runtime validation gate
 
-No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`; the quest red-box pack still requires the exact manifest identity, Cemu version, title update, RPX SHA-256, module checksum, enabled-pack set, red/blue box results, exit/re-entry, and quest completion outcome. Do not test the Experimental quest pack in multiplayer. The 30 FPS pack is also experimental after unstable user testing.
+No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. The red and blue quest candidates have failed their runtime control and are `runtime-blocked`; they are no longer offered for gameplay testing. The 30 FPS pack remains available but experimental after unstable user testing.
+
+仓库验证流程没有启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。红、蓝两个任务箱候选已经在运行时对照中失败并标记为 `runtime-blocked`，不再提供游戏内测试。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。

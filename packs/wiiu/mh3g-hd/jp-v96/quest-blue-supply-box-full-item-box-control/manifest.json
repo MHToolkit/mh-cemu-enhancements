@@ -8,7 +8,8 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
-  "availability": "available",
+  "availability": "runtime-blocked",
+  "availability_reason": "蓝箱能够显示原生交互提示，但按键后在任务场景 / quest scene 中没有反应；完整道具箱初始化器只写入据点菜单状态，后续 UI 调度受据点场景状态 6 限制，因此当前对照补丁不再提供安装。 / The blue box retained its native prompt but produced no menu after input in a quest scene; the full item-box initializer only writes hub-menu state and its UI dispatcher is gated by hub scene state 6, so this control patch is no longer installable.",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/quest-blue-supply-box-full-item-box-control",
   "install_folder": "MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)",
   "rules": "rules.txt",
@@ -113,5 +114,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "覆盖全任务共享蓝箱确认路径并打开模式 0 的完整道具箱；红箱与任务数据保持不变。 / Redirect the shared all-quest blue confirmation path to full item-box mode 0 while leaving red and quest data unchanged."
+  "summary": "蓝箱按键后没有菜单，证明据点完整仓库初始化器不能直接在任务场景工作；保留为不可安装的失败对照。 / Blue-box input produced no menu, proving that the hub full-item-box initializer cannot work directly in a quest scene; retained as a non-installable negative control."
 }
