@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 56 自动标记并标记当前区小怪 - Auto-Marker plus Current-Area Small Monsters
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/56 自动标记并标记当前区小怪 - Auto-Marker plus Current-Area Small Monsters
+description = 中文：3DS 静态 ARM #56 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 已映射自动标记核心技能检查和当前区标记判定；3DS 端另有一个 UI 虚调用点在 PPC 中没有一对一静态对应，因此小怪图标覆盖范围可能不完整。 / English: Wii U PPC conversion of 3DS static ARM cheat #56; Disabled by default; Runtime Experimental and requires gameplay verification.  Maps the core auto-marker skill checks and current-area marker tests; one 3DS UI virtual-call site has no one-to-one static PPC counterpart, so small-monster icon coverage may be incomplete.
+version = 7

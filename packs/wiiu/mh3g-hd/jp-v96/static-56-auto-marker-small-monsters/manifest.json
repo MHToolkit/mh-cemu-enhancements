@@ -1,0 +1,130 @@
+{
+  "id": "mh3g-hd-jp-v96-static-56-auto-marker-small-monsters",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "partial-semantic",
+  "source_cheat_entries": [
+    56
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x00342b0c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00347460",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00347484",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x003474b8",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008214e4",
+      "word": "0xd3a00001"
+    }
+  ],
+  "name_bilingual": "自动标记并标记当前区小怪 / Auto-Marker plus Current-Area Small Monsters",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-56-auto-marker-small-monsters",
+  "install_folder": "MH3G HD JP v96 - Static 56 - Auto-Marker plus Current-Area Small Monsters",
+  "rules": "rules.txt",
+  "patch": "patch_static_56_auto_marker_small_monsters.asm",
+  "preimages": [
+    {
+      "address": "0x026151c8",
+      "word": "0x482931ed",
+      "meaning": "中文：强制当前区怪物类型查询通过。 / English: Force the current-area monster-type query to pass."
+    },
+    {
+      "address": "0x026151e8",
+      "word": "0x4827b8ad",
+      "meaning": "中文：强制效果 ID 0x97 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x97 to return true."
+    },
+    {
+      "address": "0x02615204",
+      "word": "0x4827b891",
+      "meaning": "中文：强制效果 ID 0x97 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x97 to return true."
+    },
+    {
+      "address": "0x02615230",
+      "word": "0x48249ad9",
+      "meaning": "中文：强制当前区标记高度/可见性查询通过。 / English: Force the current-area marker height/visibility query to pass."
+    },
+    {
+      "address": "0x02892010",
+      "word": "0x4bffea85",
+      "meaning": "中文：强制效果 ID 0x97 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x97 to return true."
+    },
+    {
+      "address": "0x02892034",
+      "word": "0x4bffea61",
+      "meaning": "中文：强制效果 ID 0x97 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x97 to return true."
+    },
+    {
+      "address": "0x0289383c",
+      "word": "0x4bffd259",
+      "meaning": "中文：强制效果 ID 0x97 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x97 to return true."
+    },
+    {
+      "address": "0x02893884",
+      "word": "0x4bffd211",
+      "meaning": "中文：强制效果 ID 0x97 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x97 to return true."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x026151e0",
+      "word": "0x38800097",
+      "meaning": "中文：调用前把效果 ID 0x97 放入 PPC 参数 r4。 / English: Loads effect ID 0x97 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02615200",
+      "word": "0x38800097",
+      "meaning": "中文：调用前把效果 ID 0x97 放入 PPC 参数 r4。 / English: Loads effect ID 0x97 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02892008",
+      "word": "0x38800097",
+      "meaning": "中文：调用前把效果 ID 0x97 放入 PPC 参数 r4。 / English: Loads effect ID 0x97 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02892030",
+      "word": "0x38800097",
+      "meaning": "中文：调用前把效果 ID 0x97 放入 PPC 参数 r4。 / English: Loads effect ID 0x97 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02893834",
+      "word": "0x38800097",
+      "meaning": "中文：调用前把效果 ID 0x97 放入 PPC 参数 r4。 / English: Loads effect ID 0x97 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02893880",
+      "word": "0x38800097",
+      "meaning": "中文：调用前把效果 ID 0x97 放入 PPC 参数 r4。 / English: Loads effect ID 0x97 into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：已映射自动标记核心技能检查和当前区标记判定；3DS 端另有一个 UI 虚调用点在 PPC 中没有一对一静态对应，因此小怪图标覆盖范围可能不完整。 / English: Maps the core auto-marker skill checks and current-area marker tests; one 3DS UI virtual-call site has no one-to-one static PPC counterpart, so small-monster icon coverage may be incomplete."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #56“自动标记并标记当前区小怪”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #56 \"Auto-Marker plus Current-Area Small Monsters\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

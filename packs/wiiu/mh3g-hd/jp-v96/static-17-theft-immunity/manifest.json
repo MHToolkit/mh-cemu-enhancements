@@ -1,0 +1,74 @@
+{
+  "id": "mh3g-hd-jp-v96-static-17-theft-immunity",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "global-semantic",
+  "source_cheat_entries": [
+    17
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x00782ae8",
+      "word": "0xe3a00001"
+    }
+  ],
+  "name_bilingual": "偷盗无效 / Theft Immunity",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-17-theft-immunity",
+  "install_folder": "MH3G HD JP v96 - Static 17 - Theft Immunity",
+  "rules": "rules.txt",
+  "patch": "patch_static_17_theft_immunity.asm",
+  "preimages": [
+    {
+      "address": "0x024d26f0",
+      "word": "0x483be3a5",
+      "meaning": "中文：强制效果 ID 0x5B 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x5B to return true."
+    },
+    {
+      "address": "0x02523154",
+      "word": "0x4836d941",
+      "meaning": "中文：强制效果 ID 0x5B 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x5B to return true."
+    },
+    {
+      "address": "0x02523174",
+      "word": "0x4836d921",
+      "meaning": "中文：强制效果 ID 0x5B 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x5B to return true."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x024d26ec",
+      "word": "0x3880005b",
+      "meaning": "中文：调用前把效果 ID 0x5B 放入 PPC 参数 r4。 / English: Loads effect ID 0x5B into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02523148",
+      "word": "0x3880005b",
+      "meaning": "中文：调用前把效果 ID 0x5B 放入 PPC 参数 r4。 / English: Loads effect ID 0x5B into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x02523168",
+      "word": "0x3880005b",
+      "meaning": "中文：调用前把效果 ID 0x5B 放入 PPC 参数 r4。 / English: Loads effect ID 0x5B into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #17“偷盗无效”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #17 \"Theft Immunity\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

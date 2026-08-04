@@ -12,6 +12,7 @@ import dataclasses
 from datetime import datetime, timezone
 import hashlib
 import json
+import re
 import shlex
 import shutil
 import struct
@@ -247,10 +248,63 @@ def validate_repository(repo_root: Path) -> ValidationResult:
             errors.append(f"{manifest_rel}: unknown status {pack['status']!r}")
         if not isinstance(pack["default_install"], bool):
             errors.append(f"{manifest_rel}: default_install must be boolean")
+        auto_experimental_install = pack.get("auto_experimental_install", False)
+        if not isinstance(auto_experimental_install, bool):
+            errors.append(f"{manifest_rel}: auto_experimental_install must be boolean")
+        if auto_experimental_install and pack["status"] != "Runtime Experimental":
+            errors.append(f"{manifest_rel}: auto_experimental_install requires Runtime Experimental")
         if pack["availability"] not in {"available", "runtime-blocked"}:
             errors.append(f"{manifest_rel}: unknown availability {pack['availability']!r}")
         if pack["status"] == "Runtime Experimental" and pack["default_install"]:
             errors.append(f"{manifest_rel}: experimental pack must default_install=false")
+
+        exclusive_group = pack.get("exclusive_group")
+        if exclusive_group is not None and (
+            not isinstance(exclusive_group, str)
+            or re.fullmatch(r"[a-z0-9][a-z0-9-]+", exclusive_group) is None
+        ):
+            errors.append(f"{manifest_rel}: exclusive_group must be a lowercase hyphenated identifier")
+        source_cheat_entries = pack.get("source_cheat_entries")
+        if source_cheat_entries is not None and (
+            not isinstance(source_cheat_entries, list)
+            or any(not isinstance(entry, int) or entry < 1 for entry in source_cheat_entries)
+            or len(set(source_cheat_entries)) != len(source_cheat_entries)
+        ):
+            errors.append(f"{manifest_rel}: source_cheat_entries must be unique positive integers")
+
+        if pack.get("conversion_kind") == "3ds-arm-static-to-wiiu-ppc":
+            static_required = {
+                "auto_experimental_install",
+                "conversion_confidence",
+                "name_bilingual",
+                "source_arm_patches",
+                "source_cheat_entries",
+                "known_risks",
+                "patch",
+                "preimages",
+            }
+            missing_static = sorted(static_required - pack.keys())
+            if missing_static:
+                errors.append(
+                    f"{manifest_rel}: static ARM conversion missing fields: "
+                    + ", ".join(missing_static)
+                )
+            if pack["status"] != "Runtime Experimental" or pack["default_install"]:
+                errors.append(f"{manifest_rel}: static ARM conversion must be default-off Runtime Experimental")
+            if auto_experimental_install:
+                errors.append(f"{manifest_rel}: static ARM conversion must require explicit selection")
+            if not isinstance(source_cheat_entries, list) or len(source_cheat_entries) != 1:
+                errors.append(f"{manifest_rel}: static ARM conversion must reference exactly one source cheat")
+            if not isinstance(pack.get("name_bilingual"), str) or " / " not in pack.get("name_bilingual", ""):
+                errors.append(f"{manifest_rel}: static ARM conversion needs a bilingual name")
+            if not isinstance(pack.get("known_risks"), list) or not pack.get("known_risks"):
+                errors.append(f"{manifest_rel}: static ARM conversion needs explicit known_risks")
+            for source_patch in pack.get("source_arm_patches", []):
+                try:
+                    _number(source_patch["address"])
+                    _number(source_patch["word"])
+                except (KeyError, TypeError, ValueError) as exc:
+                    errors.append(f"{manifest_rel}: invalid source ARM patch: {exc}")
 
         package_dir = repo_root / pack["pack_dir"]
         rules_file = package_dir / pack["rules"]
@@ -374,7 +428,9 @@ def select_packs(packs: Iterable[dict[str, Any]], selected_ids: list[str], inclu
             chosen.extend(
                 pack
                 for pack in packs
-                if pack["status"] == "Runtime Experimental" and pack["availability"] == "available"
+                if pack["status"] == "Runtime Experimental"
+                and pack["availability"] == "available"
+                and pack.get("auto_experimental_install", False)
             )
     experimental = [pack["id"] for pack in chosen if pack["status"] == "Runtime Experimental"]
     if experimental and not include_experimental:

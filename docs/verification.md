@@ -1,82 +1,89 @@
-# Local verification record / 本地验证记录（2026-08-02）
+# Local verification record / 本地验证记录（2026-08-04）
 
 ## Current static gates / 当前静态门槛
 
-1. `python3 -m unittest discover -s tests -v` — 19 tests passed. The suite covers five catalog identities, schema validation, fail-closed legacy quest candidates, the combined red+blue conditional-gate contract, pinned RPX preimages/anchors, standard and isolated idempotent installation, explicit Experimental selection, inspection, migration/uninstall, and reproducible asset-free packaging.
-2. `python3 scripts/mh-cemu-enhancements.py validate` — all five manifests accepted.
-3. `verify-reference` accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared PPC preimage/anchor.
-4. Cemu 2.6's real `PPCAssembler` accepted all fifteen fixed-address combined-pack instructions without launching Cemu or allocating a code cave:
+1. `python3 -m unittest discover -s tests -v` — **25/25 tests passed**. Coverage includes 50 catalog manifests, 43 independent static ARM conversions, the 44-FPS control conversion, the three-slot Felyne-food contract, fail-closed quest candidates, pinned RPX assertions, idempotent standard/isolated installation, inspection, and reproducible asset-free packaging.
+2. `python3 scripts/mh-cemu-enhancements.py validate` — **50 manifests accepted**, of which 47 are available leaves and three quest-box research candidates are `runtime-blocked`.
+3. `verify-reference` accepted RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared PPC preimage/anchor, including all ten Felyne-food overwrite words.
+4. The Felyne-food rules contract contains exactly three categories and exactly 66 bilingual values (`0x00..0x41`) per category. Defaults inside the disabled pack are `0x06/0x36/0x00`.
+5. Cemu 2.6's real `PPCAssembler` accepted all ten fixed-address instructions and produced the expected default words. The three `$skill*` expressions produced `U32_MASKED_IMM` relocations over the 16-bit immediate field, matching Graphic Pack variable resolution:
 
 ```text
-02219de0 800c0354 lwz r0, 0x354(r12)
-02219de4 2c000006 cmpwi r0, 6
-02219de8 41820010 beq 0x02219df8
-02219dec 881f5350 lbz r0, 0x5350(r31)
-02219df0 2c000006 cmpwi r0, 6
-02219df4 40820078 bne 0x02219e6c
-028c2770 3c601031 lis r3, 0x1031
-028c2774 806344a0 lwz r3, 0x44a0(r3)
-028c2778 7fc4f378 mr r4, r30
-028c277c 38a00000 li r5, 0
-028c2780 4b92e30d bl 0x021f0a8c
-028c2784 48000074 b 0x028c27f8
-028c5824 38800000 li r4, 0
-028c5838 38a0000e li r5, 0xe
-028c5e80 38800000 li r4, 0
+021d8740 817f0140 lwz r11, 0x140(r31)
+021d8744 38000006 li r0, $skill1
+021d8748 b01b000a sth r0, 0x000a(r27)
+021d874c b00b0e3e sth r0, 0x0e3e(r11)
+021d8750 38000036 li r0, $skill2
+021d8754 b01b000c sth r0, 0x000c(r27)
+021d8758 b00b0e40 sth r0, 0x0e40(r11)
+021d875c 38000000 li r0, $skill3
+021d8760 b01b000e sth r0, 0x000e(r27)
+021d8764 b00b0e42 sth r0, 0x0e42(r11)
 ```
 
-5. The original helper at `0x021B7E08` was disassembled from the immutable RPX. Its body reads scene-object field `+0x14`, compares it with the request, returns a Boolean, and has no side effect. Because original `0x02219DDC` already loads the enclosing scene manager, direct `+0x354` is equivalent to the original `+0x340` object plus `+0x14` state field.
 6. `ruff check scripts tests` and `git diff --check` passed.
-7. Two independent `0.1.16` package builds produced identical SHA-256 values. The archive retains all five catalog entries, including both runtime-blocked negative-evidence directories, and contains no game asset or tool cache. The final digest is kept in the adjacent `.sha256` file.
+7. Two independent `0.1.17` package builds were byte-identical. The archive contains the complete catalog and no RPX, WUA, save, MLC, Cemu binary, game asset, `.idea`, or tool cache; the final SHA-256 is stored in the adjacent sidecar.
+
+These gates establish static correctness and installation integrity only. They do not promote a pack to `Runtime Verified` without gameplay evidence.
+
+以上门槛只证明静态正确性与安装完整性；没有游戏内证据时，不得把包升级为 `Runtime Verified`。
 
 ## Runtime evidence / 运行时证据
 
-- **Lobby / 大厅：** The one-word `0x02799678 = li r5, 0` pack was tested by the user. The full menu appears, and equipment change, equipment sets, and talisman operations work. It remains `Runtime Verified` and opt-in.
-- **30 FPS：** User testing was unstable; hunting behavior was not tested. It remains default-off `Runtime Experimental`.
-- **Old red candidate / 旧红箱候选：** Repeated gameplay retained a crossed unusable prompt despite verified eligibility, prompt-ID, and confirmation rewrites. It remains `runtime-blocked`.
-- **Unconditional blue bridge / 无条件蓝箱桥：** The title initially loaded with only Lobby active. Later log entries proved that Cemu hot-applied the blue patch during the running title. Neither box opened the full menu, and the quest-board dialogue became blank. Since the six box-trigger instructions cannot run from the quest board, unconditional `0x02219DF0 = nop` is the direct cross-UI corruption source. The candidate is now `runtime-blocked`.
-- **Combined conditional bridge / 红蓝统一条件桥：** Static, assembler, install, and configuration evidence pass. It converts red prompt/dispatch semantics to the shared blue path, sends both boxes to mode `0`, and dispatches outside the hub only when global UI state is exactly full-item-box state `6`. It is **Gameplay Pending / 待实机验证**, not `Runtime Verified`.
+- **Lobby / 大厅：** The one-word `0x02799678 = li r5, 0` pack was tested by the user. The full menu appears, and equipment change, equipment sets, and talisman operations work. It remains opt-in `Runtime Verified`.
+- **30 FPS：** User testing was unstable; hunting behavior was not completed. It remains default-off `Runtime Experimental`.
+- **Quest boxes / 任务箱：** Red stayed crossed; blue and later combined candidates either opened no menu, caused crashes/stuck input, or damaged unrelated quest UI. All three candidates are retained as negative research evidence and are `runtime-blocked`.
+- **43 static conversions / 43 项静态转换：** Static mapping and installation tooling pass; gameplay is still pending for each independent default-off pack.
+- **Custom Felyne Food Skills / 猫饭技能自定义：** ARM/PPC semantic mapping, rules, preimages, real assembler, and installation pass. No real meal/quest-effect test exists yet, so it remains **Runtime Experimental / Gameplay Pending**.
 
-Earlier lobby selector/resource/code-cave/accessor attempts remain negative research history. The Cemu `.origin = codecave` candidate mapped to guest `0x01800000` and crashed in the PPC recompiler; the new combined pack contains no relocation or code cave.
+The food pack changes the next native meal finalization only. After selecting presets, the user must eat again. Pre-meal preview may remain game-generated, and native incompatible combinations such as `0x41 + 0x1E` may apply only one effect.
 
-## Installed standard profile / 已安装标准配置
+猫饭包只改变下一次原生用餐结算；修改预设后必须重新吃饭。餐前预览可能仍是原版随机结果，`0x41 + 0x1E` 等原生互斥组合也可能只生效其中一项。
 
-The user's launch command supplies `-m` but no `NEMESSIX_CEMU_DATA_ROOT`, so Cemu scans the standard macOS profile. After confirming zero Cemu processes, the installer wrote only:
+## Installed isolated profile / 已安装隔离配置
 
-```text
-/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements/
-```
-
-Installed and enabled / 已安装并启用：
-
-- `MH3G HD JP v96 - Lobby Full Item Box`
-- `MH3G HD JP v96 - Quest Red & Blue Boxes - Full Item Box (Experimental)`
-
-Installed but disabled / 已安装但未启用：
-
-- `MH3G HD JP v96 - Lock 30 FPS`
-
-Absent and disabled / 未安装且未启用：
-
-- `MH3G HD JP v96 - Quest Red Delivery Box - Full Item Box (Experimental)`
-- `MH3G HD JP v96 - Quest Blue Supply Box - Full Item Box (Control)`
-
-The installer used the immutable reference RPX and recorded SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`. The pre-edit settings backup is:
+After confirming zero Cemu processes, the installer wrote only its owned directory:
 
 ```text
-/Users/vincentadamnemessis/Library/Application Support/Cemu/settings.xml.backup-mh3g-combined-conditional-20260801T183643Z
+/Volumes/GameHub/Development/Games/Nemessix/nemessix-multi-engine-apple-design-worktree/.build/nemessix-bundled-cemu-runtime-proof-20260721/home/Library/Application Support/Nemessix Dev/cemu/data/graphicPacks/mh-cemu-enhancements/
 ```
 
-The backup SHA-256 is `b716b1c4549e91bbdea2c6d7c0bffc20b2e2a7c0ace5182043258261d02efed6`; the post-edit XML parses successfully and has SHA-256 `3504dc3a6d63c5e75d0e47719de806b80e8aaca648a07eb8c493916176e6bc78`. The installed combined ASM matches its source with SHA-256 `5b17b4784261ad558b074ca2066af29990a7a1f245b1772856255a8eef47583e`. Receipt tree hashes are:
+The receipt contains exactly:
 
 ```text
-Lobby      76225166f133acfa0ea11b8773a5f2d1fe2317c24529c01e54378fb221c33580
-30 FPS     1bb04434c49729455ab155494689338f4894b7e0946f7f899bde7c437508a257
-Combined   c9e6052708bed8bdd684bfa757afe52f17b33e1fe274def1a1bc6bd378f4d95d
+mh3g-hd-jp-v96-lobby-full-item-box
+mh3g-hd-jp-v96-fps-lock-30
+mh3g-hd-jp-v96-custom-felyne-food-skills
 ```
 
-No Cemu process was launched by the repository workflow, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
+The installer intentionally did not edit `config/settings.xml`. Its existing saved states were preserved and the XML parses successfully:
+
+| Pack | Installed | Saved enabled state |
+| --- | --- | --- |
+| Lobby Full Item Box | yes | enabled |
+| Lock 30 FPS | yes | enabled |
+| Custom Felyne Food Skills | yes | disabled |
+| Lock 44 FPS | no | disabled |
+| All three quest-box candidates | no | disabled |
+
+Receipt tree hashes:
+
+```text
+Lobby       76225166f133acfa0ea11b8773a5f2d1fe2317c24529c01e54378fb221c33580
+30 FPS      c9b1b6639576486560ecfc7c9ea94ad183ba75d4e12a5cf12b6af7444e18a42d
+Felyne food 15bdce2c9c8f61907a381d7d5b166d8e5c87a725c15106143ceb9011bb304246
+```
+
+The installed Felyne-food tree equals the source tree. Per-file SHA-256 values match source and destination:
+
+```text
+manifest.json                         0e37d063d266882e3bbae5338a90cc50b8e90d366423f24fd6048fc3a3ed287f
+rules.txt                             294ac52965496822a986242cc294755cf5a1459ffba25fb12a2585dc0108c76a
+patch_custom_felyne_food_skills.asm   499ba021caf506aceacf71b0855f5f21bd5fcdf6b85eb9b2d4363239a4fa75ef
+```
+
+No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
 
 ## Distribution / 分发
 
-`dist/mh-cemu-enhancements-0.1.16.zip` is deterministic, retains all five catalog entries as source evidence, contains no game asset or tool cache, and has adjacent SHA-256 file `dist/mh-cemu-enhancements-0.1.16.zip.sha256`. Runtime selection fails closed for both older quest candidates; the combined conditional bridge requires explicit Experimental selection.
+`dist/mh-cemu-enhancements-0.1.17.zip` is the deterministic distribution archive; `dist/mh-cemu-enhancements-0.1.17.zip.sha256` is its adjacent digest. The Felyne-food pack requires explicit selection plus `--include-experimental`; it is not auto-installed merely because experimental packs are allowed.

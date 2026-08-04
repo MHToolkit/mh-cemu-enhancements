@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 37 耐力无限 - Infinite Stamina
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/37 耐力无限 - Infinite Stamina
+description = 中文：3DS 静态 ARM #37 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 同时强制耐力上限写回和耐力条件返回真；请验证奔跑、翻滚、格挡与水下动作。 / English: Wii U PPC conversion of 3DS static ARM cheat #37; Disabled by default; Runtime Experimental and requires gameplay verification.  Forces both max-stamina writeback and the stamina condition result; verify sprinting, rolling, guarding, and underwater actions.
+version = 7

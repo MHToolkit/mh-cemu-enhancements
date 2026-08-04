@@ -1,0 +1,276 @@
+{
+  "id": "mh3g-hd-jp-v96-static-60-fast-gathering",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "global-semantic",
+  "source_cheat_entries": [
+    60
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x00923668",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x009236ec",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0092372c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0092376c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923808",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0092385c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x009238b0",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923910",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0092395c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923adc",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923b44",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923d74",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923df0",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00923f10",
+      "word": "0xe3a00001"
+    }
+  ],
+  "name_bilingual": "高速收集 / Fast Gathering",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-60-fast-gathering",
+  "install_folder": "MH3G HD JP v96 - Static 60 - Fast Gathering",
+  "rules": "rules.txt",
+  "patch": "patch_static_60_fast_gathering.asm",
+  "preimages": [
+    {
+      "address": "0x028bc264",
+      "word": "0x4bfd4831",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc2d4",
+      "word": "0x4bfd47c1",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc314",
+      "word": "0x4bfd4781",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc34c",
+      "word": "0x4bfd4749",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc384",
+      "word": "0x4bfd4711",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc3d0",
+      "word": "0x4bfd46c5",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc410",
+      "word": "0x4bfd4685",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc45c",
+      "word": "0x4bfd4639",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc4a8",
+      "word": "0x4bfd45ed",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc4d4",
+      "word": "0x4bfd45c1",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc520",
+      "word": "0x4bfd4575",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc554",
+      "word": "0x4bfd4541",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc588",
+      "word": "0x4bfd450d",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc74c",
+      "word": "0x4bfd4349",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bc7d8",
+      "word": "0x4bfd42bd",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bcafc",
+      "word": "0x4bfd3f99",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bcb60",
+      "word": "0x4bfd3f35",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    },
+    {
+      "address": "0x028bcdbc",
+      "word": "0x4bfd3cd9",
+      "meaning": "中文：强制效果 ID 0x8D 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8D to return true."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x028bc25c",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc2cc",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc310",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc344",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc380",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc3c8",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc40c",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc458",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc4a4",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc4cc",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc51c",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc54c",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc580",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc748",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bc7d4",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bcaf4",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bcb58",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bcdb8",
+      "word": "0x3880008d",
+      "meaning": "中文：调用前把效果 ID 0x8D 放入 PPC 参数 r4。 / English: Loads effect ID 0x8D into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #60“高速收集”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #60 \"Fast Gathering\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

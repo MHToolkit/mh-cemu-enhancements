@@ -16,8 +16,34 @@
     "update": { "type": "string" },
     "status": { "enum": ["Static Verified", "Runtime Experimental", "Runtime Verified"] },
     "default_install": { "type": "boolean" },
+    "auto_experimental_install": { "type": "boolean" },
     "availability": { "enum": ["available", "runtime-blocked"] },
     "availability_reason": { "type": "string" },
+    "exclusive_group": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+    "source_cheat_entries": {
+      "type": "array",
+      "items": { "type": "integer", "minimum": 1 }
+    },
+    "conversion_kind": {
+      "enum": ["3ds-arm-static-to-wiiu-ppc"]
+    },
+    "conversion_confidence": {
+      "enum": [
+        "exact-static",
+        "global-semantic",
+        "global-semantic-with-exact-scalars",
+        "mixed-exact-and-global-semantic",
+        "exact-callsite-family",
+        "partial-semantic",
+        "shared-affinity-path"
+      ]
+    },
+    "name_bilingual": { "type": "string" },
+    "source_arm_patches": { "$ref": "#/$defs/wordAssertions" },
+    "known_risks": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "pack_dir": { "type": "string" },
     "install_folder": { "type": "string" },
     "rules": { "type": "string" },

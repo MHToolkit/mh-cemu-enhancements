@@ -8,7 +8,9 @@
   "update": "v96",
   "status": "Runtime Experimental",
   "default_install": false,
+  "auto_experimental_install": true,
   "availability": "available",
+  "exclusive_group": "mh3g-hd-jp-v96-vsync-frequency",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/fps-lock-30",
   "install_folder": "MH3G HD JP v96 - Lock 30 FPS",
   "rules": "rules.txt",
@@ -18,5 +20,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and pack rules; no game assets included.",
-  "summary": "用户实测 30 FPS 表现不稳定，暂降为实验状态并默认关闭；不修改 RPX 或 Cemu 全局设置。 / User testing found unstable 30 FPS behavior, so the pack is experimental and disabled by default; it does not patch RPX code or global Cemu settings."
+  "summary": "用户实测 30 FPS 表现不稳定，暂降为实验状态并默认关闭；不修改 RPX 或 Cemu 全局设置，且不得与 44 FPS 同时启用。 / User testing found unstable 30 FPS behavior, so the pack is experimental and disabled by default; it does not patch RPX code or global Cemu settings, and must not be enabled together with 44 FPS."
 }

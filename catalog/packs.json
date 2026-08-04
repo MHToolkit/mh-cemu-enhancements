@@ -6,16 +6,151 @@
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/fps-lock-30/manifest.json"
     },
     {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/fps-lock-44/manifest.json"
+    },
+    {
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box/manifest.json"
     },
     {
-      "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-delivery-full-item-box-experimental/manifest.json"
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/custom-felyne-food-skills/manifest.json"
     },
     {
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-blue-supply-box-full-item-box-control/manifest.json"
     },
     {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-delivery-full-item-box-experimental/manifest.json"
+    },
+    {
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-red-blue-full-item-box-experimental/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-05-sharpness-never-decreases/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-06-critical-display-hidden/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-07-infinite-hp/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-11-awakening/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-13-underwater-speed-x2/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-14-rock-steady/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-15-unbreakable-pickaxes-bug-nets/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-16-max-health-150/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-17-theft-immunity/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-18-mud-snow-immunity/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-21-evade-extender/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-26-bio-status-immunity/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-27-status-immunity/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-29-power-coating-anywhere/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-33-guard-plus-2/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-34-guard-up/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-35-flaming-aura/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-36-speed-eating-plus-2/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-37-infinite-stamina/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-38-focus/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-39-combination-success-100/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-40-maximum-combination-yield/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-41-high-grade-earplugs/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-44-windproof-high/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-45-stun-immunity/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-46-poison-paralysis-sleep-immunity/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-47-tremor-resistance/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-48-evasion-plus-2/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-49-minimum-bowgun-recoil/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-50-bowgun-steadiness/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-51-minds-eye/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-52-bow-auto-reload/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-53-speed-sharpening/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-54-map-always-visible/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-55-capture-guru/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-56-auto-marker-small-monsters/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-59-faster-carve-gather/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-60-fast-gathering/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-61-fast-placement/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-63-climate-temperature-adaptation/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-64-rock-steady-activated/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-65-combat-experience-enhancer/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-72-affinity-100/manifest.json"
     }
   ]
 }

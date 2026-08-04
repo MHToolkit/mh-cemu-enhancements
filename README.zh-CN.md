@@ -9,14 +9,17 @@
 | 开关 | 状态 | 可用性 | 默认安装 |
 | --- | --- | --- | --- |
 | 锁定 30 FPS | `Runtime Experimental` | `available` | 否 |
+| 锁定 44 FPS（3DS 转换） | `Runtime Experimental` | `available` | 否 |
+| 43 个 3DS 静态 ARM 转换包 | `Runtime Experimental` | `available` | 否（逐项显式选择） |
 | 集会所/酒场完整家中箱子 | `Runtime Verified` | `available` | 否 |
+| 猫饭技能自定义（三槽、`00..41`） | `Runtime Experimental` | `available` | 否（显式选择） |
 | 任务红色交纳箱 -> 完整家中箱子 | `Runtime Experimental` | `runtime-blocked` | 否 |
 | 任务蓝色补给箱 -> 完整家中箱子（无条件调度桥对照） | `Runtime Experimental` | `runtime-blocked` | 否 |
-| 任务红蓝箱 -> 完整家中箱子（条件调度桥） | `Runtime Experimental` | `available` | 否 |
+| 任务红蓝箱 -> 完整家中箱子（条件调度桥） | `Runtime Experimental` | `runtime-blocked`（暂停） | 否 |
 
 适用身份：Wii U Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、Cemu patch module checksum `0x348600a0`。
 
-`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务红箱多次实测仍不可用。无条件蓝箱调度桥已经热加载，但仍不弹菜单并导致任务看板对话框空白，因此两个旧任务候选均已阻断。新的红蓝统一候选让两箱共同进入模式 `0` 初始化器，并且只在明确的完整仓库状态 `6` 下放行任务场景逐帧调度；当前仍等待实测。
+`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务箱多次实测仍不可用，蓝箱调度桥还会使任务看板对话框空白，因此所有任务箱实验现已暂停并阻止安装。活动 3DS 金手指已完整盘点：44 FPS 使用 Cemu 原生控制项；另有 43 条静态 ARM 项已根据哈希一致的 3DS `.code` 与 JP-v96 PPC 语义/前像映射为独立实验包，共 168 条 PPC 写入。另行提供的 3DS 猫饭金手指已按语义映射到 JP-v96 原生用餐结算函数，并提供三个完整双语 `00..41` 下拉槽；当前仍待实机验证。其他动态指针、热键与注入例程仍只记录为待独立映射。
 
 ## 校验、安装、卸载、分发
 
@@ -29,25 +32,25 @@ python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx
 
-# 显式安装已实测通过的大厅包。
+# 安装基础人工实测集合：已验证大厅包、两个可选 FPS 上限包，
+# 以及显式选择的猫饭技能自定义包。
+# 不启动 Cemu，也不改 Cemu 已保存的启用/禁用状态。
 python3 scripts/mh-cemu-enhancements.py install \
   --cemu-root /绝对路径/cemu-data-root \
   --reference-rpx /绝对路径/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-lobby-full-item-box
-
-# 显式安装红蓝统一条件调度桥；Experimental 必须显式解锁。
-python3 scripts/mh-cemu-enhancements.py install \
-  --cemu-root /绝对路径/cemu-data-root \
-  --reference-rpx /绝对路径/MH3G_Cafe.rpx \
-  --pack mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental \
+  --pack mh3g-hd-jp-v96-lobby-full-item-box \
+  --pack mh3g-hd-jp-v96-fps-lock-30 \
+  --pack mh3g-hd-jp-v96-fps-lock-44 \
+  --pack mh3g-hd-jp-v96-custom-felyne-food-skills \
   --include-experimental
 
-# 两个旧任务箱候选继续 runtime-blocked；如仍需安装 30 FPS，也须显式选择并加
-# --include-experimental。
+# 全部任务箱候选均暂停且 runtime-blocked，不能安装。
+# 43 个静态转换包均需按映射清单中的包 ID 重复传入 --pack 显式安装；
+# 即使使用 --include-experimental，也不会把这 43 项自动加入安装集合。
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.16.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.17.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -64,16 +67,18 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
   --cemu-app /绝对路径/Cemu.app
 ```
 
-手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需的可用开关，并重新载入/重启游戏。两个旧任务箱候选继续阻断；新的红蓝统一条件调度桥仅限单人且仍等待实测；30 FPS 包在稳定性结论出来前保持关闭。
+手动执行打印出的命令后，在 **Graphic Packs** 中分别勾选所需的可用开关，并重新载入/重启游戏。全部任务箱实验继续阻断；两个 FPS 包在测试前保持关闭，且 30 FPS 与 44 FPS 不能同时启用。
 
 ## 补丁语义、兼容与联机
 
-- 30 FPS 使用 Graphic Pack 的 `[Control] vsyncFrequency = 30`，不写 Cemu 全局帧率配置；用户实测不稳定，因此保持 `Runtime Experimental`、默认关闭。
+- 30 FPS 与 44 FPS 都使用 Graphic Pack 的 `[Control] vsyncFrequency`，不写 Cemu 全局帧率配置；两者均保持 `Runtime Experimental`、默认关闭，且只能二选一，因为 Cemu 同时只能接受一个自定义 VSync 频率。44 FPS 包是两条重复 3DS 44 FPS 条目的语义转换。
 - 大厅包只改一条 Port Tanzia 交互指令：把传给共享箱子初始化函数 `0x021F0A8C` 的受限模式参数由 `r5 = 1` 改为完整模式 `r5 = 0`。它不替换对象、不使用分支或 code cave，完整菜单、换装、装备组合与护石功能已经实测通过，标记为 `Runtime Verified`，但仍默认关闭。
 - 红箱候选只改**红色交纳箱**，但实机仍持续显示不可用红叉。该候选保留作静态失败历史，并以 `runtime-blocked` 阻止安装。
 - 无条件蓝箱桥把 `0x02219DF0` 改成 `nop`。Cemu 已证明它在运行中成功热加载，但它仍不弹仓库菜单，并把无关任务 UI 状态送入大厅调度器，导致任务看板对话框空白；现已 `runtime-blocked`。
-- 红蓝统一候选把红箱提示/分派语义改到蓝箱共享路径，让两箱都调用模式 `0` 初始化器，并把原场景辅助函数窗口内联改为 OR 门槛：据点场景状态 `6` 或明确的全局完整仓库状态 `6`。其他任务 UI 状态仍跳到原版跳过目标，原忙碌保护保持不变。它不使用 code cave，当前仍是等待实测的 `Runtime Experimental`。
-- 当前可用 Cemu 叶子为：`MH Cemu Enhancements > MH3G HD JP v96 > Lock 30 FPS`、`Lobby Full Item Box` 与 `Quest Red & Blue Boxes -> Full Item Box (Experimental)`。两个旧任务箱候选均作为不可安装的失败证据保留。
+- 红蓝统一候选保留为源码历史，但现与其他任务箱实验一起标为 `runtime-blocked` 暂停；在拥有可复现的正确任务场景生命周期前，安装器不会选择它。
+- 猫饭技能自定义包提供三个互相独立的双语 `00..41` 下拉槽，包内默认组合为 `06/36/00`。修改预设后必须重新吃饭才会结算；餐前预览仍可能显示原版随机技能，游戏原生互斥组合（已知例：`41 + 1E`）也可能只生效其中一项。该包默认关闭，状态为 `Runtime Experimental / Gameplay Pending`。
+- 当前共有 47 个可用 Cemu 叶子：30/44 FPS、大厅完整箱子、猫饭技能自定义，以及 `3DS Static Cheats` 下 43 个独立静态转换项。所有任务箱候选均作为不可安装的失败证据保留。
+- 43 个静态转换包均默认关闭并保持 `Runtime Experimental / Gameplay Pending`。#6 与 #72 共用会心路径且互斥；#56 为部分语义映射；#65 影响通用技能比较路径，测试风险最高。
 - 联机时关闭全部道具箱修改包；30 FPS 包在稳定性结论出来前也不作为联机推荐。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。
 
@@ -82,6 +87,8 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 - [架构、状态语义与安全边界](docs/architecture.md)
 - [通用目录决策](docs/adr/0001-catalog-and-pack-boundaries.md)
 - [MH3G HD JP v96 PPC 静态证据账本](docs/research/mh3g-hd-jp-v96.md)
+- [完整 3DS → Cemu 金手指转换矩阵](docs/research/mh3g-3ds-cheat-conversion.md)
+- [43 项静态 ARM → PPC 映射与包 ID 清单](docs/research/mh3g-static-arm-mapping.md)
 - [pack manifest schema](schemas/pack-manifest.schema.json)
 
 用户给出的 Bilibili 页面没有作为实现证据：其中 b23 短链不可用。本目录只依据本机 3DS ARM 语义对照、Wii U PPC/静态资源分析，以及 Cemu Graphic Pack parser 的规则实现。

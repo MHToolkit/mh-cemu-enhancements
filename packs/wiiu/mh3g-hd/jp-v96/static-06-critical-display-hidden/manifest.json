@@ -1,0 +1,87 @@
+{
+  "id": "mh3g-hd-jp-v96-static-06-critical-display-hidden",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "shared-affinity-path",
+  "source_cheat_entries": [
+    6
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x008c3f9c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008c3fa4",
+      "word": "0x12840064"
+    },
+    {
+      "address": "0x0090ddc8",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0090ddd8",
+      "word": "0xe2840064"
+    }
+  ],
+  "name_bilingual": "会心不显示 / Critical Display Hidden",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-06-critical-display-hidden",
+  "install_folder": "MH3G HD JP v96 - Static 06 - Critical Display Hidden",
+  "rules": "rules.txt",
+  "patch": "patch_static_06_critical_display_hidden.asm",
+  "preimages": [
+    {
+      "address": "0x0286036c",
+      "word": "0x48030729",
+      "meaning": "中文：强制效果 ID 0x1B 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x1B to return true."
+    },
+    {
+      "address": "0x02860378",
+      "word": "0x3bff001e",
+      "meaning": "中文：将第一条会心加成从 30 改为 100。 / English: Change the first affinity addition from 30 to 100."
+    },
+    {
+      "address": "0x02861840",
+      "word": "0x4802f255",
+      "meaning": "中文：强制效果 ID 0x1B 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x1B to return true."
+    },
+    {
+      "address": "0x02861850",
+      "word": "0x3bff001e",
+      "meaning": "中文：将第二条会心加成从 30 改为 100。 / English: Change the second affinity addition from 30 to 100."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x02860368",
+      "word": "0x3880001b",
+      "meaning": "中文：调用前把效果 ID 0x1B 放入 PPC 参数 r4。 / English: Loads effect ID 0x1B into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x0286183c",
+      "word": "0x3880001b",
+      "meaning": "中文：调用前把效果 ID 0x1B 放入 PPC 参数 r4。 / English: Loads effect ID 0x1B into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：该源项名称写作“会心不显示”，但 ARM 指令实际把两条会心加成路径改为 100；它与 #72 共享 Wii U 路径，二者不可同时启用。 / English: The source label says critical display hidden, but its ARM instructions set two affinity-add paths to 100; it shares Wii U paths with #72 and the two cannot be enabled together."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #6“会心不显示”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #6 \"Critical Display Hidden\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental.",
+  "exclusive_group": "mh3g-hd-jp-v96-affinity-override"
+}

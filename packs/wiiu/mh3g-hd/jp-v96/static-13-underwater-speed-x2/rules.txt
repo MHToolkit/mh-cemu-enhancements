@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 13 水下速度 2 倍 - Underwater Speed ×2
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/13 水下速度 2 倍 - Underwater Speed ×2
+description = 中文：3DS 静态 ARM #13 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。 / English: Wii U PPC conversion of 3DS static ARM cheat #13; Disabled by default; Runtime Experimental and requires gameplay verification.  Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers.
+version = 7

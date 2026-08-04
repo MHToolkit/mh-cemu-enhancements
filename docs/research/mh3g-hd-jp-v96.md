@@ -4,6 +4,16 @@
 
 Target: **Monster Hunter 3G HD Ver.**, Wii U Japan, title ID `0005000010104D00`, update v96. This ledger is static evidence only; Cemu is not launched by this project.
 
+## Current disposition / 当前处置
+
+任务内红色交纳箱、蓝色补给箱替换在用户要求下已暂停。所有任务箱候选都保留为历史研究，但均为 `runtime-blocked`，不再作为安装候选；本账本中与其有关的叙述仅记录已发生的静态/运行时证据，绝不代表当前可用功能。
+
+Quest red-delivery-box and blue-supply-box replacement is paused at the user's request. Every quest-box candidate is retained as research history but is `runtime-blocked` and excluded from installation; related passages below record prior static/runtime evidence only and do not represent a currently available feature.
+
+活动 3DS 金手指已另行完整盘点：44 FPS 使用 Cemu 原生 `[Control] vsyncFrequency` 等效项；43 条静态 ARM 项已根据匹配的 3DS `.code` 与 JP-v96 PPC 语义/前像转换为独立实验包，共 168 条固定地址写入。详见 [3DS → Cemu 金手指转换矩阵](mh3g-3ds-cheat-conversion.md) 与 [43 项静态映射清单](mh3g-static-arm-mapping.md)。
+
+The active 3DS cheat list is inventoried separately. 44 FPS uses Cemu's native `[Control] vsyncFrequency`; 43 static ARM entries have also been mapped from the matching 3DS `.code` to independent JP-v96 PPC experimental packs with 168 fixed-address writes. See the [3DS → Cemu cheat conversion matrix](mh3g-3ds-cheat-conversion.md) and [43-entry static mapping ledger](mh3g-static-arm-mapping.md).
+
 ## Immutable reference
 
 | Field | Value |
@@ -21,6 +31,35 @@ The RPX is not copied into this repository. The verifier accepts an explicit loc
 The local Japanese 3DS title is `0004000000048100` / `CTR-P-AMHJ`. Its extracted `code.bin` SHA-256 is `3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77`.
 
 The existing 3DS force-30-FPS cheat follows `60C9E728 -> B0C9E728 -> +0x30` and writes float `0x41F00000`. This proves a 3DS runtime-pointer semantic only; it is ARM data and is never reused as a Wii U PPC address or patch.
+
+## Custom Felyne food skills / 猫饭技能自定义
+
+The separately supplied `MH3G猫饭技能自定义说明.txt` (`猫饭自定义 v1.2`, SHA-256 `d6afc863cc673975933cfd80becfafd2fe218f75ba8973e8ed2414a4183699cb`) uses Gateway/Azahar pointer commands to mirror three byte IDs into menu offsets `+0x7D92/+0x7D94/+0x7D96` and runtime offsets `+0xE2E/+0xE30/+0xE32`. Its documented domain is `0x00..0x41`; `0x00` is an empty slot. Those ARM addresses and little-endian byte writes are semantic evidence only and are not copied into the Wii U patch.
+
+另行提供的 `MH3G猫饭技能自定义说明.txt`（`猫饭自定义 v1.2`，SHA-256 `d6afc863cc673975933cfd80becfafd2fe218f75ba8973e8ed2414a4183699cb`）通过 Gateway/Azahar 动态指针命令，把三个字节技能 ID 同步到菜单偏移 `+0x7D92/+0x7D94/+0x7D96` 与任务运行偏移 `+0xE2E/+0xE30/+0xE32`。文档给出的有效范围是 `0x00..0x41`，其中 `0x00` 为空槽。这些 ARM 地址及小端字节写入只作为语义证据，不会直接抄到 Wii U 补丁。
+
+Function matching located the equivalent native finalizers at ARM `0x005C3054..0x005C3330` and PPC `0x021D8548..0x021D8790`. The PPC function clears and deduplicates up to three skills, then writes menu halfwords at `r30 + 0x83FE/0x8400/0x8402` and runtime halfwords at `[r31 + 0x140] + 0xE3E/0xE40/0xE42`. Independent PPC reader `0x0285F224..0x0285F258` loops over exactly three halfwords from `+0xE3E`, and its callers use IDs through `0x41`. The finalizer's located direct call is `0x021D9D9C`.
+
+函数匹配定位到等价的原生结算函数：ARM `0x005C3054..0x005C3330`、PPC `0x021D8548..0x021D8790`。PPC 函数会清空并去重最多三个技能，再把半字写到菜单侧 `r30 + 0x83FE/0x8400/0x8402` 与运行侧 `[r31 + 0x140] + 0xE3E/0xE40/0xE42`。独立 PPC 读取器 `0x0285F224..0x0285F258` 从 `+0xE3E` 恰好循环读取三个半字，其调用方使用的编号覆盖到 `0x41`；已定位的 finalizer 直接调用点为 `0x021D9D9C`。
+
+The pack replaces only the ten-instruction writeback tail and falls through to untouched code at `0x021D8768`:
+
+```asm
+0x021d8740 = lwz r11, 0x140(r31)
+0x021d8744 = li r0, $skill1
+0x021d8748 = sth r0, 0x000a(r27)
+0x021d874c = sth r0, 0x0e3e(r11)
+0x021d8750 = li r0, $skill2
+0x021d8754 = sth r0, 0x000c(r27)
+0x021d8758 = sth r0, 0x0e40(r11)
+0x021d875c = li r0, $skill3
+0x021d8760 = sth r0, 0x000e(r27)
+0x021d8764 = sth r0, 0x0e42(r11)
+```
+
+`r27` is already `r30 + 0x83F4`, making offsets `+0x0A/+0x0C/+0x0E` the three menu slots. The replacement simultaneously updates runtime state and uses no relocated code. Rules expose three categorized bilingual selectors containing all 66 values each; defaults inside the disabled pack are `06/36/00`. A preset change takes effect only when the player eats again. Preview text may remain game-generated before finalization, and native incompatible combinations—known example `41 + 1E`—may not apply both effects. The pack is therefore **Runtime Experimental / Gameplay Pending** until real meal and quest-effect validation.
+
+`r27` 在原函数中已经等于 `r30 + 0x83F4`，所以 `+0x0A/+0x0C/+0x0E` 正好是菜单侧三个槽。替换块同时更新任务运行态，不使用重定位代码。规则提供三个分类双语下拉框，每槽完整包含 66 个编号；整个包默认关闭，包内默认值为 `06/36/00`。修改预设后必须重新吃饭才会生效；结算前预览可能仍显示原版随机技能，原生互斥组合（已知例 `41 + 1E`）也可能无法同时生效。因此在真实用餐与任务效果验证前，本包保持 **Runtime Experimental / Gameplay Pending**。
 
 ## Menu-class mapping
 
@@ -183,6 +222,6 @@ The scene comparator `0x021B7E08` is pure: it reads `object +0x14`, compares the
 
 ## Runtime validation gate
 
-No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. Both older quest candidates are `runtime-blocked`. The combined conditional bridge is available but gameplay-pending `Runtime Experimental`; static and installation evidence must not promote it. The 30 FPS pack remains available but experimental after unstable user testing.
+No Cemu process was launched by the repository verification workflow. The lobby pack has separate user gameplay evidence and is `Runtime Verified`. Every quest-box candidate, including the combined conditional bridge, is `runtime-blocked`. The 30 FPS pack remains available but experimental after unstable user testing. The 43 static ARM-to-PPC conversions and Custom Felyne Food Skills pack are available, default-off, and `Runtime Experimental / Gameplay Pending`; static and installation evidence must not promote them.
 
-仓库验证流程没有启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。两个旧任务箱候选均为 `runtime-blocked`。红蓝统一条件桥已开放但仍是等待实测的 `Runtime Experimental`；静态与安装证据不得把它升级。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。
+仓库验证流程没有启动 Cemu。大厅包具有独立用户实测证据并标记为 `Runtime Verified`。包括红蓝统一条件桥在内的全部任务箱候选均为 `runtime-blocked`。30 FPS 包仍可安装，但因实测不稳定继续保持实验状态。43 个静态 ARM → PPC 转换包与猫饭技能自定义包均可安装、默认关闭，状态均为 `Runtime Experimental / Gameplay Pending`；静态与安装证据不得把它们升级为运行时已验证。

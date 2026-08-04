@@ -1,0 +1,1001 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 猫饭技能自定义 - Custom Felyne Food Skills
+path = MH Cemu Enhancements/MH3G HD JP v96/Custom Felyne Food Skills
+description = 默认关闭；分别选择三个技能槽，修改后必须重新吃饭。状态：Runtime Experimental / Gameplay Pending。 / Disabled by default; select three skill slots and eat again after changing them. Status: Runtime Experimental / Gameplay Pending.
+version = 7
+
+[Default]
+$skill1:int = 0x06
+$skill2:int = 0x36
+$skill3:int = 0x00
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 00 无 / None
+$skill1:int = 0x00
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 01 猫的解体术(大) / Felyne Carver (Hi)
+$skill1:int = 0x01
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 02 猫的解体术(小) / Felyne Carver (Lo)
+$skill1:int = 0x02
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 03 猫的医疗术 / Felyne Medic
+$skill1:int = 0x03
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 04 猫的体术 / Felyne Acrobat
+$skill1:int = 0x04
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 05 猫的火药术 / Felyne Pyro
+$skill1:int = 0x05
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 06 猫的特殊攻击术 / Felyne Specialist
+$skill1:int = 0x06
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 07 猫的防御术(大) / Felyne Defender (Hi)
+$skill1:int = 0x07
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 08 猫的防御术(小) / Felyne Defender (Lo)
+$skill1:int = 0x08
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 09 猫的吹奏术 / Felyne Maestro
+$skill1:int = 0x09
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 0A 猫的道具节约术 / Felyne Item Saver
+$skill1:int = 0x0A
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 0B 猫的魅力术 / Felyne Charisma
+$skill1:int = 0x0B
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 0C 猫的调和术(大) / Felyne Combiner (Hi)
+$skill1:int = 0x0C
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 0D 猫的调和术(小) / Felyne Combiner (Lo)
+$skill1:int = 0x0D
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 0E 猫的采集术 / Felyne Gatherer
+$skill1:int = 0x0E
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 0F 猫的射击术 / Felyne Sharpshooter
+$skill1:int = 0x0F
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 10 招财猫的激运 / Lucky Cat
+$skill1:int = 0x10
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 11 招财猫的幸运 / Felyne Lucky
+$skill1:int = 0x11
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 12 猫的火事场力 / Felyne Heroics
+$skill1:int = 0x12
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 13 猫的弹刀术 / Felyne Deflector
+$skill1:int = 0x13
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 14 猫的逃走术 / Felyne Escape Artist
+$skill1:int = 0x14
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 15 猫的投掷术 / Felyne Hurler
+$skill1:int = 0x15
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 16 猫的胆力 / Felyne Courage
+$skill1:int = 0x16
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 17 猫的搬运超人 / Felyne Supercat
+$skill1:int = 0x17
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 18 猫的搬运铁人 / Felyne Iron Cat
+$skill1:int = 0x18
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 19 猫的弱小招来术 / Felyne Weakener
+$skill1:int = 0x19
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 1A 猫的秘境探索术 / Felyne Explorer
+$skill1:int = 0x1A
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 1B 猫的换算术 / Felyne Calculator
+$skill1:int = 0x1B
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 1C 猫的起身术(大) / Felyne Riser (Hi)
+$skill1:int = 0x1C
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 1D 猫的起身术(小) / Felyne Riser (Lo)
+$skill1:int = 0x1D
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 1E 猫的狂乱射击术 / Felyne Temper
+$skill1:int = 0x1E
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 1F 猫的踢脚术 / Felyne Kicker
+$skill1:int = 0x1F
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 20 猫的拳斗术 / Felyne Fighter
+$skill1:int = 0x20
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 21 猫的攀藤超人 / Felyne Super Climber
+$skill1:int = 0x21
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 22 猫的攀藤铁人 / Felyne Iron Climber
+$skill1:int = 0x22
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 23 猫的解体铁人 / Felyne Carving Ironman
+$skill1:int = 0x23
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 24 猫的着地术 / Felyne Landing
+$skill1:int = 0x24
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 25 猫的休息术 / Felyne Relaxer
+$skill1:int = 0x25
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 26 猫的蛮横术 / Felyne Bulldozer
+$skill1:int = 0x26
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 27 猫的附加术 / Felyne Bonus
+$skill1:int = 0x27
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 28 猫的KO术 / Felyne Slugger
+$skill1:int = 0x28
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 29 招财猫的金运 / Felyne Money Maker
+$skill1:int = 0x29
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 2A 猫的木天蓼爆破术 / Felyne Matatabi Bomber
+$skill1:int = 0x2A
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 2B 猫的炮击术 / Felyne Artillery
+$skill1:int = 0x2B
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 2C 猫的大根性 / Felyne Moxie
+$skill1:int = 0x2C
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 2D 猫的肥料弹达人 / Felyne Dungmaster
+$skill1:int = 0x2D
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 2E 猫的舔毛术 / Felyne Groomer
+$skill1:int = 0x2E
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 2F 猫的走火术 / Felyne Firestarter
+$skill1:int = 0x2F
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 30 猫的穿越术 / Felyne Traverser
+$skill1:int = 0x30
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 31 猫的千里眼之术 / Felyne Oracle
+$skill1:int = 0x31
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 32 猫的研磨术 / Felyne Polisher
+$skill1:int = 0x32
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 33 猫的受身术 / Felyne Ukemi
+$skill1:int = 0x33
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 34 猫的强者挑战术 / Felyne Challenger
+$skill1:int = 0x34
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 35 猫的奇面族指导术 / Felyne Shakalaka Coach
+$skill1:int = 0x35
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 36 猫的短期催眠术 / Felyne Booster
+$skill1:int = 0x36
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 37 猫的分配能手 / Felyne Distributor
+$skill1:int = 0x37
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 38 猫的不眠术 / Felyne Insomniac
+$skill1:int = 0x38
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 39 猫的平衡术 / Felyne Balance
+$skill1:int = 0x39
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 3A 猫的钓鱼术 / Felyne Fisher
+$skill1:int = 0x3A
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 3B 猫的火属性得意 / Felyne Fire Res
+$skill1:int = 0x3B
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 3C 猫的水属性得意 / Felyne Water Res
+$skill1:int = 0x3C
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 3D 猫的雷属性得意 / Felyne Thunder Res
+$skill1:int = 0x3D
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 3E 猫的冰属性得意 / Felyne Ice Res
+$skill1:int = 0x3E
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 3F 猫的龙属性得意 / Felyne Dragon Res
+$skill1:int = 0x3F
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 40 猫的游泳名人 / Felyne Swimmer
+$skill1:int = 0x40
+
+[Preset]
+category = 技能槽 1 / Skill Slot 1
+name = 41 招财猫的厄运 / Unlucky Cat
+$skill1:int = 0x41
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 00 无 / None
+$skill2:int = 0x00
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 01 猫的解体术(大) / Felyne Carver (Hi)
+$skill2:int = 0x01
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 02 猫的解体术(小) / Felyne Carver (Lo)
+$skill2:int = 0x02
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 03 猫的医疗术 / Felyne Medic
+$skill2:int = 0x03
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 04 猫的体术 / Felyne Acrobat
+$skill2:int = 0x04
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 05 猫的火药术 / Felyne Pyro
+$skill2:int = 0x05
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 06 猫的特殊攻击术 / Felyne Specialist
+$skill2:int = 0x06
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 07 猫的防御术(大) / Felyne Defender (Hi)
+$skill2:int = 0x07
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 08 猫的防御术(小) / Felyne Defender (Lo)
+$skill2:int = 0x08
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 09 猫的吹奏术 / Felyne Maestro
+$skill2:int = 0x09
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 0A 猫的道具节约术 / Felyne Item Saver
+$skill2:int = 0x0A
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 0B 猫的魅力术 / Felyne Charisma
+$skill2:int = 0x0B
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 0C 猫的调和术(大) / Felyne Combiner (Hi)
+$skill2:int = 0x0C
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 0D 猫的调和术(小) / Felyne Combiner (Lo)
+$skill2:int = 0x0D
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 0E 猫的采集术 / Felyne Gatherer
+$skill2:int = 0x0E
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 0F 猫的射击术 / Felyne Sharpshooter
+$skill2:int = 0x0F
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 10 招财猫的激运 / Lucky Cat
+$skill2:int = 0x10
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 11 招财猫的幸运 / Felyne Lucky
+$skill2:int = 0x11
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 12 猫的火事场力 / Felyne Heroics
+$skill2:int = 0x12
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 13 猫的弹刀术 / Felyne Deflector
+$skill2:int = 0x13
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 14 猫的逃走术 / Felyne Escape Artist
+$skill2:int = 0x14
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 15 猫的投掷术 / Felyne Hurler
+$skill2:int = 0x15
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 16 猫的胆力 / Felyne Courage
+$skill2:int = 0x16
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 17 猫的搬运超人 / Felyne Supercat
+$skill2:int = 0x17
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 18 猫的搬运铁人 / Felyne Iron Cat
+$skill2:int = 0x18
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 19 猫的弱小招来术 / Felyne Weakener
+$skill2:int = 0x19
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 1A 猫的秘境探索术 / Felyne Explorer
+$skill2:int = 0x1A
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 1B 猫的换算术 / Felyne Calculator
+$skill2:int = 0x1B
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 1C 猫的起身术(大) / Felyne Riser (Hi)
+$skill2:int = 0x1C
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 1D 猫的起身术(小) / Felyne Riser (Lo)
+$skill2:int = 0x1D
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 1E 猫的狂乱射击术 / Felyne Temper
+$skill2:int = 0x1E
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 1F 猫的踢脚术 / Felyne Kicker
+$skill2:int = 0x1F
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 20 猫的拳斗术 / Felyne Fighter
+$skill2:int = 0x20
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 21 猫的攀藤超人 / Felyne Super Climber
+$skill2:int = 0x21
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 22 猫的攀藤铁人 / Felyne Iron Climber
+$skill2:int = 0x22
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 23 猫的解体铁人 / Felyne Carving Ironman
+$skill2:int = 0x23
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 24 猫的着地术 / Felyne Landing
+$skill2:int = 0x24
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 25 猫的休息术 / Felyne Relaxer
+$skill2:int = 0x25
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 26 猫的蛮横术 / Felyne Bulldozer
+$skill2:int = 0x26
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 27 猫的附加术 / Felyne Bonus
+$skill2:int = 0x27
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 28 猫的KO术 / Felyne Slugger
+$skill2:int = 0x28
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 29 招财猫的金运 / Felyne Money Maker
+$skill2:int = 0x29
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 2A 猫的木天蓼爆破术 / Felyne Matatabi Bomber
+$skill2:int = 0x2A
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 2B 猫的炮击术 / Felyne Artillery
+$skill2:int = 0x2B
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 2C 猫的大根性 / Felyne Moxie
+$skill2:int = 0x2C
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 2D 猫的肥料弹达人 / Felyne Dungmaster
+$skill2:int = 0x2D
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 2E 猫的舔毛术 / Felyne Groomer
+$skill2:int = 0x2E
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 2F 猫的走火术 / Felyne Firestarter
+$skill2:int = 0x2F
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 30 猫的穿越术 / Felyne Traverser
+$skill2:int = 0x30
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 31 猫的千里眼之术 / Felyne Oracle
+$skill2:int = 0x31
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 32 猫的研磨术 / Felyne Polisher
+$skill2:int = 0x32
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 33 猫的受身术 / Felyne Ukemi
+$skill2:int = 0x33
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 34 猫的强者挑战术 / Felyne Challenger
+$skill2:int = 0x34
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 35 猫的奇面族指导术 / Felyne Shakalaka Coach
+$skill2:int = 0x35
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 36 猫的短期催眠术 / Felyne Booster
+$skill2:int = 0x36
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 37 猫的分配能手 / Felyne Distributor
+$skill2:int = 0x37
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 38 猫的不眠术 / Felyne Insomniac
+$skill2:int = 0x38
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 39 猫的平衡术 / Felyne Balance
+$skill2:int = 0x39
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 3A 猫的钓鱼术 / Felyne Fisher
+$skill2:int = 0x3A
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 3B 猫的火属性得意 / Felyne Fire Res
+$skill2:int = 0x3B
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 3C 猫的水属性得意 / Felyne Water Res
+$skill2:int = 0x3C
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 3D 猫的雷属性得意 / Felyne Thunder Res
+$skill2:int = 0x3D
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 3E 猫的冰属性得意 / Felyne Ice Res
+$skill2:int = 0x3E
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 3F 猫的龙属性得意 / Felyne Dragon Res
+$skill2:int = 0x3F
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 40 猫的游泳名人 / Felyne Swimmer
+$skill2:int = 0x40
+
+[Preset]
+category = 技能槽 2 / Skill Slot 2
+name = 41 招财猫的厄运 / Unlucky Cat
+$skill2:int = 0x41
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 00 无 / None
+$skill3:int = 0x00
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 01 猫的解体术(大) / Felyne Carver (Hi)
+$skill3:int = 0x01
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 02 猫的解体术(小) / Felyne Carver (Lo)
+$skill3:int = 0x02
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 03 猫的医疗术 / Felyne Medic
+$skill3:int = 0x03
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 04 猫的体术 / Felyne Acrobat
+$skill3:int = 0x04
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 05 猫的火药术 / Felyne Pyro
+$skill3:int = 0x05
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 06 猫的特殊攻击术 / Felyne Specialist
+$skill3:int = 0x06
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 07 猫的防御术(大) / Felyne Defender (Hi)
+$skill3:int = 0x07
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 08 猫的防御术(小) / Felyne Defender (Lo)
+$skill3:int = 0x08
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 09 猫的吹奏术 / Felyne Maestro
+$skill3:int = 0x09
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 0A 猫的道具节约术 / Felyne Item Saver
+$skill3:int = 0x0A
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 0B 猫的魅力术 / Felyne Charisma
+$skill3:int = 0x0B
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 0C 猫的调和术(大) / Felyne Combiner (Hi)
+$skill3:int = 0x0C
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 0D 猫的调和术(小) / Felyne Combiner (Lo)
+$skill3:int = 0x0D
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 0E 猫的采集术 / Felyne Gatherer
+$skill3:int = 0x0E
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 0F 猫的射击术 / Felyne Sharpshooter
+$skill3:int = 0x0F
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 10 招财猫的激运 / Lucky Cat
+$skill3:int = 0x10
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 11 招财猫的幸运 / Felyne Lucky
+$skill3:int = 0x11
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 12 猫的火事场力 / Felyne Heroics
+$skill3:int = 0x12
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 13 猫的弹刀术 / Felyne Deflector
+$skill3:int = 0x13
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 14 猫的逃走术 / Felyne Escape Artist
+$skill3:int = 0x14
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 15 猫的投掷术 / Felyne Hurler
+$skill3:int = 0x15
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 16 猫的胆力 / Felyne Courage
+$skill3:int = 0x16
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 17 猫的搬运超人 / Felyne Supercat
+$skill3:int = 0x17
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 18 猫的搬运铁人 / Felyne Iron Cat
+$skill3:int = 0x18
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 19 猫的弱小招来术 / Felyne Weakener
+$skill3:int = 0x19
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 1A 猫的秘境探索术 / Felyne Explorer
+$skill3:int = 0x1A
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 1B 猫的换算术 / Felyne Calculator
+$skill3:int = 0x1B
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 1C 猫的起身术(大) / Felyne Riser (Hi)
+$skill3:int = 0x1C
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 1D 猫的起身术(小) / Felyne Riser (Lo)
+$skill3:int = 0x1D
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 1E 猫的狂乱射击术 / Felyne Temper
+$skill3:int = 0x1E
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 1F 猫的踢脚术 / Felyne Kicker
+$skill3:int = 0x1F
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 20 猫的拳斗术 / Felyne Fighter
+$skill3:int = 0x20
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 21 猫的攀藤超人 / Felyne Super Climber
+$skill3:int = 0x21
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 22 猫的攀藤铁人 / Felyne Iron Climber
+$skill3:int = 0x22
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 23 猫的解体铁人 / Felyne Carving Ironman
+$skill3:int = 0x23
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 24 猫的着地术 / Felyne Landing
+$skill3:int = 0x24
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 25 猫的休息术 / Felyne Relaxer
+$skill3:int = 0x25
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 26 猫的蛮横术 / Felyne Bulldozer
+$skill3:int = 0x26
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 27 猫的附加术 / Felyne Bonus
+$skill3:int = 0x27
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 28 猫的KO术 / Felyne Slugger
+$skill3:int = 0x28
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 29 招财猫的金运 / Felyne Money Maker
+$skill3:int = 0x29
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 2A 猫的木天蓼爆破术 / Felyne Matatabi Bomber
+$skill3:int = 0x2A
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 2B 猫的炮击术 / Felyne Artillery
+$skill3:int = 0x2B
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 2C 猫的大根性 / Felyne Moxie
+$skill3:int = 0x2C
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 2D 猫的肥料弹达人 / Felyne Dungmaster
+$skill3:int = 0x2D
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 2E 猫的舔毛术 / Felyne Groomer
+$skill3:int = 0x2E
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 2F 猫的走火术 / Felyne Firestarter
+$skill3:int = 0x2F
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 30 猫的穿越术 / Felyne Traverser
+$skill3:int = 0x30
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 31 猫的千里眼之术 / Felyne Oracle
+$skill3:int = 0x31
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 32 猫的研磨术 / Felyne Polisher
+$skill3:int = 0x32
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 33 猫的受身术 / Felyne Ukemi
+$skill3:int = 0x33
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 34 猫的强者挑战术 / Felyne Challenger
+$skill3:int = 0x34
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 35 猫的奇面族指导术 / Felyne Shakalaka Coach
+$skill3:int = 0x35
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 36 猫的短期催眠术 / Felyne Booster
+$skill3:int = 0x36
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 37 猫的分配能手 / Felyne Distributor
+$skill3:int = 0x37
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 38 猫的不眠术 / Felyne Insomniac
+$skill3:int = 0x38
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 39 猫的平衡术 / Felyne Balance
+$skill3:int = 0x39
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 3A 猫的钓鱼术 / Felyne Fisher
+$skill3:int = 0x3A
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 3B 猫的火属性得意 / Felyne Fire Res
+$skill3:int = 0x3B
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 3C 猫的水属性得意 / Felyne Water Res
+$skill3:int = 0x3C
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 3D 猫的雷属性得意 / Felyne Thunder Res
+$skill3:int = 0x3D
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 3E 猫的冰属性得意 / Felyne Ice Res
+$skill3:int = 0x3E
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 3F 猫的龙属性得意 / Felyne Dragon Res
+$skill3:int = 0x3F
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 40 猫的游泳名人 / Felyne Swimmer
+$skill3:int = 0x40
+
+[Preset]
+category = 技能槽 3 / Skill Slot 3
+name = 41 招财猫的厄运 / Unlucky Cat
+$skill3:int = 0x41

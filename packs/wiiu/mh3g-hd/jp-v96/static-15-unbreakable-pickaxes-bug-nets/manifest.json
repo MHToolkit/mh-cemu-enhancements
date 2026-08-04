@@ -1,0 +1,83 @@
+{
+  "id": "mh3g-hd-jp-v96-static-15-unbreakable-pickaxes-bug-nets",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "mixed-exact-and-global-semantic",
+  "source_cheat_entries": [
+    15
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x0090e588",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00588058",
+      "word": "0xe3a00064"
+    }
+  ],
+  "name_bilingual": "铁镐和虫网不会损坏 / Unbreakable Pickaxes and Bug Nets",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-15-unbreakable-pickaxes-bug-nets",
+  "install_folder": "MH3G HD JP v96 - Static 15 - Unbreakable Pickaxes and Bug Nets",
+  "rules": "rules.txt",
+  "patch": "patch_static_15_unbreakable_pickaxes_bug_nets.asm",
+  "preimages": [
+    {
+      "address": "0x0211ad38",
+      "word": "0x7c0b4050",
+      "meaning": "中文：把铁镐/虫网耐久余量固定为 100。 / English: Fix the pickaxe/bug-net durability remainder at 100."
+    },
+    {
+      "address": "0x028b73b4",
+      "word": "0x4bfd96e1",
+      "meaning": "中文：强制效果 ID 0x8F 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8F to return true."
+    },
+    {
+      "address": "0x028bbd10",
+      "word": "0x4bfd4d85",
+      "meaning": "中文：强制效果 ID 0x8F 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8F to return true."
+    },
+    {
+      "address": "0x028c3a80",
+      "word": "0x4bfcd015",
+      "meaning": "中文：强制效果 ID 0x8F 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x8F to return true."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x028b73b0",
+      "word": "0x3880008f",
+      "meaning": "中文：调用前把效果 ID 0x8F 放入 PPC 参数 r4。 / English: Loads effect ID 0x8F into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028bbd0c",
+      "word": "0x3880008f",
+      "meaning": "中文：调用前把效果 ID 0x8F 放入 PPC 参数 r4。 / English: Loads effect ID 0x8F into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c3a7c",
+      "word": "0x3880008f",
+      "meaning": "中文：调用前把效果 ID 0x8F 放入 PPC 参数 r4。 / English: Loads effect ID 0x8F into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：耐久余量固定为 100，并同时强制相关技能检查；请验证采矿、捕虫和任务消耗品路径。 / English: Fixes the durability remainder at 100 and forces related skill checks; verify mining, bug catching, and quest consumable paths."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #15“铁镐和虫网不会损坏”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #15 \"Unbreakable Pickaxes and Bug Nets\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

@@ -1,0 +1,176 @@
+{
+  "id": "mh3g-hd-jp-v96-static-13-underwater-speed-x2",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "global-semantic-with-exact-scalars",
+  "source_cheat_entries": [
+    13
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x008a3ccc",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008a3e0c",
+      "word": "0x40000000"
+    },
+    {
+      "address": "0x008a6a54",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008a6b00",
+      "word": "0xeddf0a6a"
+    }
+  ],
+  "name_bilingual": "水下速度 2 倍 / Underwater Speed ×2",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-13-underwater-speed-x2",
+  "install_folder": "MH3G HD JP v96 - Static 13 - Underwater Speed ×2",
+  "rules": "rules.txt",
+  "patch": "patch_static_13_underwater_speed_x2.asm",
+  "preimages": [
+    {
+      "address": "0x028c7368",
+      "word": "0x4bfc972d",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c73b4",
+      "word": "0x4bfc96e1",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c7420",
+      "word": "0x4bfc9675",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c7464",
+      "word": "0x4bfc9631",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c74a8",
+      "word": "0x4bfc95ed",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c74d0",
+      "word": "0xc14ce36c",
+      "meaning": "中文：把 1.05 倍路径重定向到 JP v96 已有的 2.0 常量。 / English: Redirect the 1.05 path to an existing JP-v96 2.0 constant."
+    },
+    {
+      "address": "0x028c7578",
+      "word": "0x4bfc951d",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c7ab0",
+      "word": "0x4bfc8fe5",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c7af0",
+      "word": "0x4bfc8fa5",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c966c",
+      "word": "0x4bfc7429",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c96c0",
+      "word": "0x4bfc73d5",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c96f8",
+      "word": "0x4bfc739d",
+      "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c971c",
+      "word": "0xc00ae2d0",
+      "meaning": "中文：把 1.10 倍路径重定向到 JP v96 已有的 2.0 常量。 / English: Redirect the 1.10 path to an existing JP-v96 2.0 constant."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x028c7360",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c73ac",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c7418",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c745c",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c74a0",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c7574",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c7aa8",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c7ae8",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c9664",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c96b8",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028c96f0",
+      "word": "0x388000c7",
+      "meaning": "中文：调用前把效果 ID 0xC7 放入 PPC 参数 r4。 / English: Loads effect ID 0xC7 into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。 / English: Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #13“水下速度 2 倍”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #13 \"Underwater Speed ×2\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

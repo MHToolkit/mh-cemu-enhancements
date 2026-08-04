@@ -1,0 +1,48 @@
+{
+  "id": "mh3g-hd-jp-v96-static-07-infinite-hp",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "exact-static",
+  "source_cheat_entries": [
+    7
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x008ce640",
+      "word": "0xe1c123b0"
+    }
+  ],
+  "name_bilingual": "HP 无限 / Infinite HP",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-07-infinite-hp",
+  "install_folder": "MH3G HD JP v96 - Static 07 - Infinite HP",
+  "rules": "rules.txt",
+  "patch": "patch_static_07_infinite_hp.asm",
+  "preimages": [
+    {
+      "address": "0x02865ff8",
+      "word": "0xb18a0640",
+      "meaning": "中文：禁止普通当前 HP 写回。 / English: Suppress the normal current-HP writeback."
+    }
+  ],
+  "anchors": [],
+  "known_risks": [
+    "中文：通过停止普通当前 HP 写回来冻结 HP；受到治疗时当前 HP 也可能保持不变。 / English: Freezes HP by suppressing the normal current-HP writeback; healing may also leave current HP unchanged."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #7“HP 无限”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #7 \"Infinite HP\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

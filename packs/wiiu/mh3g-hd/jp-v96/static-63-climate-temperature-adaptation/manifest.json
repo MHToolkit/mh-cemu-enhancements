@@ -1,0 +1,219 @@
+{
+  "id": "mh3g-hd-jp-v96-static-63-climate-temperature-adaptation",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "global-semantic",
+  "source_cheat_entries": [
+    63
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x008cd9d8",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008cd9f4",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008edaa8",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008edb5c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008eddc0",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008f3904",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008f399c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0091d630",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0091d6a4",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00a2effc",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008f3a1c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x008f3a9c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0091d714",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0091d77c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00a2f78c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x00a2f7c0",
+      "word": "0xe3a00001"
+    }
+  ],
+  "name_bilingual": "气候温度适应 / Climate and Temperature Adaptation",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-63-climate-temperature-adaptation",
+  "install_folder": "MH3G HD JP v96 - Static 63 - Climate and Temperature Adaptation",
+  "rules": "rules.txt",
+  "patch": "patch_static_63_climate_temperature_adaptation.asm",
+  "preimages": [
+    {
+      "address": "0x0229ce84",
+      "word": "0x485f3c11",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x0229ced0",
+      "word": "0x485f3bc5",
+      "meaning": "中文：强制效果 ID 0x82 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x82 to return true."
+    },
+    {
+      "address": "0x02865264",
+      "word": "0x4bfffe89",
+      "meaning": "中文：强制备用温度状态 ID 0x7E 查询返回真。 / English: Force the alternate temperature-status ID 0x7E query to return true."
+    },
+    {
+      "address": "0x02866b70",
+      "word": "0x4bffe57d",
+      "meaning": "中文：强制第一条备用温度状态 ID 0x82 查询返回真。 / English: Force the first alternate temperature-status ID 0x82 query to return true."
+    },
+    {
+      "address": "0x02866b90",
+      "word": "0x4bffe55d",
+      "meaning": "中文：强制第二条备用温度状态 ID 0x82 查询返回真。 / English: Force the second alternate temperature-status ID 0x82 query to return true."
+    },
+    {
+      "address": "0x02893610",
+      "word": "0x4bffd485",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x0289f9f4",
+      "word": "0x4bff10a1",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x0289fae0",
+      "word": "0x4bff0fb5",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x0289fccc",
+      "word": "0x4bff0dc9",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x028b2ca8",
+      "word": "0x4bfddded",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x028b2d10",
+      "word": "0x4bfddd85",
+      "meaning": "中文：强制效果 ID 0x82 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x82 to return true."
+    },
+    {
+      "address": "0x028b312c",
+      "word": "0x4bfdd969",
+      "meaning": "中文：强制效果 ID 0x7E 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x7E to return true."
+    },
+    {
+      "address": "0x028b3184",
+      "word": "0x4bfdd911",
+      "meaning": "中文：强制效果 ID 0x82 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0x82 to return true."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x0229ce80",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x0229cecc",
+      "word": "0x38800082",
+      "meaning": "中文：调用前把效果 ID 0x82 放入 PPC 参数 r4。 / English: Loads effect ID 0x82 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x0289360c",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x0289f9f0",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x0289fadc",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x0289fcc8",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028b2ca4",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028b2d0c",
+      "word": "0x38800082",
+      "meaning": "中文：调用前把效果 ID 0x82 放入 PPC 参数 r4。 / English: Loads effect ID 0x82 into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028b3128",
+      "word": "0x3880007e",
+      "meaning": "中文：调用前把效果 ID 0x7E 放入 PPC 参数 r4。 / English: Loads effect ID 0x7E into PPC argument r4 before the call."
+    },
+    {
+      "address": "0x028b3180",
+      "word": "0x38800082",
+      "meaning": "中文：调用前把效果 ID 0x82 放入 PPC 参数 r4。 / English: Loads effect ID 0x82 into PPC argument r4 before the call."
+    }
+  ],
+  "known_risks": [
+    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #63“气候温度适应”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #63 \"Climate and Temperature Adaptation\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}

@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 72 会心率 100% - Affinity 100%
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/72 会心率 100% - Affinity 100%
+description = 中文：3DS 静态 ARM #72 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 Wii U 编译结果把 #72 的核心逻辑折叠到与 #6 相同的两条会心路径；两项当前等效且不可同时启用。 / English: Wii U PPC conversion of 3DS static ARM cheat #72; Disabled by default; Runtime Experimental and requires gameplay verification.  The Wii U build folds #72's core behavior into the same two affinity paths as #6; the two are currently equivalent and cannot be enabled together.
+version = 7

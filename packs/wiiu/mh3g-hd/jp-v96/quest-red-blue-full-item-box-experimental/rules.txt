@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Quest Red & Blue Boxes - Full Item Box (Experimental)
 path = MH Cemu Enhancements/MH3G HD JP v96/Quest Red & Blue Boxes -> Full Item Box (Experimental)
-description = 红蓝任务箱统一完整仓库，使用状态 6 条件调度；仅限单人实验。 / Unified full item box for both quest boxes with state-6 conditional dispatch; single-player experiment only.
+description = 红蓝任务箱复用大厅 GUI，并在交互当帧一次性激活、消费状态转换及补齐任务场景缺失的最终 UI 挂接；仅限单人实验。 / Both quest boxes reuse the lobby GUI, then activate, consume the state transition, and complete the final UI attachment missing from quest scenes once on the interaction frame; single-player experiment only.
 version = 7

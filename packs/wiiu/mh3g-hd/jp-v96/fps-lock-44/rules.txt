@@ -1,0 +1,9 @@
+[Definition]
+titleIds = 0005000010104D00
+name = MH3G HD JP v96 - Lock 44 FPS (3DS Conversion)
+path = MH Cemu Enhancements/MH3G HD JP v96/Lock 44 FPS (3DS Conversion)
+description = 从 3DS「帧数 44帧 / 44贞」转换；默认关闭，不要与 30 FPS 同时启用。 / Converted from 3DS "44 FPS" entries; disabled by default. Do not enable together with 30 FPS.
+version = 7
+
+[Control]
+vsyncFrequency = 44

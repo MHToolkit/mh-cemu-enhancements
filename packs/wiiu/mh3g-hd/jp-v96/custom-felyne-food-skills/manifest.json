@@ -1,0 +1,167 @@
+{
+  "id": "mh3g-hd-jp-v96-custom-felyne-food-skills",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "name_bilingual": "猫饭技能自定义 / Custom Felyne Food Skills",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/custom-felyne-food-skills",
+  "install_folder": "MH3G HD JP v96 - Custom Felyne Food Skills",
+  "rules": "rules.txt",
+  "patch": "patch_custom_felyne_food_skills.asm",
+  "preimages": [
+    {
+      "address": "0x021d8740",
+      "word": "0x54ec083c",
+      "meaning": "原版去重循环的槽位索引计算。 / Original deduplication-loop slot-index calculation."
+    },
+    {
+      "address": "0x021d8744",
+      "word": "0x817f0140",
+      "meaning": "原版读取运行态基址指针。 / Original runtime-state base-pointer load."
+    },
+    {
+      "address": "0x021d8748",
+      "word": "0x7d3b6214",
+      "meaning": "原版计算菜单目标槽地址。 / Original menu-slot address calculation."
+    },
+    {
+      "address": "0x021d874c",
+      "word": "0x7c19622e",
+      "meaning": "原版读取已生成技能半字。 / Original generated-skill halfword load."
+    },
+    {
+      "address": "0x021d8750",
+      "word": "0x7d4b6214",
+      "meaning": "原版计算运行态目标槽地址。 / Original runtime-slot address calculation."
+    },
+    {
+      "address": "0x021d8754",
+      "word": "0x38e70001",
+      "meaning": "原版递增三槽循环计数器。 / Original three-slot loop increment."
+    },
+    {
+      "address": "0x021d8758",
+      "word": "0xb009000a",
+      "meaning": "原版写入菜单侧技能槽。 / Original menu-side skill-slot store."
+    },
+    {
+      "address": "0x021d875c",
+      "word": "0x2c070003",
+      "meaning": "原版比较三槽循环上限。 / Original three-slot loop-bound comparison."
+    },
+    {
+      "address": "0x021d8760",
+      "word": "0xb00a0e3e",
+      "meaning": "原版写入任务运行态技能槽。 / Original quest-runtime skill-slot store."
+    },
+    {
+      "address": "0x021d8764",
+      "word": "0x4180ffdc",
+      "meaning": "原版回跳三槽循环。 / Original three-slot loop branch."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x021d8548",
+      "word": "0x9421ffc8",
+      "meaning": "猫饭技能原生结算函数入口。 / Native Felyne-food skill finalizer entry."
+    },
+    {
+      "address": "0x021d8568",
+      "word": "0x3f400001",
+      "meaning": "构造菜单槽基址常量的高半字。 / High half of the menu-slot base constant."
+    },
+    {
+      "address": "0x021d856c",
+      "word": "0x84dd5c50",
+      "meaning": "原函数读取餐食状态对象。 / Original meal-state object load."
+    },
+    {
+      "address": "0x021d8570",
+      "word": "0x3b5a83f4",
+      "meaning": "完成菜单相对偏移 0x83F4。 / Completes menu-relative offset 0x83F4."
+    },
+    {
+      "address": "0x021d8574",
+      "word": "0x84794278",
+      "meaning": "原函数读取菜单状态对象。 / Original menu-state object load."
+    },
+    {
+      "address": "0x021d857c",
+      "word": "0x7f7ed214",
+      "meaning": "形成 r27 = r30 + 0x83F4。 / Forms r27 = r30 + 0x83F4."
+    },
+    {
+      "address": "0x021d8768",
+      "word": "0x3c601020",
+      "meaning": "覆盖块后的原生 fallthrough 首指令。 / First native fallthrough instruction after the replacement."
+    },
+    {
+      "address": "0x021d876c",
+      "word": "0x8063d9cc",
+      "meaning": "fallthrough 重新装载后续所需对象。 / Fallthrough reloads the object needed by subsequent code."
+    },
+    {
+      "address": "0x021d8774",
+      "word": "0x4bf42581",
+      "meaning": "原生后续调用保持不变。 / Subsequent native call remains unchanged."
+    },
+    {
+      "address": "0x021d9d9c",
+      "word": "0x4bffe7ad",
+      "meaning": "已定位的原生结算函数直接调用点。 / Located direct caller of the native finalizer."
+    },
+    {
+      "address": "0x0285f224",
+      "word": "0x39400000",
+      "meaning": "独立运行态技能读取器初始化三槽索引。 / Independent runtime reader initializes its three-slot index."
+    },
+    {
+      "address": "0x0285f228",
+      "word": "0x81830e30",
+      "meaning": "独立读取器取得运行态对象指针。 / Independent reader loads the runtime-state pointer."
+    },
+    {
+      "address": "0x0285f234",
+      "word": "0xa12c0e3e",
+      "meaning": "独立读取器从 +0xE3E 读取技能半字。 / Independent reader loads a skill halfword from +0xE3E."
+    },
+    {
+      "address": "0x0285f24c",
+      "word": "0x2c0a0003",
+      "meaning": "独立读取器确认恰好遍历三个槽。 / Independent reader confirms an exact three-slot loop."
+    }
+  ],
+  "source_cheat": {
+    "name": "MH3G猫饭技能自定义说明.txt - 猫饭自定义 v1.2",
+    "platform": "Nintendo 3DS / Gateway-Azahar code format",
+    "sha256": "d6afc863cc673975933cfd80becfafd2fe218f75ba8973e8ed2414a4183699cb",
+    "skill_id_range": "0x00..0x41"
+  },
+  "conversion_method": "Native JP-v96 meal-finalizer semantic rewrite / JP-v96 原生用餐结算语义改写",
+  "default_slots": [
+    "0x06",
+    "0x36",
+    "0x00"
+  ],
+  "known_risks": [
+    "修改预设后必须重新吃饭；补丁不会追溯修改已经完成的猫饭。 / You must eat again after changing presets; the patch does not retroactively alter an already completed meal.",
+    "餐前预览可能仍显示游戏原本随机生成的技能；任务内状态和实际效果需要实机验证。 / The pre-meal preview may still show the game-generated skills; quest status and actual effects require gameplay validation.",
+    "游戏原生互斥或非法组合可能只生效其中一项；已知 0x41 与 0x1E incompatible、不能共存。 / Native mutually exclusive or invalid combinations may apply only one effect; 0x41 and 0x1E are known to be incompatible.",
+    "当前仅有静态映射、固定 RPX 与安装验证，状态保持 Runtime Experimental / Gameplay Pending。 / Evidence is currently limited to static mapping, pinned-RPX, and installation checks, so status remains Runtime Experimental / Gameplay Pending."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "提供 0x00..0x41 的三槽双语猫饭技能选择，并在下一次原生用餐结算时同步菜单与任务运行状态；默认关闭，待实机验证。 / Provides three bilingual 0x00..0x41 Felyne-food skill selectors and synchronizes menu and quest runtime state during the next native meal finalization; disabled by default and gameplay pending."
+}

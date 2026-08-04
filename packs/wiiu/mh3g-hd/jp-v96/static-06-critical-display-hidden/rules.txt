@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 06 会心不显示 - Critical Display Hidden
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/06 会心不显示 - Critical Display Hidden
+description = 中文：3DS 静态 ARM #6 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 该源项名称写作“会心不显示”，但 ARM 指令实际把两条会心加成路径改为 100；它与 #72 共享 Wii U 路径，二者不可同时启用。 / English: Wii U PPC conversion of 3DS static ARM cheat #6; Disabled by default; Runtime Experimental and requires gameplay verification.  The source label says critical display hidden, but its ARM instructions set two affinity-add paths to 100; it shares Wii U paths with #72 and the two cannot be enabled together.
+version = 7

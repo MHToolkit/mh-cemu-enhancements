@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 15 铁镐和虫网不会损坏 - Unbreakable Pickaxes and Bug Nets
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/15 铁镐和虫网不会损坏 - Unbreakable Pickaxes and Bug Nets
+description = 中文：3DS 静态 ARM #15 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 耐久余量固定为 100，并同时强制相关技能检查；请验证采矿、捕虫和任务消耗品路径。 / English: Wii U PPC conversion of 3DS static ARM cheat #15; Disabled by default; Runtime Experimental and requires gameplay verification.  Fixes the durability remainder at 100 and forces related skill checks; verify mining, bug catching, and quest consumable paths.
+version = 7

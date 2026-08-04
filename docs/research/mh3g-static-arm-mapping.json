@@ -1,0 +1,706 @@
+{
+  "schema_version": 1,
+  "source_static_entry_count": 43,
+  "source_indices": [
+    5,
+    6,
+    7,
+    11,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    21,
+    26,
+    27,
+    29,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    59,
+    60,
+    61,
+    63,
+    64,
+    65,
+    72
+  ],
+  "source_3ds_code": {
+    "base": "0x00100000",
+    "size": 12255232,
+    "sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "target_wiiu_ppc": {
+    "title_id": "0005000010104D00",
+    "update": "v96",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "text_base": "0x02000020",
+    "text_size": 18439328
+  },
+  "runtime_status": "Gameplay Pending",
+  "entries": [
+    {
+      "source_index": 5,
+      "name_zh": "锋利度不减",
+      "name_en": "Sharpness Never Decreases",
+      "pack_id": "mh3g-hd-jp-v96-static-05-sharpness-never-decreases",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x0285f100"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 6,
+      "name_zh": "会心不显示",
+      "name_en": "Critical Display Hidden",
+      "pack_id": "mh3g-hd-jp-v96-static-06-critical-display-hidden",
+      "conversion_confidence": "shared-affinity-path",
+      "ppc_patch_count": 4,
+      "ppc_addresses": [
+        "0x0286036c",
+        "0x02860378",
+        "0x02861840",
+        "0x02861850"
+      ],
+      "risk": "中文：该源项名称写作“会心不显示”，但 ARM 指令实际把两条会心加成路径改为 100；它与 #72 共享 Wii U 路径，二者不可同时启用。 / English: The source label says critical display hidden, but its ARM instructions set two affinity-add paths to 100; it shares Wii U paths with #72 and the two cannot be enabled together."
+    },
+    {
+      "source_index": 7,
+      "name_zh": "HP 无限",
+      "name_en": "Infinite HP",
+      "pack_id": "mh3g-hd-jp-v96-static-07-infinite-hp",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x02865ff8"
+      ],
+      "risk": "中文：通过停止普通当前 HP 写回来冻结 HP；受到治疗时当前 HP 也可能保持不变。 / English: Freezes HP by suppressing the normal current-HP writeback; healing may also leave current HP unchanged."
+    },
+    {
+      "source_index": 11,
+      "name_zh": "里属性觉醒",
+      "name_en": "Awakening",
+      "pack_id": "mh3g-hd-jp-v96-static-11-awakening",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 3,
+      "ppc_addresses": [
+        "0x028600a0",
+        "0x028606e4",
+        "0x028a8c1c"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 13,
+      "name_zh": "水下速度 2 倍",
+      "name_en": "Underwater Speed ×2",
+      "pack_id": "mh3g-hd-jp-v96-static-13-underwater-speed-x2",
+      "conversion_confidence": "global-semantic-with-exact-scalars",
+      "ppc_patch_count": 13,
+      "ppc_addresses": [
+        "0x028c7368",
+        "0x028c73b4",
+        "0x028c7420",
+        "0x028c7464",
+        "0x028c74a8",
+        "0x028c74d0",
+        "0x028c7578",
+        "0x028c7ab0",
+        "0x028c7af0",
+        "0x028c966c",
+        "0x028c96c0",
+        "0x028c96f8",
+        "0x028c971c"
+      ],
+      "risk": "中文：强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。 / English: Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers."
+    },
+    {
+      "source_index": 14,
+      "name_zh": "金刚体",
+      "name_en": "Rock Steady",
+      "pack_id": "mh3g-hd-jp-v96-static-14-rock-steady",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 7,
+      "ppc_addresses": [
+        "0x0212a65c",
+        "0x02896e6c",
+        "0x02896ea4",
+        "0x02896ef0",
+        "0x02897de0",
+        "0x028982a4",
+        "0x028984a8"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 15,
+      "name_zh": "铁镐和虫网不会损坏",
+      "name_en": "Unbreakable Pickaxes and Bug Nets",
+      "pack_id": "mh3g-hd-jp-v96-static-15-unbreakable-pickaxes-bug-nets",
+      "conversion_confidence": "mixed-exact-and-global-semantic",
+      "ppc_patch_count": 4,
+      "ppc_addresses": [
+        "0x0211ad38",
+        "0x028b73b4",
+        "0x028bbd10",
+        "0x028c3a80"
+      ],
+      "risk": "中文：耐久余量固定为 100，并同时强制相关技能检查；请验证采矿、捕虫和任务消耗品路径。 / English: Fixes the durability remainder at 100 and forces related skill checks; verify mining, bug catching, and quest consumable paths."
+    },
+    {
+      "source_index": 16,
+      "name_zh": "体力上限 150",
+      "name_en": "Maximum Health 150",
+      "pack_id": "mh3g-hd-jp-v96-static-16-max-health-150",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x02864060",
+        "0x02866fdc"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 17,
+      "name_zh": "偷盗无效",
+      "name_en": "Theft Immunity",
+      "pack_id": "mh3g-hd-jp-v96-static-17-theft-immunity",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 3,
+      "ppc_addresses": [
+        "0x024d26f0",
+        "0x02523154",
+        "0x02523174"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 18,
+      "name_zh": "泥雪无效",
+      "name_en": "Mud and Snow Immunity",
+      "pack_id": "mh3g-hd-jp-v96-static-18-mud-snow-immunity",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x02897b68",
+        "0x02897bcc"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 21,
+      "name_zh": "回避距离 UP",
+      "name_en": "Evade Extender",
+      "pack_id": "mh3g-hd-jp-v96-static-21-evade-extender",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 9,
+      "ppc_addresses": [
+        "0x028afcc8",
+        "0x028b4bb0",
+        "0x028b6850",
+        "0x028b6888",
+        "0x028b6a88",
+        "0x028b8e6c",
+        "0x028b9824",
+        "0x028c4d6c",
+        "0x028c5094"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 26,
+      "name_zh": "细菌感染无效",
+      "name_en": "Bio Status Immunity",
+      "pack_id": "mh3g-hd-jp-v96-static-26-bio-status-immunity",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 4,
+      "ppc_addresses": [
+        "0x027b0bec",
+        "0x02895c34",
+        "0x028964f0",
+        "0x028bf3b0"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 27,
+      "name_zh": "属性异常无效",
+      "name_en": "Abnormal-Status Immunity",
+      "pack_id": "mh3g-hd-jp-v96-static-27-status-immunity",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x02895cf8"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 29,
+      "name_zh": "任何地方可用电阻弹",
+      "name_en": "Power Coating Usable Anywhere",
+      "pack_id": "mh3g-hd-jp-v96-static-29-power-coating-anywhere",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x02898fdc"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 33,
+      "name_zh": "防御性能 +2",
+      "name_en": "Guard +2",
+      "pack_id": "mh3g-hd-jp-v96-static-33-guard-plus-2",
+      "conversion_confidence": "exact-callsite-family",
+      "ppc_patch_count": 3,
+      "ppc_addresses": [
+        "0x0289589c",
+        "0x028958c4",
+        "0x02896a38"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 34,
+      "name_zh": "防御强化",
+      "name_en": "Guard Up",
+      "pack_id": "mh3g-hd-jp-v96-static-34-guard-up",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x0285da08",
+        "0x02897728"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 35,
+      "name_zh": "燃鳞",
+      "name_en": "Flaming Aura",
+      "pack_id": "mh3g-hd-jp-v96-static-35-flaming-aura",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x025a0ff8"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 36,
+      "name_zh": "速食者 +2",
+      "name_en": "Speed Eating +2",
+      "pack_id": "mh3g-hd-jp-v96-static-36-speed-eating-plus-2",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 3,
+      "ppc_addresses": [
+        "0x028bd23c",
+        "0x028bd274",
+        "0x028bfacc"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 37,
+      "name_zh": "耐力无限",
+      "name_en": "Infinite Stamina",
+      "pack_id": "mh3g-hd-jp-v96-static-37-infinite-stamina",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x02863dfc",
+        "0x028665b0"
+      ],
+      "risk": "中文：同时强制耐力上限写回和耐力条件返回真；请验证奔跑、翻滚、格挡与水下动作。 / English: Forces both max-stamina writeback and the stamina condition result; verify sprinting, rolling, guarding, and underwater actions."
+    },
+    {
+      "source_index": 38,
+      "name_zh": "蓄力缩短",
+      "name_en": "Focus",
+      "pack_id": "mh3g-hd-jp-v96-static-38-focus",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 5,
+      "ppc_addresses": [
+        "0x02851260",
+        "0x0285decc",
+        "0x0287e934",
+        "0x0288b1d8",
+        "0x028a4260"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 39,
+      "name_zh": "调和成功率 100%",
+      "name_en": "Combination Success 100%",
+      "pack_id": "mh3g-hd-jp-v96-static-39-combination-success-100",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x0203ade4"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 40,
+      "name_zh": "最大调和数",
+      "name_en": "Maximum Combination Yield",
+      "pack_id": "mh3g-hd-jp-v96-static-40-maximum-combination-yield",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x0203b2b8"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 41,
+      "name_zh": "高级耳栓",
+      "name_en": "High-Grade Earplugs",
+      "pack_id": "mh3g-hd-jp-v96-static-41-high-grade-earplugs",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 12,
+      "ppc_addresses": [
+        "0x0212a648",
+        "0x0212a6a4",
+        "0x02897dcc",
+        "0x02897e24",
+        "0x02898250",
+        "0x02898290",
+        "0x02898338",
+        "0x0289837c",
+        "0x028983e0",
+        "0x0289841c",
+        "0x02898494",
+        "0x028984d4"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 44,
+      "name_zh": "风压（大）无效",
+      "name_en": "Windproof (High)",
+      "pack_id": "mh3g-hd-jp-v96-static-44-windproof-high",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 3,
+      "ppc_addresses": [
+        "0x02898590",
+        "0x028985c0",
+        "0x02898790"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 45,
+      "name_zh": "眩晕和气绝无效",
+      "name_en": "Stun Immunity",
+      "pack_id": "mh3g-hd-jp-v96-static-45-stun-immunity",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x02896540"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 46,
+      "name_zh": "毒、麻痹、睡眠无效",
+      "name_en": "Poison, Paralysis, and Sleep Immunity",
+      "pack_id": "mh3g-hd-jp-v96-static-46-poison-paralysis-sleep-immunity",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 5,
+      "ppc_addresses": [
+        "0x02896240",
+        "0x028966cc",
+        "0x028967d0",
+        "0x0289fc2c",
+        "0x028a6938"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 47,
+      "name_zh": "耐震",
+      "name_en": "Tremor Resistance",
+      "pack_id": "mh3g-hd-jp-v96-static-47-tremor-resistance",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x02898c1c"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 48,
+      "name_zh": "回避性能 +2",
+      "name_en": "Evasion +2",
+      "pack_id": "mh3g-hd-jp-v96-static-48-evasion-plus-2",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x028a59d8",
+        "0x028a59ec"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 49,
+      "name_zh": "弩后坐力最小",
+      "name_en": "Minimum Bowgun Recoil",
+      "pack_id": "mh3g-hd-jp-v96-static-49-minimum-bowgun-recoil",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x0289cab0",
+        "0x028a7b78"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 50,
+      "name_zh": "弩无摇晃",
+      "name_en": "Bowgun Steadiness",
+      "pack_id": "mh3g-hd-jp-v96-static-50-bowgun-steadiness",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x028a6c24",
+        "0x028a6c50"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 51,
+      "name_zh": "近战不弹刀",
+      "name_en": "Mind's Eye",
+      "pack_id": "mh3g-hd-jp-v96-static-51-minds-eye",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x02884d54",
+        "0x02899e20"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 52,
+      "name_zh": "弓箭自填",
+      "name_en": "Bow Auto-Reload",
+      "pack_id": "mh3g-hd-jp-v96-static-52-bow-auto-reload",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 5,
+      "ppc_addresses": [
+        "0x02852900",
+        "0x02853f00",
+        "0x02854aa8",
+        "0x028947d8",
+        "0x028a6b08"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 53,
+      "name_zh": "砥石高速化",
+      "name_en": "Speed Sharpening",
+      "pack_id": "mh3g-hd-jp-v96-static-53-speed-sharpening",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x028c0428"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 54,
+      "name_zh": "地图常显",
+      "name_en": "Map Always Visible",
+      "pack_id": "mh3g-hd-jp-v96-static-54-map-always-visible",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x0260f284"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 55,
+      "name_zh": "观察眼",
+      "name_en": "Capture Guru",
+      "pack_id": "mh3g-hd-jp-v96-static-55-capture-guru",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 4,
+      "ppc_addresses": [
+        "0x02615588",
+        "0x026155ac",
+        "0x026155c8",
+        "0x026155e4"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 56,
+      "name_zh": "自动标记并标记当前区小怪",
+      "name_en": "Auto-Marker plus Current-Area Small Monsters",
+      "pack_id": "mh3g-hd-jp-v96-static-56-auto-marker-small-monsters",
+      "conversion_confidence": "partial-semantic",
+      "ppc_patch_count": 8,
+      "ppc_addresses": [
+        "0x026151c8",
+        "0x026151e8",
+        "0x02615204",
+        "0x02615230",
+        "0x02892010",
+        "0x02892034",
+        "0x0289383c",
+        "0x02893884"
+      ],
+      "risk": "中文：已映射自动标记核心技能检查和当前区标记判定；3DS 端另有一个 UI 虚调用点在 PPC 中没有一对一静态对应，因此小怪图标覆盖范围可能不完整。 / English: Maps the core auto-marker skill checks and current-area marker tests; one 3DS UI virtual-call site has no one-to-one static PPC counterpart, so small-monster icon coverage may be incomplete."
+    },
+    {
+      "source_index": 59,
+      "name_zh": "剥取、采集动作与获取加快",
+      "name_en": "Faster Carving, Gathering, and Acquisition",
+      "pack_id": "mh3g-hd-jp-v96-static-59-faster-carve-gather",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 2,
+      "ppc_addresses": [
+        "0x028bc168",
+        "0x028bc174"
+      ],
+      "risk": "中文：精确替换共享剥取/采集动作倍率 1.3→2.0 与获取倍率 1.1→1.5；动画与实际结算可能在少数动作上不同步。 / English: Exactly redirects the shared carve/gather action multiplier 1.3→2.0 and acquisition multiplier 1.1→1.5; animation and settlement timing may diverge for a few actions."
+    },
+    {
+      "source_index": 60,
+      "name_zh": "高速收集",
+      "name_en": "Fast Gathering",
+      "pack_id": "mh3g-hd-jp-v96-static-60-fast-gathering",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 18,
+      "ppc_addresses": [
+        "0x028bc264",
+        "0x028bc2d4",
+        "0x028bc314",
+        "0x028bc34c",
+        "0x028bc384",
+        "0x028bc3d0",
+        "0x028bc410",
+        "0x028bc45c",
+        "0x028bc4a8",
+        "0x028bc4d4",
+        "0x028bc520",
+        "0x028bc554",
+        "0x028bc588",
+        "0x028bc74c",
+        "0x028bc7d8",
+        "0x028bcafc",
+        "0x028bcb60",
+        "0x028bcdbc"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 61,
+      "name_zh": "高速设置",
+      "name_en": "Fast Placement",
+      "pack_id": "mh3g-hd-jp-v96-static-61-fast-placement",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 7,
+      "ppc_addresses": [
+        "0x028bcec8",
+        "0x028bd16c",
+        "0x028bfcf0",
+        "0x028bfd40",
+        "0x028c01ac",
+        "0x028c3078",
+        "0x028c31f0"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 63,
+      "name_zh": "气候温度适应",
+      "name_en": "Climate and Temperature Adaptation",
+      "pack_id": "mh3g-hd-jp-v96-static-63-climate-temperature-adaptation",
+      "conversion_confidence": "global-semantic",
+      "ppc_patch_count": 13,
+      "ppc_addresses": [
+        "0x0229ce84",
+        "0x0229ced0",
+        "0x02865264",
+        "0x02866b70",
+        "0x02866b90",
+        "0x02893610",
+        "0x0289f9f4",
+        "0x0289fae0",
+        "0x0289fccc",
+        "0x028b2ca8",
+        "0x028b2d10",
+        "0x028b312c",
+        "0x028b3184"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 64,
+      "name_zh": "金刚身发动",
+      "name_en": "Rock Steady Activated",
+      "pack_id": "mh3g-hd-jp-v96-static-64-rock-steady-activated",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x028968a4"
+      ],
+      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    },
+    {
+      "source_index": 65,
+      "name_zh": "战斗体验改善器",
+      "name_en": "Combat Experience Enhancer",
+      "pack_id": "mh3g-hd-jp-v96-static-65-combat-experience-enhancer",
+      "conversion_confidence": "exact-static",
+      "ppc_patch_count": 1,
+      "ppc_addresses": [
+        "0x02890ae4"
+      ],
+      "risk": "中文：源代码把通用技能查询的首个比较强制为相等，影响面极广；可能让大量未勾选技能也被判定为生效，应单独测试。 / English: The source forces the first comparison in the generic skill query to equal, giving it an extremely broad blast radius; many unrelated skills may be treated as active, so test it in isolation."
+    },
+    {
+      "source_index": 72,
+      "name_zh": "会心率 100%",
+      "name_en": "Affinity 100%",
+      "pack_id": "mh3g-hd-jp-v96-static-72-affinity-100",
+      "conversion_confidence": "shared-affinity-path",
+      "ppc_patch_count": 4,
+      "ppc_addresses": [
+        "0x0286036c",
+        "0x02860378",
+        "0x02861840",
+        "0x02861850"
+      ],
+      "risk": "中文：Wii U 编译结果把 #72 的核心逻辑折叠到与 #6 相同的两条会心路径；两项当前等效且不可同时启用。 / English: The Wii U build folds #72's core behavior into the same two affinity paths as #6; the two are currently equivalent and cannot be enabled together."
+    }
+  ]
+}

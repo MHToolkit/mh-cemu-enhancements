@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -13,6 +14,56 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "scripts" / "mh-cemu-enhancements.py"
+
+STATIC_ARM_PACKS = {
+    5: "sharpness-never-decreases",
+    6: "critical-display-hidden",
+    7: "infinite-hp",
+    11: "awakening",
+    13: "underwater-speed-x2",
+    14: "rock-steady",
+    15: "unbreakable-pickaxes-bug-nets",
+    16: "max-health-150",
+    17: "theft-immunity",
+    18: "mud-snow-immunity",
+    21: "evade-extender",
+    26: "bio-status-immunity",
+    27: "status-immunity",
+    29: "power-coating-anywhere",
+    33: "guard-plus-2",
+    34: "guard-up",
+    35: "flaming-aura",
+    36: "speed-eating-plus-2",
+    37: "infinite-stamina",
+    38: "focus",
+    39: "combination-success-100",
+    40: "maximum-combination-yield",
+    41: "high-grade-earplugs",
+    44: "windproof-high",
+    45: "stun-immunity",
+    46: "poison-paralysis-sleep-immunity",
+    47: "tremor-resistance",
+    48: "evasion-plus-2",
+    49: "minimum-bowgun-recoil",
+    50: "bowgun-steadiness",
+    51: "minds-eye",
+    52: "bow-auto-reload",
+    53: "speed-sharpening",
+    54: "map-always-visible",
+    55: "capture-guru",
+    56: "auto-marker-small-monsters",
+    59: "faster-carve-gather",
+    60: "fast-gathering",
+    61: "fast-placement",
+    63: "climate-temperature-adaptation",
+    64: "rock-steady-activated",
+    65: "combat-experience-enhancer",
+    72: "affinity-100",
+}
+
+
+def static_pack_id(source_index: int, slug: str) -> str:
+    return f"mh3g-hd-jp-v96-static-{source_index:02d}-{slug}"
 
 
 def load_tool():
@@ -35,13 +86,85 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
+                "mh3g-hd-jp-v96-fps-lock-44",
                 "mh3g-hd-jp-v96-lobby-full-item-box",
+                "mh3g-hd-jp-v96-custom-felyne-food-skills",
                 "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
                 "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
                 "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
+            }
+            | {
+                static_pack_id(source_index, slug)
+                for source_index, slug in STATIC_ARM_PACKS.items()
             },
             {pack["id"] for pack in result.packs},
         )
+
+    def test_43_static_arm_conversions_are_independent_bilingual_default_off_leaves(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {
+            pack["source_cheat_entries"][0]: pack
+            for pack in result.packs
+            if pack.get("conversion_kind") == "3ds-arm-static-to-wiiu-ppc"
+        }
+
+        self.assertEqual(set(STATIC_ARM_PACKS), set(packs))
+        self.assertEqual(43, len(packs))
+        for source_index, slug in STATIC_ARM_PACKS.items():
+            pack = packs[source_index]
+            self.assertEqual(static_pack_id(source_index, slug), pack["id"])
+            self.assertEqual("Runtime Experimental", pack["status"])
+            self.assertFalse(pack["default_install"])
+            self.assertFalse(pack["auto_experimental_install"])
+            self.assertEqual("available", pack["availability"])
+            self.assertEqual([source_index], pack["source_cheat_entries"])
+            self.assertTrue(pack["preimages"])
+            self.assertEqual(len(pack["preimages"]), len({item["address"] for item in pack["preimages"]}))
+            self.assertIn(" / ", pack["summary"])
+            self.assertIn(" / ", pack["name_bilingual"])
+
+            package_dir = REPO / pack["pack_dir"]
+            rules = (package_dir / pack["rules"]).read_text()
+            patch = (package_dir / pack["patch"]).read_text()
+            self.assertIn("3DS Static Cheats", rules)
+            self.assertIn(f"{source_index:02d} ", rules)
+            self.assertIn("中文", rules)
+            self.assertIn("English", rules)
+            self.assertIn("默认关闭", rules)
+            self.assertIn("Disabled by default", rules)
+            self.assertIn("Runtime Experimental", rules)
+            self.assertIn("中文", patch)
+            self.assertIn("English", patch)
+
+    def test_static_arm_conversions_can_be_explicitly_installed_with_44_fps(self):
+        result = self.tool.validate_repository(REPO)
+        selected_ids = ["mh3g-hd-jp-v96-fps-lock-44"] + [
+            static_pack_id(source_index, slug)
+            for source_index, slug in STATIC_ARM_PACKS.items()
+        ]
+
+        selected = self.tool.select_packs(
+            result.packs,
+            selected_ids,
+            include_experimental=True,
+        )
+
+        self.assertEqual(set(selected_ids), {pack["id"] for pack in selected})
+        self.assertEqual(44, len(selected))
+
+    def test_custom_felyne_food_skills_requires_explicit_experimental_selection(self):
+        result = self.tool.validate_repository(REPO)
+        pack_id = "mh3g-hd-jp-v96-custom-felyne-food-skills"
+
+        with self.assertRaisesRegex(ValueError, "--include-experimental"):
+            self.tool.select_packs(result.packs, [pack_id], include_experimental=False)
+
+        selected = self.tool.select_packs(
+            result.packs,
+            [pack_id],
+            include_experimental=True,
+        )
+        self.assertEqual([pack_id], [pack["id"] for pack in selected])
 
     def test_manifest_schema_is_json_and_exposes_required_statuses(self):
         schema = json.loads((REPO / "schemas" / "pack-manifest.schema.json").read_text())
@@ -53,7 +176,11 @@ class CatalogTests(unittest.TestCase):
     def test_rules_paths_expose_each_pack_as_an_independent_cemu_leaf(self):
         expected_paths = {
             "fps-lock-30": "MH Cemu Enhancements/MH3G HD JP v96/Lock 30 FPS",
+            "fps-lock-44": "MH Cemu Enhancements/MH3G HD JP v96/Lock 44 FPS (3DS Conversion)",
             "lobby-full-item-box": "MH Cemu Enhancements/MH3G HD JP v96/Lobby Full Item Box",
+            "custom-felyne-food-skills": (
+                "MH Cemu Enhancements/MH3G HD JP v96/Custom Felyne Food Skills"
+            ),
             "quest-delivery-full-item-box-experimental": (
                 "MH Cemu Enhancements/MH3G HD JP v96/"
                 "Quest Red Delivery Box -> Full Item Box (Experimental)"
@@ -108,6 +235,24 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertTrue(any("pack_dir does not match" in error for error in errors))
 
+        fps44_manifest = "packs/wiiu/mh3g-hd/jp-v96/fps-lock-44/manifest.json"
+        errors = validate_after(
+            fps44_manifest,
+            lambda path: path.write_text(
+                path.read_text().replace(
+                    '"exclusive_group": "mh3g-hd-jp-v96-vsync-frequency"',
+                    '"exclusive_group": "bad exclusive group"',
+                )
+            ),
+        )
+        self.assertTrue(any("exclusive_group" in error for error in errors))
+
+        errors = validate_after(
+            fps44_manifest,
+            lambda path: path.write_text(path.read_text().replace('"source_cheat_entries": [71, 73]', '"source_cheat_entries": ["71"]')),
+        )
+        self.assertTrue(any("source_cheat_entries" in error for error in errors))
+
         errors = validate_after(
             "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box/patch_lobby_full_item_box.asm",
             lambda path: path.write_text(path.read_text().replace("0x348600a0", "0x00000000")),
@@ -161,7 +306,7 @@ class CatalogTests(unittest.TestCase):
             self.tool.uninstall(cemu_root)
             self.assertFalse(base.exists())
 
-    def test_include_experimental_adds_fps_and_combined_quest_pack(self):
+    def test_include_experimental_adds_only_available_fps_packs(self):
         result = self.tool.validate_repository(REPO)
 
         selected = self.tool.select_packs(result.packs, [], include_experimental=True)
@@ -169,7 +314,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(
             {
                 "mh3g-hd-jp-v96-fps-lock-30",
-                "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
+                "mh3g-hd-jp-v96-fps-lock-44",
             },
             {pack["id"] for pack in selected},
         )
@@ -244,6 +389,169 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", fps["status"])
         self.assertFalse(fps["default_install"])
+
+    def test_44_fps_is_a_bilingual_3ds_conversion_and_is_mutually_exclusive_with_30(self):
+        result = self.tool.validate_repository(REPO)
+        fps = next(pack for pack in result.packs if pack["id"] == "mh3g-hd-jp-v96-fps-lock-44")
+
+        self.assertEqual("Runtime Experimental", fps["status"])
+        self.assertFalse(fps["default_install"])
+        self.assertEqual("available", fps["availability"])
+        self.assertEqual("mh3g-hd-jp-v96-vsync-frequency", fps["exclusive_group"])
+        self.assertEqual([], fps.get("preimages", []))
+        self.assertEqual([71, 73], fps["source_cheat_entries"])
+
+        rules = (REPO / fps["pack_dir"] / fps["rules"]).read_text()
+        self.assertIn("name = MH3G HD JP v96 - Lock 44 FPS (3DS Conversion)", rules)
+        self.assertIn("44 FPS", rules)
+        self.assertIn("不要与 30 FPS", rules)
+        self.assertIn("Do not enable together with 30 FPS", rules)
+        self.assertIn("vsyncFrequency = 44", rules)
+
+    def test_custom_felyne_food_skills_has_complete_bilingual_three_slot_contract(self):
+        result = self.tool.validate_repository(REPO)
+        custom = next(
+            pack
+            for pack in result.packs
+            if pack["id"] == "mh3g-hd-jp-v96-custom-felyne-food-skills"
+        )
+
+        self.assertEqual("Runtime Experimental", custom["status"])
+        self.assertFalse(custom["default_install"])
+        self.assertFalse(custom["auto_experimental_install"])
+        self.assertEqual("available", custom["availability"])
+        self.assertIn(" / ", custom["name_bilingual"])
+        self.assertIn(" / ", custom["summary"])
+        risks = "\n".join(custom["known_risks"])
+        self.assertIn("重新吃饭", risks)
+        self.assertIn("eat again", risks.lower())
+        self.assertIn("互斥", risks)
+        self.assertIn("incompatible", risks.lower())
+
+        self.assertEqual(
+            {
+                0x021D8740: 0x54EC083C,
+                0x021D8744: 0x817F0140,
+                0x021D8748: 0x7D3B6214,
+                0x021D874C: 0x7C19622E,
+                0x021D8750: 0x7D4B6214,
+                0x021D8754: 0x38E70001,
+                0x021D8758: 0xB009000A,
+                0x021D875C: 0x2C070003,
+                0x021D8760: 0xB00A0E3E,
+                0x021D8764: 0x4180FFDC,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in custom["preimages"]
+            },
+        )
+        anchors = {
+            self.tool._number(item["address"]): self.tool._number(item["word"])
+            for item in custom["anchors"]
+        }
+        self.assertLessEqual(
+            {
+                0x021D8568: 0x3F400001,
+                0x021D856C: 0x84DD5C50,
+                0x021D8570: 0x3B5A83F4,
+                0x021D8574: 0x84794278,
+                0x021D857C: 0x7F7ED214,
+                0x021D8768: 0x3C601020,
+                0x021D876C: 0x8063D9CC,
+                0x021D8774: 0x4BF42581,
+            }.items(),
+            anchors.items(),
+        )
+
+        rules = (REPO / custom["pack_dir"] / custom["rules"]).read_text()
+        self.assertIn("$skill1:int = 0x06", rules)
+        self.assertIn("$skill2:int = 0x36", rules)
+        self.assertIn("$skill3:int = 0x00", rules)
+        category_variables = {
+            "技能槽 1 / Skill Slot 1": "$skill1:int",
+            "技能槽 2 / Skill Slot 2": "$skill2:int",
+            "技能槽 3 / Skill Slot 3": "$skill3:int",
+        }
+        presets = []
+        for block in re.split(r"(?m)^\[Preset\]\s*$", rules)[1:]:
+            fields = {}
+            for line in block.splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    fields[key.strip()] = value.strip()
+            presets.append(fields)
+
+        self.assertEqual(198, len(presets))
+        for category, variable in category_variables.items():
+            category_presets = [preset for preset in presets if preset.get("category") == category]
+            self.assertEqual(66, len(category_presets))
+            values = [int(preset[variable], 0) for preset in category_presets]
+            self.assertEqual(list(range(0x42)), values)
+            for value, preset in zip(values, category_presets, strict=True):
+                self.assertTrue(preset["name"].startswith(f"{value:02X} "))
+                self.assertIn(" / ", preset["name"])
+
+        patch = (REPO / custom["pack_dir"] / custom["patch"]).read_text()
+        self.assertEqual(
+            [f"0x{address:08x}" for address in range(0x021D8740, 0x021D8768, 4)],
+            re.findall(r"(?mi)^(0x[0-9a-f]{8})\s*=", patch),
+        )
+        for instruction in (
+            "0x021d8740 = lwz r11, 0x140(r31)",
+            "0x021d8744 = li r0, $skill1",
+            "0x021d8748 = sth r0, 0x000a(r27)",
+            "0x021d874c = sth r0, 0x0e3e(r11)",
+            "0x021d8750 = li r0, $skill2",
+            "0x021d8754 = sth r0, 0x000c(r27)",
+            "0x021d8758 = sth r0, 0x0e40(r11)",
+            "0x021d875c = li r0, $skill3",
+            "0x021d8760 = sth r0, 0x000e(r27)",
+            "0x021d8764 = sth r0, 0x0e42(r11)",
+        ):
+            self.assertIn(instruction, patch)
+        self.assertNotIn("codecave", patch.lower())
+
+    def test_3ds_cheat_conversion_matrix_covers_the_live_source_without_silent_drops(self):
+        matrix = json.loads(
+            (REPO / "docs" / "research" / "mh3g-3ds-cheat-conversion.json").read_text()
+        )
+
+        self.assertEqual(1, matrix["schema_version"])
+        self.assertEqual("0004000000048100", matrix["source"]["title_id"])
+        self.assertEqual(
+            "6add19f3237edcefd05d3bd9cdbf96662e82452c32b51ca7883135b19279711a",
+            matrix["source"]["sha256"],
+        )
+        self.assertEqual(73, matrix["source"]["entry_count"])
+        self.assertEqual(73, len(matrix["entries"]))
+        self.assertTrue(matrix["analysis_evidence"]["matching_3ds_code_binary_available"])
+        self.assertEqual(
+            "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77",
+            matrix["analysis_evidence"]["matching_3ds_code_sha256"],
+        )
+        self.assertEqual(
+            "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77",
+            matrix["analysis_evidence"]["prior_jp_control_code_sha256"],
+        )
+
+        entries = {entry["source_index"]: entry for entry in matrix["entries"]}
+        self.assertEqual(set(range(1, 74)), set(entries))
+        self.assertEqual("excluded-fps60", entries[67]["disposition"])
+        self.assertEqual("excluded-fps60", entries[70]["disposition"])
+        self.assertEqual("implemented", entries[71]["disposition"])
+        self.assertEqual("mh3g-hd-jp-v96-fps-lock-44", entries[71]["cemu_pack"])
+        self.assertEqual(71, entries[73]["duplicate_of"])
+        self.assertEqual(9, entries[22]["duplicate_of"])
+        self.assertEqual(13, entries[43]["duplicate_of"])
+        self.assertEqual(18, entries[42]["duplicate_of"])
+        self.assertEqual("not-applicable", entries[69]["disposition"])
+        self.assertEqual("not-supported", entries[68]["disposition"])
+        self.assertTrue(all(entry["name_zh"] and entry["name_en"] for entry in matrix["entries"]))
+        for source_index, slug in STATIC_ARM_PACKS.items():
+            self.assertEqual("implemented-static-experimental", entries[source_index]["disposition"])
+            self.assertEqual(static_pack_id(source_index, slug), entries[source_index]["cemu_pack"])
 
     def test_quest_red_delivery_box_redirect_is_narrow_and_fail_closed(self):
         result = self.tool.validate_repository(REPO)
@@ -408,7 +716,9 @@ class CatalogTests(unittest.TestCase):
         self.assertNotIn("quest id", patch.lower())
         self.assertNotIn("codecave", patch.lower())
 
-    def test_quest_red_blue_combined_pack_is_conditionally_gated(self):
+    def test_quest_red_blue_combined_pack_consumes_and_attaches_task_local_box_transition(
+        self,
+    ):
         result = self.tool.validate_repository(REPO)
         combined = next(
             pack
@@ -418,23 +728,53 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual("Runtime Experimental", combined["status"])
         self.assertFalse(combined["default_install"])
-        self.assertEqual("available", combined["availability"])
+        self.assertEqual("runtime-blocked", combined["availability"])
+        self.assertIn("暂停", combined["availability_reason"])
+        self.assertIn("paused", combined["availability_reason"].lower())
         self.assertIn("任务", combined["summary"])
         self.assertIn("quest", combined["summary"].lower())
         self.assertEqual(
             {
-                0x02219DE0: 0x38800006,
-                0x02219DE4: 0x386C0340,
-                0x02219DE8: 0x4BF9E021,
-                0x02219DEC: 0x2C030000,
-                0x02219DF0: 0x4182007C,
-                0x02219DF4: 0x819D0000,
+                0x021B0E50: 0x386003F0,
+                0x021B0E54: 0x38800010,
+                0x021B0E58: 0x484439D5,
+                0x021B0E5C: 0x2C030000,
+                0x021B0E60: 0x7C641B78,
+                0x021B0E64: 0x4182000C,
+                0x021B0E68: 0x48443BB5,
+                0x021B0E6C: 0x7C641B78,
+                0x021B0ED4: 0x38600410,
+                0x021B0ED8: 0x38800010,
+                0x021B0EDC: 0x48461A35,
+                0x021B0EE0: 0x2C030000,
+                0x021B0EE4: 0x7C641B78,
+                0x021B0EE8: 0x4182000C,
+                0x021B0EEC: 0x48461C15,
+                0x021B0EF0: 0x7C641B78,
+                0x021D5BA8: 0x4E800020,
+                0x021D5BAC: 0x4E800020,
+                0x021D5BB0: 0x4E800020,
+                0x021D5BB4: 0x4E800020,
+                0x021D5BB8: 0x4E800020,
+                0x021D5BBC: 0x4E800020,
+                0x021D5BC0: 0x4E800020,
+                0x021D5BC4: 0x4E800020,
+                0x021D5BC8: 0x4E800020,
+                0x021D5BCC: 0x4E800020,
+                0x021D5BD8: 0x4E800020,
+                0x021D5BDC: 0x4E800020,
+                0x021D5BE0: 0x4E800020,
+                0x0268AB20: 0x4BC01E8D,
+                0x026FD1B0: 0x4BB8F7FD,
                 0x028C2770: 0x819E0E30,
                 0x028C2774: 0x3D601008,
                 0x028C2778: 0x39000001,
                 0x028C277C: 0xC00BE204,
                 0x028C2780: 0x38800000,
                 0x028C2784: 0x990C0BAE,
+                0x028C2788: 0x7C862378,
+                0x028C278C: 0x7FC3F378,
+                0x028C2790: 0xD00C0BB4,
                 0x028C5824: 0x38800001,
                 0x028C5838: 0x38A0000F,
                 0x028C5E80: 0x38800001,
@@ -444,69 +784,74 @@ class CatalogTests(unittest.TestCase):
                 for item in combined["preimages"]
             },
         )
-        self.assertEqual(
+        anchors = {
+            self.tool._number(item["address"]): self.tool._number(item["word"])
+            for item in combined["anchors"]
+        }
+        self.assertLessEqual(
             {
-                0x0215165C: 0x89835350,
-                0x02151698: 0x480000B4,
-                0x0215174C: 0x4809F5BC,
-                0x021B7E14: 0x81830014,
-                0x021B7E18: 0x7C806278,
-                0x021B7E1C: 0x7C0B0034,
-                0x021B7E20: 0x5560D97E,
-                0x021B7E24: 0x7C030378,
-                0x021B7E28: 0x4E800020,
-                0x021F0AD0: 0x9BFC6E12,
-                0x021F0AF0: 0x2C1F0001,
-                0x021F0AF4: 0x38000006,
-                0x021F0AFC: 0x38000003,
+                0x021BB628: 0x9421FFA8,
+                0x021F0A8C: 0x9421FFD8,
                 0x021F0D08: 0x7C0802A6,
-                0x02219DD8: 0x3FA01031,
-                0x02219DDC: 0x859D4278,
-                0x02219DF8: 0x356C03D0,
-                0x02219DFC: 0x41820070,
-                0x02219E00: 0x892B0020,
-                0x02219E04: 0x2C090000,
-                0x02219E08: 0x40820064,
-                0x02219E4C: 0x7FE3FB78,
-                0x02219E50: 0x4BF3780D,
+                0x02201A94: 0x7C0802A6,
+                0x02201AF8: 0x9421FFC8,
+                0x0228C9AC: 0x7C0802A6,
                 0x028C2768: 0x2C1F0000,
                 0x028C276C: 0x40820048,
                 0x028C27F8: 0x3D201008,
-                0x028C5828: 0x4B8A5BD5,
-                0x028C582C: 0x2C030000,
-                0x028C5830: 0x40820018,
-                0x028C583C: 0x38800001,
-                0x028C5844: 0x4BFCC8C1,
-                0x028C5E78: 0x38800000,
-                0x028C5E7C: 0x4BFFC874,
-                0x028C5E84: 0x4BFFC86C,
-            },
-            {
-                self.tool._number(item["address"]): self.tool._number(item["word"])
-                for item in combined["anchors"]
-            },
+            }.items(),
+            anchors.items(),
         )
         patch = (REPO / combined["pack_dir"] / combined["patch"]).read_text()
         for instruction in (
-            "0x02219de0 = lwz r0, 0x354(r12)",
-            "0x02219de4 = cmpwi r0, 6",
-            "0x02219de8 = beq 0x02219df8",
-            "0x02219dec = lbz r0, 0x5350(r31)",
-            "0x02219df0 = cmpwi r0, 6",
-            "0x02219df4 = bne 0x02219e6c",
             "0x028c2770 = lis r3, 0x1031",
             "0x028c2774 = lwz r3, 0x44a0(r3)",
             "0x028c2778 = mr r4, r30",
             "0x028c277c = li r5, 0",
             "0x028c2780 = bl 0x021f0a8c",
-            "0x028c2784 = b 0x028c27f8",
+            "0x028c2784 = lis r3, 0x1031",
+            "0x028c2788 = lwz r3, 0x44a0(r3)",
+            "0x028c278c = bl 0x021f0d08",
+            "0x028c2790 = b 0x021d5ba8",
+            "0x021d5ba8 = lis r3, 0x1031",
+            "0x021d5bac = lwz r3, 0x44a0(r3)",
+            "0x021d5bb0 = bl 0x02201af8",
+            "0x021d5bb4 = lis r3, 0x1031",
+            "0x021d5bb8 = lwz r3, 0x44a0(r3)",
+            "0x021d5bbc = lbz r0, 0x6e10(r3)",
+            "0x021d5bc0 = cmpwi r0, 0x20",
+            "0x021d5bc4 = bne 0x021d5bcc",
+            "0x021d5bc8 = bl 0x02201a94",
+            "0x021d5bcc = b 0x028c27f8",
             "0x028c5824 = li r4, 0",
             "0x028c5838 = li r5, 0xe",
             "0x028c5e80 = li r4, 0",
+            "0x021b0e50 = mr r3, r27",
+            "0x021b0e6c = b 0x021bb628",
+            "0x021b0ed4 = mr r3, r27",
+            "0x021b0ef0 = b 0x021bb628",
+            "0x0268ab20 = bl 0x021d5bd8",
+            "0x026fd1b0 = bl 0x021d5bd8",
+            "0x021d5bdc = stw r0, 0xf0(r3)",
+            "0x021d5be0 = b 0x0228c9ac",
         ):
             self.assertIn(instruction, patch)
-        self.assertNotIn("0x02219df0 = nop", patch.lower())
-        self.assertNotIn("codecave", patch.lower())
+        self.assertIn("任务本地一次性激活", patch)
+        self.assertIn("task-local one-shot activation", patch.lower())
+        self.assertIn("消费完整仓库状态转换", patch)
+        self.assertIn("consume the full-item-box state transition", patch.lower())
+        self.assertIn("补齐任务场景缺失的最终 ui 挂接", patch.lower())
+        self.assertIn("complete the final ui attachment missing from quest scenes", patch.lower())
+        self.assertIn("保留大厅 gui 资源", patch.lower())
+        self.assertIn("retain the hub gui resources", patch.lower())
+        for forbidden in (
+            "0x02219de0 =",
+            "0x02219df0 =",
+            "0x021afe74 =",
+            "bl 0x0215165c",
+            "bl 0x021f0b64",
+        ):
+            self.assertNotIn(forbidden, patch.lower())
 
     def test_inspect_reports_installed_pack_that_is_not_enabled(self):
         result = self.tool.validate_repository(REPO)

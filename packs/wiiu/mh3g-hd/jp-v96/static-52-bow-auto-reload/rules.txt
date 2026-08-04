@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 52 弓箭自填 - Bow Auto-Reload
+path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/52 弓箭自填 - Bow Auto-Reload
+description = 中文：3DS 静态 ARM #52 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Wii U PPC conversion of 3DS static ARM cheat #52; Disabled by default; Runtime Experimental and requires gameplay verification.  Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts.
+version = 7

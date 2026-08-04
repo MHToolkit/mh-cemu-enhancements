@@ -1,0 +1,61 @@
+{
+  "id": "mh3g-hd-jp-v96-static-37-infinite-stamina",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_kind": "3ds-arm-static-to-wiiu-ppc",
+  "conversion_confidence": "exact-static",
+  "source_cheat_entries": [
+    37
+  ],
+  "source_arm_patches": [
+    {
+      "address": "0x00a2f510",
+      "word": "0xe1a00000"
+    },
+    {
+      "address": "0x00a2f514",
+      "word": "0xe3a01afa"
+    },
+    {
+      "address": "0x00a2f678",
+      "word": "0xd3a00001"
+    }
+  ],
+  "name_bilingual": "耐力无限 / Infinite Stamina",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/static-37-infinite-stamina",
+  "install_folder": "MH3G HD JP v96 - Static 37 - Infinite Stamina",
+  "rules": "rules.txt",
+  "patch": "patch_static_37_infinite_stamina.asm",
+  "preimages": [
+    {
+      "address": "0x02863dfc",
+      "word": "0x38600000",
+      "meaning": "中文：强制耐力条件帮助函数返回真。 / English: Force the stamina-condition helper to return true."
+    },
+    {
+      "address": "0x028665b0",
+      "word": "0x41800008",
+      "meaning": "中文：跳过低于上限分支，使耐力上限值始终写回。 / English: Skip the below-maximum branch so the maximum stamina value is always written back."
+    }
+  ],
+  "anchors": [],
+  "known_risks": [
+    "中文：同时强制耐力上限写回和耐力条件返回真；请验证奔跑、翻滚、格挡与水下动作。 / English: Forces both max-stamina writeback and the stamina condition result; verify sprinting, rolling, guarding, and underwater actions."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把 3DS 静态 ARM 金手指 #37“耐力无限”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #37 \"Infinite Stamina\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+}
