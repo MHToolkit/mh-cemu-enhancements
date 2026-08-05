@@ -263,7 +263,7 @@
     }
   ],
   "known_risks": [
-    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    "中文：强制 JP v96 中高速收集效果 ID 的全部直接检查；#59 已直接加速剥取、采集动作与获取倍率，会掩盖本项差异。验证 #60 时请关闭 #59，并对同一采集点的完整循环计时。 / English: Forces every direct JP-v96 check for the Fast Gathering effect ID; #59 directly accelerates carving, gathering actions, and acquisition, which can mask this difference. To validate #60, disable #59 and time a complete cycle at the same gathering point."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",

@@ -49,7 +49,7 @@
     }
   ],
   "known_risks": [
-    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    "中文：强制 JP v96 中燃鳞效果 ID 的公共检查；该技能主要改变同区域小型怪物行为，不是面板数值或大型怪物身上的可见光效，因此目测通常不明显。 / English: Forces the shared JP-v96 check for the Flaming Aura effect ID; the skill mainly changes small-monster behavior in the same area, not a status-screen value or visible aura on large monsters, so it is usually subtle."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",

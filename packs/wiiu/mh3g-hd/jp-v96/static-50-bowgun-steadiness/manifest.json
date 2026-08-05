@@ -51,7 +51,7 @@
     }
   ],
   "known_risks": [
-    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    "中文：强制 JP v96 中弩偏移修正效果 ID 的全部直接检查；必须使用自带左右偏移的弩并在远距离对比弹道，零偏移弩无法验证。该项不改变 #49 的后坐力。 / English: Forces every direct JP-v96 check for the bowgun-deviation correction effect ID; use a bowgun with built-in left/right deviation and compare trajectories at long range, because a zero-deviation bowgun cannot validate it. This does not change recoil from #49."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",

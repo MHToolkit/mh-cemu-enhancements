@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 07 HP 无限 - Infinite HP
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/07 HP 无限 - Infinite HP
-description = 中文：3DS 静态 ARM #7 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 通过停止普通当前 HP 写回来冻结 HP；受到治疗时当前 HP 也可能保持不变。 / English: Wii U PPC conversion of 3DS static ARM cheat #7; Disabled by default; Runtime Experimental and requires gameplay verification.  Freezes HP by suppressing the normal current-HP writeback; healing may also leave current HP unchanged.
+description = 中文：3DS 静态 ARM #7 的 Wii U PPC 增强转换；默认关闭；Runtime Experimental，需实机验证。 同时停止常规 HP 写回与超量伤害的致死归零写回；治疗时当前 HP 也可能保持不变。 / English: Enhanced Wii U PPC conversion of 3DS static ARM cheat #7; Disabled by default; Runtime Experimental and requires gameplay verification. Stops both normal HP writeback and the lethal zero-clamp for overkill damage; healing may also leave current HP unchanged.
 version = 7

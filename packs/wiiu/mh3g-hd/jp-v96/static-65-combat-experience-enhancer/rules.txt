@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 65 战斗体验改善器 - Combat Experience Enhancer
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/65 战斗体验改善器 - Combat Experience Enhancer
-description = 中文：3DS 静态 ARM #65 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 源代码把通用技能查询的首个比较强制为相等，影响面极广；可能让大量未勾选技能也被判定为生效，应单独测试。 / English: Wii U PPC conversion of 3DS static ARM cheat #65; Disabled by default; Runtime Experimental and requires gameplay verification.  The source forces the first comparison in the generic skill query to equal, giving it an extremely broad blast radius; many unrelated skills may be treated as active, so test it in isolation.
+description = 中文：3DS 静态 ARM #65 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 源代码把常规游戏模式的通用技能槽比较强制为相等，影响面极广；大量未勾选技能可能在第一次比较时就被判定为生效，必须单独测试。 / English: Wii U PPC conversion of 3DS static ARM cheat #65; Disabled by default; Runtime Experimental and requires gameplay verification. The source forces the normal-game-mode generic skill-slot comparison to equal, giving it an extremely broad blast radius; many unequipped skills may be treated as active on the first comparison, so test it in isolation.
 version = 7

@@ -51,7 +51,7 @@
     }
   ],
   "known_risks": [
-    "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+    "中文：强制 JP v96 中防御强化效果 ID 的全部直接检查；它只允许带盾武器格挡原本不可防御的攻击，普通可防御攻击无法验证此效果。 / English: Forces every direct JP-v96 check for the Guard Up effect ID; it only lets shielded weapons guard normally unblockable attacks, so ordinary blockable attacks cannot validate the effect."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",

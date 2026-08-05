@@ -152,6 +152,71 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(set(selected_ids), {pack["id"] for pack in selected})
         self.assertEqual(44, len(selected))
 
+    def test_runtime_feedback_fixes_cover_lethal_hp_and_normal_skill_query_paths(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {
+            pack["source_cheat_entries"][0]: pack
+            for pack in result.packs
+            if pack.get("conversion_kind") == "3ds-arm-static-to-wiiu-ppc"
+        }
+
+        hp = packs[7]
+        self.assertEqual(
+            {
+                0x02865FF8: 0xB18A0640,
+                0x02866004: 0xB18A0640,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in hp["preimages"]
+            },
+        )
+        hp_patch = (REPO / hp["pack_dir"] / hp["patch"]).read_text()
+        self.assertIn("0x02865ff8 = nop", hp_patch)
+        self.assertIn("0x02866004 = nop", hp_patch)
+
+        combat = packs[65]
+        self.assertEqual(
+            {0x02890B14: 0x7C082040},
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in combat["preimages"]
+            },
+        )
+        combat_patch = (REPO / combat["pack_dir"] / combat["patch"]).read_text()
+        self.assertIn("0x02890b14 = cmplw r8, r8", combat_patch)
+        self.assertNotIn("0x02890ae4 =", combat_patch)
+
+        mapping = json.loads(
+            (REPO / "docs" / "research" / "mh3g-static-arm-mapping.json").read_text()
+        )
+        rows = {entry["source_index"]: entry for entry in mapping["entries"]}
+        self.assertEqual(["0x02865ff8", "0x02866004"], rows[7]["ppc_addresses"])
+        self.assertEqual(["0x02890b14"], rows[65]["ppc_addresses"])
+
+    def test_feedback_sensitive_packs_explain_isolated_gameplay_conditions(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {
+            pack["source_cheat_entries"][0]: pack
+            for pack in result.packs
+            if pack.get("conversion_kind") == "3ds-arm-static-to-wiiu-ppc"
+        }
+        expected_guidance = {
+            13: ("同一路线计时", "time the same underwater route"),
+            21: ("固定武器", "fixed weapon"),
+            34: ("原本不可防御", "normally unblockable"),
+            35: ("小型怪物行为", "small-monster behavior"),
+            44: ("特殊或脚本化吹飞", "special or scripted knockback"),
+            50: ("自带左右偏移", "built-in left/right deviation"),
+            60: ("关闭 #59", "disable #59"),
+        }
+
+        for source_index, phrases in expected_guidance.items():
+            with self.subTest(source_index=source_index):
+                risks = "\n".join(packs[source_index]["known_risks"])
+                self.assertIn(phrases[0], risks)
+                self.assertIn(phrases[1], risks.lower())
+
     def test_custom_felyne_food_skills_requires_explicit_experimental_selection(self):
         result = self.tool.validate_repository(REPO)
         pack_id = "mh3g-hd-jp-v96-custom-felyne-food-skills"
@@ -425,6 +490,8 @@ class CatalogTests(unittest.TestCase):
         risks = "\n".join(custom["known_risks"])
         self.assertIn("重新吃饭", risks)
         self.assertIn("eat again", risks.lower())
+        self.assertIn("重启或重新载入游戏", risks)
+        self.assertIn("restart or reload the title", risks.lower())
         self.assertIn("互斥", risks)
         self.assertIn("incompatible", risks.lower())
 

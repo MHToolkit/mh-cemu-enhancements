@@ -1,4 +1,40 @@
-# Local verification record / 本地验证记录（2026-08-04）
+# Runtime feedback correction / 实测反馈修正（2026-08-05）
+
+## Confirmed defects / 已确认缺陷
+
+1. **#07 HP 无限 / Infinite HP**: the previous PPC conversion suppressed the normal write at `0x02865FF8` but left the lethal zero-clamp at `0x02866004`. This exactly explains surviving ordinary damage but dying to overkill damage. The corrected pack suppresses both writes. This PPC behavior is intentionally stronger than the source 3DS one-instruction patch; overkill survival on 3DS remains unverified.
+2. **#65 战斗体验改善器 / Combat Experience Enhancer**: ARM `0x008A68BC` is in the normal-game-mode skill-slot branch. The previous PPC conversion incorrectly patched the special-mode branch at `0x02890AE4`; the corrected address is the normal branch at `0x02890B14`.
+3. **猫饭技能自定义 / Custom Felyne Food Skills**: the latest `settings.xml` and `log.txt` showed that the pack was disabled and not loaded. Cemu resolves Graphic Pack variables while loading the title. After selecting and enabling presets, restart or reload the title, then eat a new meal; changing presets during a running title is not a valid test.
+
+## Feedback classification / 反馈分类
+
+| # | Feedback / 反馈 | Static conclusion / 静态结论 | Isolated retest / 隔离复测 |
+| ---: | --- | --- | --- |
+| 13 | 水下速度 2 倍不明显 | Eleven effect-ID checks plus the 1.05/1.10 to 2.0 scalar routes remain mapped correctly. / 11 条效果检查与两条倍率路径映射仍正确。 | Keep the same FPS/action and time the same underwater route. / 保持相同 FPS 与动作，对同一路线计时。 |
+| 21 | 回距 UP 不明显 | All nine JP-v96 checks for effect ID `0xB8` are covered. / 已覆盖 `0xB8` 的 9 条检查。 | Use a fixed weapon, start point, and direction; compare one roll endpoint. / 固定武器、起点、方向并比较翻滚终点。 |
+| 29 | 电阻弹可用 | User gameplay confirmed the intended availability behavior. / 用户已确认预期可用性行为。 | No corrective change. / 无需修正。 |
+| 34 | 防强不明显 | Both JP-v96 checks for effect ID `0x25` are covered. / 已覆盖 `0x25` 的两条检查。 | Use a shielded weapon against a normally unblockable attack; ordinary blocks do not test Guard Up. / 用带盾武器格挡原本不可防御攻击。 |
+| 35 | 燃鳞不明显 | Three ARM paths fold into one shared PPC check for effect ID `0xCF`; the mapping is structurally consistent. / 三条 ARM 路径在 PPC 合并为 `0xCF` 公共检查。 | Observe small-monster behavior in the same area, not a visible stat or large-monster aura. / 观察同区小怪行为。 |
+| 44 | 对煌黑龙吹倒无效 | All three ordinary high-wind checks matching the 3DS source are covered. Special/scripted knockback may bypass them. / 与 3DS 源相同的三条普通大风压检查均已覆盖，特殊吹飞可能绕过。 | Test ordinary large wind pressure separately; Alatreon alone is not a mapping verdict. / 另测普通大风压。 |
+| 48 | 未测 | No new failure evidence. / 暂无失败证据。 | Test invulnerability timing separately from #21 distance. / 与 #21 位移分开测试无敌帧。 |
+| 50 | 弩无摇晃不明显 | Both JP-v96 checks for effect ID `0xAE` are covered. / 已覆盖 `0xAE` 的两条检查。 | Use a bowgun with built-in left/right deviation and compare long-range trajectories; this is not recoil. / 使用自带左右偏移的弩远距离对比弹道。 |
+| 60 | 高速收集不明显 | All 18 JP-v96 checks for effect ID `0x8D` are covered. / 已覆盖 `0x8D` 的 18 条检查。 | Disable #59 and time a full cycle at the same gathering point. / 关闭 #59 后对同一采集点完整循环计时。 |
+
+The reported run enabled almost every static pack at once, including both #59/#60 and #6/#72. Cemu logged every selected pack as applied and no patch parser errors, but that combined run cannot isolate subtle effects. After the corrections above, all packs remain `Runtime Experimental / Gameplay Pending` until a focused gameplay retest is recorded.
+
+该次反馈运行几乎同时启用了全部静态包，包括 #59/#60 与 #6/#72。Cemu 日志显示所选包均已应用且没有补丁解析错误，但该组合无法隔离判断细微效果。本轮修正后，各项仍保持 `Runtime Experimental / Gameplay Pending`，等待逐项实测。
+
+## 2026-08-05 static and install gates / 静态与安装门禁
+
+1. `pytest tests/ -q` passed **27/27** tests; `validate` accepted all **50** manifests.
+2. The pinned JP-v96 RPX passed every declared preimage and anchor check.
+3. Cemu's real `PPCAssembler` encoded the corrected instructions as `02865FF8 -> 60000000`, `02866004 -> 60000000`, and `02890B14 -> 7C084040`.
+4. Ruff and `git diff --check` passed.
+5. With no Cemu process running, the installer refreshed the same **47-pack** receipt at `/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements`.
+6. Installed #07, #65, and Felyne-food trees exactly match their source trees. `settings.xml` remained valid XML and its SHA-256 stayed `90aff50f44231d06ae33f799e1136a0929da394958547259864216e5b1947a3f`; saved enable states were not edited.
+7. Two independent `0.1.18` builds were byte-identical; the final archive digest is stored in its adjacent `.sha256` sidecar.
+
+# Local verification record / 本地验证记录（2026-08-04，0.1.17）
 
 ## Current static gates / 当前静态门槛
 
@@ -36,9 +72,9 @@ These gates establish static correctness and installation integrity only. They d
 - **43 static conversions / 43 项静态转换：** Static mapping and installation tooling pass; gameplay is still pending for each independent default-off pack.
 - **Custom Felyne Food Skills / 猫饭技能自定义：** ARM/PPC semantic mapping, rules, preimages, real assembler, and installation pass. No real meal/quest-effect test exists yet, so it remains **Runtime Experimental / Gameplay Pending**.
 
-The food pack changes the next native meal finalization only. After selecting presets, the user must eat again. Pre-meal preview may remain game-generated, and native incompatible combinations such as `0x41 + 0x1E` may apply only one effect.
+The food pack changes the next native meal finalization only. Cemu resolves Graphic Pack parameters when loading the title, so after selecting presets the user must restart or reload the title and then eat again. Pre-meal preview may remain game-generated, and native incompatible combinations such as `0x41 + 0x1E` may apply only one effect.
 
-猫饭包只改变下一次原生用餐结算；修改预设后必须重新吃饭。餐前预览可能仍是原版随机结果，`0x41 + 0x1E` 等原生互斥组合也可能只生效其中一项。
+猫饭包只改变下一次原生用餐结算。Cemu 在标题加载时解析 Graphic Pack 参数，因此修改预设后必须重启或重新载入游戏，再重新吃饭。餐前预览可能仍是原版随机结果，`0x41 + 0x1E` 等原生互斥组合也可能只生效其中一项。
 
 ## Installed isolated profile / 已安装隔离配置
 

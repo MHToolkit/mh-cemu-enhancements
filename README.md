@@ -50,7 +50,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.17.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.18.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
@@ -76,9 +76,9 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 - The red candidate changes only the **red delivery box**, but gameplay continued to show an unusable crossed prompt. It is retained for static history and is `runtime-blocked` from installation.
 - The unconditional blue bridge changed `0x02219DF0` to `nop`. Cemu proved it hot-loaded, but it still opened no item-box menu and blanked quest-board dialogue by exposing unrelated quest UI states to the lobby dispatcher. It is now `runtime-blocked`.
 - The combined candidate is retained as source history, but is now `runtime-blocked` and paused with the other task-box experiments. It is excluded from the installer selection until a reproducible correct quest-scene lifecycle exists.
-- Custom Felyne Food Skills exposes three independent bilingual selectors covering IDs `00..41`, defaulting inside the pack to `06/36/00`. Preset changes apply only on the next completed meal, so eat again after changing them. Pre-meal preview may remain game-generated, and native incompatible combinations (known example: `41 + 1E`) may apply only one effect. The pack is default-off `Runtime Experimental / Gameplay Pending`.
+- Custom Felyne Food Skills exposes three independent bilingual selectors covering IDs `00..41`, defaulting inside the pack to `06/36/00`. Cemu resolves Graphic Pack parameters when loading the title: after changing presets, restart or reload the title and then eat again. Pre-meal preview may remain game-generated, and native incompatible combinations (known example: `41 + 1E`) may apply only one effect. The pack is default-off `Runtime Experimental / Gameplay Pending`.
 - There are 47 available Cemu leaves: 30/44 FPS, Lobby Full Item Box, Custom Felyne Food Skills, and 43 independent entries under `3DS Static Cheats`. The catalog keeps all task-box candidates as non-installable negative evidence.
-- All 43 static conversions are default-off `Runtime Experimental / Gameplay Pending`. #6 and #72 share an affinity path and are mutually exclusive; #56 is a partial semantic mapping; #65 changes a generic skill-comparison path and has the broadest test risk.
+- All 43 static conversions are default-off `Runtime Experimental / Gameplay Pending`. #6 and #72 share an affinity path and are mutually exclusive; #56 is a partial semantic mapping; #65 forces the normal-game-mode generic skill comparison and has the broadest test risk.
 - Leave all item-box modification packs disabled for multiplayer. The 30 FPS pack is also not recommended until its instability is resolved.
 - Never enable this JP v96 catalog against another title, region, update, RPX hash, or module checksum.
 

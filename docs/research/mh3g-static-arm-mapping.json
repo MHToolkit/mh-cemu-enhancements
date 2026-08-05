@@ -94,11 +94,12 @@
       "name_en": "Infinite HP",
       "pack_id": "mh3g-hd-jp-v96-static-07-infinite-hp",
       "conversion_confidence": "exact-static",
-      "ppc_patch_count": 1,
+      "ppc_patch_count": 2,
       "ppc_addresses": [
-        "0x02865ff8"
+        "0x02865ff8",
+        "0x02866004"
       ],
-      "risk": "中文：通过停止普通当前 HP 写回来冻结 HP；受到治疗时当前 HP 也可能保持不变。 / English: Freezes HP by suppressing the normal current-HP writeback; healing may also leave current HP unchanged."
+      "risk": "中文：同时停止常规 HP 写回与超量伤害的致死归零写回；治疗时当前 HP 也可能保持不变。该 PPC 行为强于源 3DS 单指令补丁，3DS 版能否承受超量伤害尚未实机确认。 / English: Stops both normal HP writeback and the lethal zero-clamp for overkill damage; healing may also leave current HP unchanged. This PPC behavior is stronger than the source 3DS one-instruction patch, whose overkill behavior has not been confirmed on hardware."
     },
     {
       "source_index": 11,
@@ -136,7 +137,7 @@
         "0x028c96f8",
         "0x028c971c"
       ],
-      "risk": "中文：强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。 / English: Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers."
+      "risk": "中文：强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。请保持相同 FPS 设置与动作，对同一路线计时，不要只凭目测。 / English: Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers. Keep the same FPS setting and action, and time the same underwater route instead of relying on visual judgment alone."
     },
     {
       "source_index": 14,
@@ -229,7 +230,7 @@
         "0x028c4d6c",
         "0x028c5094"
       ],
-      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+      "risk": "中文：强制 JP v96 中回避距离效果 ID 的全部直接检查；它只改变回避位移，不增加 #48 的无敌帧。请使用固定武器、起点和方向，对比一次完整翻滚的终点。 / English: Forces every direct JP-v96 check for the Evade Extender effect ID; it changes dodge displacement only and does not add the invulnerability frames from #48. Use a fixed weapon, starting point, and direction, then compare the endpoint of one complete roll."
     },
     {
       "source_index": 26,
@@ -295,7 +296,7 @@
         "0x0285da08",
         "0x02897728"
       ],
-      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+      "risk": "中文：强制 JP v96 中防御强化效果 ID 的全部直接检查；它只允许带盾武器格挡原本不可防御的攻击，普通可防御攻击无法验证此效果。 / English: Forces every direct JP-v96 check for the Guard Up effect ID; it only lets shielded weapons guard normally unblockable attacks, so ordinary blockable attacks cannot validate the effect."
     },
     {
       "source_index": 35,
@@ -307,7 +308,7 @@
       "ppc_addresses": [
         "0x025a0ff8"
       ],
-      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+      "risk": "中文：强制 JP v96 中燃鳞效果 ID 的公共检查；该技能主要改变同区域小型怪物行为，不是面板数值或大型怪物身上的可见光效，因此目测通常不明显。 / English: Forces the shared JP-v96 check for the Flaming Aura effect ID; the skill mainly changes small-monster behavior in the same area, not a status-screen value or visible aura on large monsters, so it is usually subtle."
     },
     {
       "source_index": 36,
@@ -411,7 +412,7 @@
         "0x028985c0",
         "0x02898790"
       ],
-      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+      "risk": "中文：强制 JP v96 中普通大风压效果 ID 的三个直接检查；煌黑龙等特殊或脚本化吹飞可能绕过普通风压判定，因此对这类吹飞无效不能单独证明映射错误。 / English: Forces the three direct JP-v96 checks for ordinary high wind pressure; special or scripted knockback such as Alatreon's may bypass the normal wind-pressure checks, so failure against that knockback alone does not prove a mapping error."
     },
     {
       "source_index": 45,
@@ -490,7 +491,7 @@
         "0x028a6c24",
         "0x028a6c50"
       ],
-      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+      "risk": "中文：强制 JP v96 中弩偏移修正效果 ID 的全部直接检查；必须使用自带左右偏移的弩并在远距离对比弹道，零偏移弩无法验证。该项不改变 #49 的后坐力。 / English: Forces every direct JP-v96 check for the bowgun-deviation correction effect ID; use a bowgun with built-in left/right deviation and compare trajectories at long range, because a zero-deviation bowgun cannot validate it. This does not change recoil from #49."
     },
     {
       "source_index": 51,
@@ -619,7 +620,7 @@
         "0x028bcb60",
         "0x028bcdbc"
       ],
-      "risk": "中文：通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts."
+      "risk": "中文：强制 JP v96 中高速收集效果 ID 的全部直接检查；#59 已直接加速剥取、采集动作与获取倍率，会掩盖本项差异。验证 #60 时请关闭 #59，并对同一采集点的完整循环计时。 / English: Forces every direct JP-v96 check for the Fast Gathering effect ID; #59 directly accelerates carving, gathering actions, and acquisition, which can mask this difference. To validate #60, disable #59 and time a complete cycle at the same gathering point."
     },
     {
       "source_index": 61,
@@ -683,9 +684,9 @@
       "conversion_confidence": "exact-static",
       "ppc_patch_count": 1,
       "ppc_addresses": [
-        "0x02890ae4"
+        "0x02890b14"
       ],
-      "risk": "中文：源代码把通用技能查询的首个比较强制为相等，影响面极广；可能让大量未勾选技能也被判定为生效，应单独测试。 / English: The source forces the first comparison in the generic skill query to equal, giving it an extremely broad blast radius; many unrelated skills may be treated as active, so test it in isolation."
+      "risk": "中文：源代码把常规游戏模式的通用技能槽比较强制为相等，影响面极广；大量未勾选技能可能在第一次比较时就被判定为生效，必须单独测试。 / English: The source forces the normal-game-mode generic skill-slot comparison to equal, giving it an extremely broad blast radius; many unequipped skills may be treated as active on the first comparison, so test it in isolation."
     },
     {
       "source_index": 72,

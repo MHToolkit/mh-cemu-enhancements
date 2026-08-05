@@ -2,7 +2,7 @@
 titleIds = 0005000010104D00
 name = 猫饭技能自定义 - Custom Felyne Food Skills
 path = MH Cemu Enhancements/MH3G HD JP v96/Custom Felyne Food Skills
-description = 默认关闭；分别选择三个技能槽，修改后必须重新吃饭。状态：Runtime Experimental / Gameplay Pending。 / Disabled by default; select three skill slots and eat again after changing them. Status: Runtime Experimental / Gameplay Pending.
+description = 默认关闭；分别选择三个技能槽，修改后必须重启或重新载入游戏，再重新吃饭。状态：Runtime Experimental / Gameplay Pending。 / Disabled by default; select three skill slots, restart or reload the title, and then eat again. Status: Runtime Experimental / Gameplay Pending.
 version = 7
 
 [Default]

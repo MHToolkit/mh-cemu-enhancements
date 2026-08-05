@@ -30,12 +30,17 @@
     {
       "address": "0x02865ff8",
       "word": "0xb18a0640",
-      "meaning": "中文：禁止普通当前 HP 写回。 / English: Suppress the normal current-HP writeback."
+      "meaning": "中文：禁止伤害计算后的常规当前 HP 写回。 / English: Suppress the normal current-HP writeback after damage calculation."
+    },
+    {
+      "address": "0x02866004",
+      "word": "0xb18a0640",
+      "meaning": "中文：禁止超量伤害路径把当前 HP 强制写为 0。 / English: Suppress the lethal-damage path that clamps current HP to zero."
     }
   ],
   "anchors": [],
   "known_risks": [
-    "中文：通过停止普通当前 HP 写回来冻结 HP；受到治疗时当前 HP 也可能保持不变。 / English: Freezes HP by suppressing the normal current-HP writeback; healing may also leave current HP unchanged."
+    "中文：同时停止常规 HP 写回与超量伤害的致死归零写回；治疗时当前 HP 也可能保持不变。该 PPC 行为强于源 3DS 单指令补丁，3DS 版能否承受超量伤害尚未实机确认。 / English: Stops both normal HP writeback and the lethal zero-clamp for overkill damage; healing may also leave current HP unchanged. This PPC behavior is stronger than the source 3DS one-instruction patch, whose overkill behavior has not been confirmed on hardware."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",

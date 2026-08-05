@@ -28,14 +28,14 @@
   "patch": "patch_static_65_combat_experience_enhancer.asm",
   "preimages": [
     {
-      "address": "0x02890ae4",
+      "address": "0x02890b14",
       "word": "0x7c082040",
-      "meaning": "中文：把通用技能查询的首个比较改为自比较。 / English: Replace the first generic-skill comparison with a self-comparison."
+      "meaning": "中文：把常规游戏模式技能槽查询的比较改为自比较；特殊模式分支保持原样。 / English: Replace the normal-game-mode skill-slot comparison with a self-comparison while leaving the special-mode branch unchanged."
     }
   ],
   "anchors": [],
   "known_risks": [
-    "中文：源代码把通用技能查询的首个比较强制为相等，影响面极广；可能让大量未勾选技能也被判定为生效，应单独测试。 / English: The source forces the first comparison in the generic skill query to equal, giving it an extremely broad blast radius; many unrelated skills may be treated as active, so test it in isolation."
+    "中文：源代码把常规游戏模式的通用技能槽比较强制为相等，影响面极广；大量未勾选技能可能在第一次比较时就被判定为生效，必须单独测试。 / English: The source forces the normal-game-mode generic skill-slot comparison to equal, giving it an extremely broad blast radius; many unequipped skills may be treated as active on the first comparison, so test it in isolation."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
