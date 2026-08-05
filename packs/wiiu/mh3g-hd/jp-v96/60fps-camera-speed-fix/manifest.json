@@ -1,0 +1,37 @@
+{
+  "id": "mh3g-hd-jp-v96-60fps-camera-speed",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-camera-speed",
+  "install_folder": "MH3G HD JP v96 - 60FPS Camera Speed",
+  "rules": "rules.txt",
+  "patch": "patch_camera.asm",
+  "preimages": [
+    {
+      "address": "0x02286f78",
+      "word": "0x3B20040B",
+      "meaning": "原 li r25, 0x40b (默认视角速度加载)。/ Original li r25, 0x40b (default camera speed load)."
+    },
+    {
+      "address": "0x02286f8c",
+      "word": "0x3B20034B",
+      "meaning": "原 li r25, 0x34b (瞄准视角速度加载)。/ Original li r25, 0x34b (aim camera speed load)."
+    }
+  ],
+  "anchors": [],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "在60帧下自定义视角速度，支持多级预设。 / Custom camera speed at 60 FPS with multiple preset levels."
+}
