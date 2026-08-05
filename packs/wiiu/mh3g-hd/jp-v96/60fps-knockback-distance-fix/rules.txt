@@ -1,5 +1,5 @@
 [Definition]
-titleIds = 0005000010104D00,0005000010105700,0005000010117200,0005000010117100
+titleIds = 0005000010104D00
 name = 60帧风压吹飞距离修复 / 60FPS Knockback Distance
 path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Knockback Distance
 description = "在60帧运行下吹飞距离与30帧一致。 / Fix knockback distance at 60 FPS to match 30 FPS."

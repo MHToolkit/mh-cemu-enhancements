@@ -1,5 +1,5 @@
 [Definition]
-titleIds = 0005000010104D00,0005000010105700,0005000010117200,0005000010117100
+titleIds = 0005000010104D00
 name = 60帧锤子正本垒修复 / 60FPS Hammer Golf Swing Fix
 path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Hammer Golf Swing Fix
 description = "在60帧运行下仍然可以使用正本垒。 / Enables golf swing at 60 FPS."

@@ -1,5 +1,5 @@
 [Definition]
-titleIds = 0005000010104D00,0005000010105700,0005000010117200,0005000010117100
+titleIds = 0005000010104D00
 name = 60帧视角速度 / 60FPS Camera Speed
 path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Camera Speed
 description = "在60帧下自定义视角速度。 / Custom camera speed at 60 FPS."
