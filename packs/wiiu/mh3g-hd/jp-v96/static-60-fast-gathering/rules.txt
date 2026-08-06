@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 60 高速收集 - Fast Gathering
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/60 高速收集 - Fast Gathering
-description = 中文：3DS 静态 ARM #60 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。#59 会掩盖本项差异；验证 #60 时请关闭 #59，并对同一采集点的完整循环计时。 / English: Wii U PPC conversion of 3DS static ARM cheat #60; Disabled by default; Runtime Experimental and requires gameplay verification. #59 can mask this difference; to validate #60, disable #59 and time a complete cycle at the same gathering point.
+description = 中文：3DS 静态 ARM #60 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。#59 与 #65 都会掩盖本项差异；验证 #60 时只启用本项，关闭 #59，并关闭 #65，再对同一采集点的完整循环计时。 / English: Wii U PPC conversion of 3DS static ARM cheat #60; Disabled by default; Runtime Experimental and requires gameplay verification. Both #59 and #65 can mask this difference; to validate #60, enable only this pack, disable #59, disable #65, and time a complete cycle at the same gathering point.
 version = 7

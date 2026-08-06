@@ -42,24 +42,23 @@ Function matching located the equivalent native finalizers at ARM `0x005C3054..0
 
 函数匹配定位到等价的原生结算函数：ARM `0x005C3054..0x005C3330`、PPC `0x021D8548..0x021D8790`。PPC 函数会清空并去重最多三个技能，再把半字写到菜单侧 `r30 + 0x83FE/0x8400/0x8402` 与运行侧 `[r31 + 0x140] + 0xE3E/0xE40/0xE42`。独立 PPC 读取器 `0x0285F224..0x0285F258` 从 `+0xE3E` 恰好循环读取三个半字，其调用方使用的编号覆盖到 `0x41`；已定位的 finalizer 直接调用点为 `0x021D9D9C`。
 
-The pack replaces only the ten-instruction writeback tail and falls through to untouched code at `0x021D8768`:
+Runtime feedback exposed a data-flow defect in the first conversion: it replaced the final mirror loop at `0x021D8740..0x021D8764` but left the native source slots at `r31 + 0x68/0x6A/0x6C` holding random generated values. The corrected path writes the three selected halfwords immediately after generator call `0x021D8658`, skips the random-result deduplication loop, and resumes native meal post-processing at `0x021D86B4`:
+
+实测反馈暴露了首版转换的数据流缺陷：它覆盖了 `0x021D8740..0x021D8764` 的最终镜像循环，却让原生源槽 `r31 + 0x68/0x6A/0x6C` 保留随机生成值。修正版在生成器调用 `0x021D8658` 返回后立即写入三个所选半字，跳过随机结果去重循环，再从 `0x021D86B4` 恢复原生餐食后处理：
 
 ```asm
-0x021d8740 = lwz r11, 0x140(r31)
-0x021d8744 = li r0, $skill1
-0x021d8748 = sth r0, 0x000a(r27)
-0x021d874c = sth r0, 0x0e3e(r11)
-0x021d8750 = li r0, $skill2
-0x021d8754 = sth r0, 0x000c(r27)
-0x021d8758 = sth r0, 0x0e40(r11)
-0x021d875c = li r0, $skill3
-0x021d8760 = sth r0, 0x000e(r27)
-0x021d8764 = sth r0, 0x0e42(r11)
+0x021d865c = li r0, $skill1
+0x021d8660 = sth r0, 0x0068(r31)
+0x021d8664 = li r0, $skill2
+0x021d8668 = sth r0, 0x006a(r31)
+0x021d866c = li r0, $skill3
+0x021d8670 = sth r0, 0x006c(r31)
+0x021d8674 = b 0x021d86b4
 ```
 
-`r27` is already `r30 + 0x83F4`, making offsets `+0x0A/+0x0C/+0x0E` the three menu slots. The replacement simultaneously updates runtime state and uses no relocated code. Rules expose three categorized bilingual selectors containing all 66 values each; defaults inside the disabled pack are `06/36/00`. A preset change takes effect only when the player eats again. Preview text may remain game-generated before finalization, and native incompatible combinations—known example `41 + 1E`—may not apply both effects. The pack is therefore **Runtime Experimental / Gameplay Pending** until real meal and quest-effect validation.
+The corrected block preserves the complete native mirror loop at `0x021D8740..0x021D8764`, so the post-meal display, menu state, and quest runtime state now consume the same three source slots. It uses no code cave. Rules expose three categorized bilingual selectors containing all 66 values each; defaults inside the disabled pack are `06/36/00`. A preset change takes effect only after a title restart/reload and a new meal. Preview text may remain game-generated before finalization, and native incompatible combinations, such as `41 + 1E`, may not apply both effects. The pack remains **Runtime Experimental / Gameplay Pending** until a real meal and quest-effect retest succeeds.
 
-`r27` 在原函数中已经等于 `r30 + 0x83F4`，所以 `+0x0A/+0x0C/+0x0E` 正好是菜单侧三个槽。替换块同时更新任务运行态，不使用重定位代码。规则提供三个分类双语下拉框，每槽完整包含 66 个编号；整个包默认关闭，包内默认值为 `06/36/00`。修改预设后必须重新吃饭才会生效；结算前预览可能仍显示原版随机技能，原生互斥组合（已知例 `41 + 1E`）也可能无法同时生效。因此在真实用餐与任务效果验证前，本包保持 **Runtime Experimental / Gameplay Pending**。
+修正版完整保留 `0x021D8740..0x021D8764` 的原生镜像循环，因此用餐后显示、菜单状态和任务运行态会读取同一组三个源槽；补丁不使用 code cave。规则提供三个分类双语下拉框，每槽完整包含 66 个编号；整个包默认关闭，包内默认值为 `06/36/00`。修改预设后必须重启或重新载入标题并重新吃饭。结算前预览可能仍显示原版随机技能，`41 + 1E` 等原生互斥组合也可能只生效其中一项。因此在真实用餐与任务效果复测成功前，本包保持 **Runtime Experimental / Gameplay Pending**。
 
 ## Menu-class mapping
 

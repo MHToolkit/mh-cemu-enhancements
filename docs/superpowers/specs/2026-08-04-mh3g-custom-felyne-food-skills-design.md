@@ -51,24 +51,21 @@ Graphic Pack `rules.txt` 提供三个互不绑定的分类：
 
 每个分类都完整列出 `00 无 / None` 与 `01..41` 的中英双语技能名。包内默认组合为 `06 / 36 / 00`（猫的特殊攻击术、猫的短期催眠术、空槽），但整个包默认不安装、不启用。
 
-### 2. 原位覆盖结算尾段 / In-place finalizer rewrite
+### 2. 原位覆盖生成结果 / In-place generated-result rewrite
 
-不使用 `.origin = codecave`。本机 Cemu 2.6 曾把 code cave 放到 guest `0x01800000` 并触发 PPC recompiler 崩溃。改为只覆盖 finalizer 尾部现有十条指令 `0x021D8740..0x021D8764`：
+不使用 `.origin = codecave`。本机 Cemu 2.6 曾把 code cave 放到 guest `0x01800000` 并触发 PPC recompiler 崩溃。首版覆盖 finalizer 最终镜像循环 `0x021D8740..0x021D8764`，但实测发现原生临时技能槽仍保留随机结果。修正版改为在随机生成器返回后覆盖七条指令 `0x021D865C..0x021D8674`：
 
 ```asm
-0x021d8740 = lwz r11, 0x140(r31)
-0x021d8744 = li r0, $skill1
-0x021d8748 = sth r0, 0x000a(r27)
-0x021d874c = sth r0, 0x0e3e(r11)
-0x021d8750 = li r0, $skill2
-0x021d8754 = sth r0, 0x000c(r27)
-0x021d8758 = sth r0, 0x0e40(r11)
-0x021d875c = li r0, $skill3
-0x021d8760 = sth r0, 0x000e(r27)
-0x021d8764 = sth r0, 0x0e42(r11)
+0x021d865c = li r0, $skill1
+0x021d8660 = sth r0, 0x0068(r31)
+0x021d8664 = li r0, $skill2
+0x021d8668 = sth r0, 0x006a(r31)
+0x021d866c = li r0, $skill3
+0x021d8670 = sth r0, 0x006c(r31)
+0x021d8674 = b 0x021d86b4
 ```
 
-`r27` 在原函数中已经等于 `r30 + 0x83F4`，因此 `+0x0A/+0x0C/+0x0E` 精确对应菜单侧 `+0x83FE/+0x8400/+0x8402`。覆盖块同时更新 runtime state，然后原样落入 `0x021D8768` 的后续流程。后续代码会重新装载所需寄存器，不依赖被替换循环留下的 `r7/r9/r10/r12` 值。
+`r31 + 0x68/0x6A/0x6C` 是该函数先清空、再由随机结果去重循环填充的三个最终半字槽。修正版直接写入所选 ID，跳过随机结果去重，然后继续执行 `0x021D86B4` 起的餐食后处理。`0x021D8740..0x021D8764` 的原生循环保持不变，最终把这三个源槽同步到菜单侧 `+0x83FE/+0x8400/+0x8402` 与任务运行侧 `+0xE3E/+0xE40/+0xE42`。
 
 ### 3. 作用时机 / Activation timing
 
@@ -77,7 +74,7 @@ Graphic Pack `rules.txt` 提供三个互不绑定的分类：
 ## 安全边界 / Safety boundaries
 
 - 仅匹配 Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、module checksum `0x348600a0`。
-- manifest 固定记录十个覆盖字的原始 preimage，并记录函数入口、寄存器构造、覆盖尾端与 fallthrough anchors。
+- manifest 固定记录七个覆盖字的原始 preimage，并把原生最终镜像循环的十条指令记录为 anchors，防止再次误覆盖。
 - 不修改 Cemu、WUA、RPX、MLC 或存档；只安装仓库自有 Graphic Pack 文件。
 - `41 + 1E` 已知不能共存；其他游戏原生互斥或非法组合也可能只生效其中一项。
 - 没有真实吃饭并进入任务的游戏证据前，状态保持 `Runtime Experimental / Gameplay Pending`。
@@ -88,7 +85,7 @@ Graphic Pack `rules.txt` 提供三个互不绑定的分类：
 
 1. 先添加目录、manifest、规则预设与精确补丁契约测试，并确认因包尚不存在而失败。
 2. 校验每个槽恰好拥有 `0x00..0x41` 共 66 个双语选项。
-3. 校验覆盖地址连续且仅为 `0x021D8740..0x021D8764`，补丁不含 `codecave`。
+3. 校验覆盖地址连续且仅为 `0x021D865C..0x021D8674`，补丁不含 `codecave`，并确认 `0x021D8740..0x021D8764` 的原生最终镜像循环保持不变。
 4. 针对固定 JP-v96 RPX 校验全部 preimage 与 anchors。
 5. 运行完整单元测试、catalog validation、lint、`git diff --check` 与确定性打包。
 6. 在不启动 Cemu 的前提下，保留大厅包与 30 FPS 包，并把本包安装到同一 Cemu Graphic Packs 根目录；核验 receipt 与源/安装文件哈希。

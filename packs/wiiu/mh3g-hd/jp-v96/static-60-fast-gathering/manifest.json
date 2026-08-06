@@ -263,7 +263,7 @@
     }
   ],
   "known_risks": [
-    "中文：强制 JP v96 中高速收集效果 ID 的全部直接检查；#59 已直接加速剥取、采集动作与获取倍率，会掩盖本项差异。验证 #60 时请关闭 #59，并对同一采集点的完整循环计时。 / English: Forces every direct JP-v96 check for the Fast Gathering effect ID; #59 directly accelerates carving, gathering actions, and acquisition, which can mask this difference. To validate #60, disable #59 and time a complete cycle at the same gathering point."
+    "中文：强制 JP v96 中高速收集效果 ID 的全部直接检查；#59 已直接加速剥取、采集动作与获取倍率，#65 会把通用技能查询强制为真，二者都会掩盖本项差异。验证 #60 时只启用本项，关闭 #59，并关闭 #65，再对同一采集点的完整循环计时。 / English: Forces every direct JP-v96 check for the Fast Gathering effect ID; #59 directly accelerates carving, gathering actions, and acquisition, while #65 forces the generic skill query true, so either can mask this difference. To validate #60, enable only this pack, disable #59, disable #65, and time a complete cycle at the same gathering point."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",

@@ -6,6 +6,8 @@
 
 **Architecture:** Replace only the ten-instruction writeback tail at `0x021D8740..0x021D8764`. The inline block writes all three selected halfword IDs to the menu and runtime structures, then falls through to untouched game code. No code cave, game asset, save, or emulator binary is modified.
 
+> **2026-08-06 correction:** Gameplay feedback disproved that initial data-flow choice. The current pack instead replaces seven instructions at `0x021D865C..0x021D8674`, writes `r31 + 0x68/0x6A/0x6C` after random generation, branches to `0x021D86B4`, and preserves the native final mirror loop at `0x021D8740..0x021D8764`. The original checklist below is retained as implementation history.
+
 **Tech Stack:** Cemu Graphic Pack v7, Cemu PPC patch assembler variables, Python 3 `unittest`, JSON manifests, immutable JP-v96 RPX preimage verification.
 
 ---

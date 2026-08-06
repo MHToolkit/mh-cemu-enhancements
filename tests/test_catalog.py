@@ -217,6 +217,24 @@ class CatalogTests(unittest.TestCase):
                 self.assertIn(phrases[0], risks)
                 self.assertIn(phrases[1], risks.lower())
 
+    def test_skill_effect_comparisons_require_disabling_broad_skill_enhancer(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {
+            pack["source_cheat_entries"][0]: pack
+            for pack in result.packs
+            if pack.get("conversion_kind") == "3ds-arm-static-to-wiiu-ppc"
+        }
+        for source_index in (13, 21, 34, 50, 60):
+            with self.subTest(source_index=source_index):
+                risks = "\n".join(packs[source_index]["known_risks"])
+                self.assertIn("关闭 #65", risks)
+                self.assertIn("disable #65", risks.lower())
+                rules = (
+                    REPO / packs[source_index]["pack_dir"] / packs[source_index]["rules"]
+                ).read_text()
+                self.assertIn("关闭 #65", rules)
+                self.assertIn("disable #65", rules.lower())
+
     def test_custom_felyne_food_skills_requires_explicit_experimental_selection(self):
         result = self.tool.validate_repository(REPO)
         pack_id = "mh3g-hd-jp-v96-custom-felyne-food-skills"
@@ -497,16 +515,13 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual(
             {
-                0x021D8740: 0x54EC083C,
-                0x021D8744: 0x817F0140,
-                0x021D8748: 0x7D3B6214,
-                0x021D874C: 0x7C19622E,
-                0x021D8750: 0x7D4B6214,
-                0x021D8754: 0x38E70001,
-                0x021D8758: 0xB009000A,
-                0x021D875C: 0x2C070003,
-                0x021D8760: 0xB00A0E3E,
-                0x021D8764: 0x4180FFDC,
+                0x021D865C: 0x38E00000,
+                0x021D8660: 0x38000000,
+                0x021D8664: 0x7C080378,
+                0x021D8668: 0x7C083800,
+                0x021D866C: 0x40800028,
+                0x021D8670: 0x7CDA38AE,
+                0x021D8674: 0x550C083C,
             },
             {
                 self.tool._number(item["address"]): self.tool._number(item["word"])
@@ -524,6 +539,18 @@ class CatalogTests(unittest.TestCase):
                 0x021D8570: 0x3B5A83F4,
                 0x021D8574: 0x84794278,
                 0x021D857C: 0x7F7ED214,
+                0x021D8658: 0x4BFFF341,
+                0x021D86B4: 0xA1980006,
+                0x021D8740: 0x54EC083C,
+                0x021D8744: 0x817F0140,
+                0x021D8748: 0x7D3B6214,
+                0x021D874C: 0x7C19622E,
+                0x021D8750: 0x7D4B6214,
+                0x021D8754: 0x38E70001,
+                0x021D8758: 0xB009000A,
+                0x021D875C: 0x2C070003,
+                0x021D8760: 0xB00A0E3E,
+                0x021D8764: 0x4180FFDC,
                 0x021D8768: 0x3C601020,
                 0x021D876C: 0x8063D9CC,
                 0x021D8774: 0x4BF42581,
@@ -562,23 +589,48 @@ class CatalogTests(unittest.TestCase):
 
         patch = (REPO / custom["pack_dir"] / custom["patch"]).read_text()
         self.assertEqual(
-            [f"0x{address:08x}" for address in range(0x021D8740, 0x021D8768, 4)],
+            [f"0x{address:08x}" for address in range(0x021D865C, 0x021D8678, 4)],
             re.findall(r"(?mi)^(0x[0-9a-f]{8})\s*=", patch),
         )
         for instruction in (
-            "0x021d8740 = lwz r11, 0x140(r31)",
-            "0x021d8744 = li r0, $skill1",
-            "0x021d8748 = sth r0, 0x000a(r27)",
-            "0x021d874c = sth r0, 0x0e3e(r11)",
-            "0x021d8750 = li r0, $skill2",
-            "0x021d8754 = sth r0, 0x000c(r27)",
-            "0x021d8758 = sth r0, 0x0e40(r11)",
-            "0x021d875c = li r0, $skill3",
-            "0x021d8760 = sth r0, 0x000e(r27)",
-            "0x021d8764 = sth r0, 0x0e42(r11)",
+            "0x021d865c = li r0, $skill1",
+            "0x021d8660 = sth r0, 0x0068(r31)",
+            "0x021d8664 = li r0, $skill2",
+            "0x021d8668 = sth r0, 0x006a(r31)",
+            "0x021d866c = li r0, $skill3",
+            "0x021d8670 = sth r0, 0x006c(r31)",
+            "0x021d8674 = b 0x021d86b4",
         ):
             self.assertIn(instruction, patch)
         self.assertNotIn("codecave", patch.lower())
+
+    def test_custom_felyne_food_skills_overrides_generator_slots_before_native_writeback(self):
+        """Selected IDs must replace the temporary meal slots before native writeback."""
+        result = self.tool.validate_repository(REPO)
+        custom = next(
+            pack
+            for pack in result.packs
+            if pack["id"] == "mh3g-hd-jp-v96-custom-felyne-food-skills"
+        )
+        patch = (REPO / custom["pack_dir"] / custom["patch"]).read_text()
+
+        # The generator's temporary slots are the source consumed by the native
+        # final writeback loop. Replacing only the later mirror writes leaves
+        # the source meal slots generated/random and can diverge from the result.
+        for instruction in (
+            "0x021d865c = li r0, $skill1",
+            "0x021d8660 = sth r0, 0x0068(r31)",
+            "0x021d8664 = li r0, $skill2",
+            "0x021d8668 = sth r0, 0x006a(r31)",
+            "0x021d866c = li r0, $skill3",
+            "0x021d8670 = sth r0, 0x006c(r31)",
+            "0x021d8674 = b 0x021d86b4",
+        ):
+            self.assertIn(instruction, patch)
+
+        # Keep the original finalizer's state-mirroring loop untouched.
+        for address in range(0x021D8740, 0x021D8768, 4):
+            self.assertNotIn(f"0x{address:08x} =", patch.lower())
 
     def test_3ds_cheat_conversion_matrix_covers_the_live_source_without_silent_drops(self):
         matrix = json.loads(

@@ -1,4 +1,42 @@
-# Runtime feedback correction / 实测反馈修正（2026-08-05）
+# Runtime feedback correction / 实测反馈修正（2026-08-06，0.1.19）
+
+## Root-cause result / 根因结论
+
+1. **猫饭技能自定义 / Custom Felyne Food Skills:** the source ID is correct (`0x41 = 招财猫的厄运 / Unlucky Cat`), but the old patch replaced only the downstream mirror loop at `0x021D8740..0x021D8764`. Native temporary slots `r31 + 0x68/0x6A/0x6C` could therefore remain random and diverge from later meal processing/display. The corrected patch writes those three source slots after generator call `0x021D8658`, branches to native post-processing at `0x021D86B4`, and preserves the complete native menu/runtime mirror loop. This is a static/data-flow correction and still requires a real meal retest.
+2. **#13/#21/#34/#50/#60:** re-disassembly with the correct RPX `.text` base `0x02000020` confirmed their effect IDs, call sites, branch consumers, and declared preimages. No replacement-address defect was found. The saved test profile enabled almost every static pack, including #65; #65 forces the normal-mode generic skill-slot comparison true and prevents a clean on/off comparison for these skill-based effects. #59 independently masks #60's collection timing.
+
+猫饭源编号无误（`0x41 = 招财猫的厄运`），问题在首版补丁的数据流：只改最终镜像循环，没有先统一原生临时源槽。修正版改为写入 `r31 + 0x68/0x6A/0x6C`，再交回原生后处理和最终镜像循环。五个静态包没有发现地址或 PPC 指令错误；之前几乎全开的配置中，#65 会让通用技能查询恒真，#59 还会单独掩盖 #60，因此该次结果不能判定这五项不生效。
+
+## Isolated retest / 隔离复测
+
+Every comparison starts with all other static packs disabled. In particular, disable #65 for #13/#21/#34/#50/#60 and also disable #59 for #60. Keep the FPS cap identical between baseline and enabled runs.
+
+每项都必须在其余静态包关闭的条件下单独对照；#13/#21/#34/#50/#60 一律关闭 #65，#60 还要关闭 #59。基线与启用后的 FPS 设置必须完全相同。
+
+| Target / 项目 | Required comparison / 必须对照方式 |
+| --- | --- |
+| #13 水下速度 2 倍 | Same underwater route, action, start/end points, and FPS; record elapsed time rather than visual impression. / 固定同一路线、动作、起终点和 FPS，记录耗时。 |
+| #21 回避距离 UP | Same weapon, flat start point, camera/direction, and one full roll; compare endpoints. / 固定武器、平地起点、镜头方向，比较一次完整翻滚终点。 |
+| #34 防御强化 | Shielded weapon against a normally unblockable attack; an ordinary block proves nothing. / 用带盾武器格挡原本不可防御的攻击；普通攻击无验证价值。 |
+| #50 弩无摇晃 | Bowgun with built-in left/right deviation, same ammo and long-range target; this is deviation, not #49 recoil. / 使用自带左右偏移的弩、相同弹药和远距离目标；该项不是 #49 后坐力。 |
+| #60 高速收集 | Only #60 enabled, #59/#65 disabled; time a complete cycle at the same gathering point. / 只启用 #60，关闭 #59/#65，对同一采集点完整循环计时。 |
+| 猫饭 / Felyne | Enable the pack, select `41/00/00`, fully restart/reload the title, eat a new meal, then check the post-meal result for `招财猫的厄运`; pre-meal preview may remain random. / 启用包并选 `41/00/00`，完整重启或重载标题后重新吃饭，用餐后核对“招财猫的厄运”；餐前预览仍可能随机。 |
+
+## 2026-08-06 static and install gates / 静态与安装门禁
+
+1. `pytest tests/ -q` passes **29/29** tests; `validate` accepts all **50** manifests.
+2. The pinned JP-v96 RPX SHA-256 is `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`; every declared preimage and anchor passes against that immutable file.
+3. Cemu's real `PPCAssembler` accepts the corrected seven-instruction Felyne block. With defaults `06/36/00`, the words are `38000006`, `B01F0068`, `38000036`, `B01F006A`, `38000000`, `B01F006C`, and `48000040`; the three selectors use `U32_MASKED_IMM` relocations and the final branch uses `BRANCH_S26`.
+4. Ruff and `git diff --check` pass.
+5. With no Cemu process running, the installer refreshes exactly **47 available packs** at `/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/mh-cemu-enhancements`; all 47 installed tree hashes match their repository sources.
+6. The receipt binds the install to the pinned RPX. `settings.xml` remains valid XML and its SHA-256 stays `90aff50f44231d06ae33f799e1136a0929da394958547259864216e5b1947a3f`; saved enable states are not edited.
+7. Two independent `0.1.19` package builds are byte-identical; the final archive digest is stored in its adjacent `.sha256` sidecar.
+
+These gates prove static correction and installation integrity only. The five subtle effects and the corrected Felyne meal path remain `Runtime Experimental / Gameplay Pending` until the isolated gameplay tests above pass.
+
+以上门禁只证明静态修正与安装完整性。五个细微效果及修正版猫饭流程仍为 `Runtime Experimental / Gameplay Pending`，必须通过上面的隔离实测后才能升级结论。
+
+# Runtime feedback correction / 实测反馈修正（2026-08-05，0.1.18 历史记录）
 
 ## Confirmed defects / 已确认缺陷
 
