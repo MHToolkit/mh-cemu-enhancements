@@ -50,7 +50,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.22.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.23.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
@@ -78,7 +78,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 - 红蓝统一候选保留为源码历史，但现与其他任务箱实验一起标为 `runtime-blocked` 暂停；在拥有可复现的正确任务场景生命周期前，安装器不会选择它。
 - 猫饭技能自定义包提供三个互相独立的双语 `00..41` 下拉槽，包内默认组合为 `06/36/00`。修正版在随机生成结束后覆盖原生临时槽 `r31 + 0x68/0x6A/0x6C`，并保留游戏原生的菜单/任务状态最终镜像循环。Cemu 在标题加载时解析 Graphic Pack 参数；修改预设后必须重启或重新载入游戏，再重新吃饭。餐前预览仍可能显示原版随机技能，游戏原生互斥组合（已知例：`41 + 1E`）也可能只生效其中一项。该包默认关闭，状态为 `Runtime Experimental / Gameplay Pending`。
 - 当前共有 47 个可用 Cemu 叶子：30/44 FPS、大厅完整箱子、猫饭技能自定义，以及 `3DS Static Cheats` 下 43 个独立静态转换项。所有任务箱候选均作为不可安装的失败证据保留。
-- 43 个静态转换包均默认关闭并保持 `Runtime Experimental / Gameplay Pending`。#6 与 #72 共用会心路径且互斥；#56 为部分语义映射；#65 强制常规游戏模式的通用技能比较，测试风险最高。隔离复测 #13/#21/#34/#50/#60 时必须关闭 #65；复测 #60 时还必须关闭 #59。
+- 43 个静态转换包均默认关闭并保持 `Runtime Experimental / Gameplay Pending`。每个 Cemu 描述现都先讲真实游戏效果，再用中英双语列明作用边界、隔离验收方法与 3DS/PPC 来源状态，不再只显示“由 3DS ASM 转换”的样板说明。#6 与 #72 共用会心路径且互斥；#56 为部分语义映射；#65 强制常规游戏模式的通用技能比较，测试风险最高。隔离复测 #13/#21/#34/#50/#60 时必须关闭 #65；复测 #60 时还必须关闭 #59。2026-08-07 本机实测已确认 #13 0.1.22 不再只是动画加速，水下实际位移也明显翻倍；皮皮鸟独立复测仍待回报，因此暂时保持实验状态。
 - 联机时关闭全部道具箱修改包；30 FPS 包在稳定性结论出来前也不作为联机推荐。
 - 不得对不同 Title ID、地区、更新、RPX hash 或 module checksum 使用本 JP v96 目录。
 

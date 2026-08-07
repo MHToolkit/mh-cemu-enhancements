@@ -1,14 +1,20 @@
 # #13 ordinary-swim final-integration candidate / #13 普通游泳最终积分候选（2026-08-07，0.1.22）
 
+## Preliminary gameplay pass / 本机初步实机通过（2026-08-07）
+
+After installing 0.1.22 and comparing it again in game, the user reported that underwater movement now shows an unmistakable speed increase and that actual coordinate travel—not only the animation—visibly doubles. This is the first positive runtime evidence for the corrected state-9 final integrations. The same isolated pack was sent to Pipi for an independent retest with fixed FPS, weapon, stick magnitude, camera, action, and route. That independent result and the requested three-run median transcript are still pending, so #13 remains default-off `Runtime Experimental` rather than being promoted prematurely.
+
+安装 0.1.22 后，用户再次进行游戏内对照并反馈：水下移动速度已经明显加快，**实际坐标位移而非只有动画**也能清楚看出翻倍。这是状态 9 最终积分修正后的首份正向运行时证据。同一单项包已经通过 QQ 发给皮皮鸟，要求在固定 FPS、武器、摇杆幅度、镜头、动作与路线的条件下独立复测。皮皮鸟结果以及每组至少三次的中位数记录仍待回报，因此 #13 继续默认关闭并保持 `Runtime Experimental`，暂不提前升级状态。
+
 ## Superseding runtime verdict / 覆盖性实测结论
 
 The 0.1.21 candidate did **not** pass gameplay acceptance. Cemu log evidence confirms that the isolated profile loaded JP-v96 module checksum `0x348600a0`, updated RPX hash `8cb62099`, and the exact installed #13 pack. The user still observed faster action presentation without a clear increase in actual ordinary-swim route displacement. This is therefore a patch-logic failure, not an installation/configuration failure.
 
 0.1.21 候选**没有通过实机验收**。Cemu 日志已确认隔离配置载入 JP-v96 模块校验值 `0x348600a0`、更新后 RPX hash `8cb62099` 与当时精确安装的 #13 包；用户仍只观察到动作表现变快，普通游泳路线的实际位移没有明显提升。因此这是补丁逻辑问题，不是安装或配置问题。
 
-Current 0.1.22 remains a new **Runtime Experimental / Gameplay Pending** candidate. None of the static evidence below is a claim that underwater travel is already 2x.
+Before the positive user retest above, 0.1.22 was a new **Runtime Experimental / Gameplay Pending** candidate. The static evidence below alone was not a claim that underwater travel was already 2x.
 
-当前 0.1.22 仍只是新的 **Runtime Experimental / Gameplay Pending** 候选。以下静态证据均不等于“实际水下位移已经达到 2 倍”。
+在上述用户正向复测之前，0.1.22 仍只是新的 **Runtime Experimental / Gameplay Pending** 候选；以下静态证据本身并不等于“实际水下位移已经达到 2 倍”。
 
 ## RCA and narrow correction / 根因与窄范围修正
 
@@ -37,9 +43,9 @@ Current 0.1.22 remains a new **Runtime Experimental / Gameplay Pending** candida
 6. The isolated `settings.xml` SHA-256 remains `229e0e06225027d07b2e1077596011445cb5f477d85835c7cfbb98631b8506ac`; no save/MLC path was modified, and no Cemu process was launched by this verification.
 7. Two independent 0.1.22 package builds are byte-identical. Final archive SHA-256 is `379d386bd726f0fbab907ec25557da2b2c579fd571e13619bc07bedca065f3b3` and is recorded in `dist/mh-cemu-enhancements-0.1.22.zip.sha256`.
 
-These gates prove exact-binary targeting, assembler validity, narrow state-9 coverage, deterministic packaging, and installation integrity only. They do not prove that actual underwater travel is now 2x; the pack remains **Runtime Experimental / Gameplay Pending** until the timed gameplay comparison passes.
+These gates prove exact-binary targeting, assembler validity, narrow state-9 coverage, deterministic packaging, and installation integrity only. The later user report above adds preliminary gameplay evidence that actual travel visibly doubles, but the pack remains **Runtime Experimental / Gameplay Pending** until the fixed-route three-run median and independent retest are recorded.
 
-以上门禁只证明目标二进制、汇编器编码、状态 9 窄范围覆盖、确定性打包与安装完整性，**不证明实际水下路程已经达到 2 倍**。只有计时实测通过后，才能升级运行时结论。
+以上门禁只证明目标二进制、汇编器编码、状态 9 窄范围覆盖、确定性打包与安装完整性。后续用户反馈补充了“实际位移明显翻倍”的初步实机证据，但在固定路线三次中位数和独立复测记录齐全前，仍保持 **Runtime Experimental / Gameplay Pending**。
 
 # Runtime feedback correction / 实测反馈修正（2026-08-06，0.1.19）
 

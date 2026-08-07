@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 53 砥石高速化 - Speed Sharpening
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/53 砥石高速化 - Speed Sharpening
-description = 中文：3DS 静态 ARM #53 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Wii U PPC conversion of 3DS static ARM cheat #53; Disabled by default; Runtime Experimental and requires gameplay verification.  Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts.
+description = 中文：效果：强制发动砥石使用高速化，减少磨刀所需的重复动作并更快恢复操作。边界：不改变一次磨刀恢复的斩味量，也不阻止之后继续掉斩味（#5 才是锋利度不减）。验证：让同一武器掉到相同斩味后使用同一种砥石，计时到恢复可操作。来源/状态：由 3DS 静态 ARM #53 转换；默认关闭；Runtime Experimental，需实机验证。 / English: Effect: forces Speed Sharpening, reducing repeated whetstone motions and returning control sooner. Scope: it does not change how much sharpness one whetstone restores or prevent later sharpness loss (#5 does that). Verify: lower the same weapon to the same sharpness, use the same whetstone, and time until control returns. Source/status: converted from 3DS static ARM cheat #53; Disabled by default; Runtime Experimental and requires gameplay verification.
 version = 7

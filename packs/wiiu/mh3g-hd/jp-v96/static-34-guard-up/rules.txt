@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 34 防御强化 - Guard Up
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/34 防御强化 - Guard Up
-description = 中文：3DS 静态 ARM #34 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。对照时只启用本项并关闭 #65；只允许带盾武器格挡原本不可防御的攻击，普通可防御攻击无法验证。 / English: Wii U PPC conversion of 3DS static ARM cheat #34; Disabled by default; Runtime Experimental and requires gameplay verification. For an isolated comparison, enable only this pack and disable #65; it only lets shielded weapons guard normally unblockable attacks, so ordinary blockable attacks cannot validate it.
+description = 中文：效果：强制发动防御强化/Guard Up，使带盾武器能够格挡原本明确不可防御的攻击。边界：不会降低普通格挡的耐力、削血或后退，那属于 #33 防御性能 +2；用普通可防御攻击无法证明本项生效。验证：只启用本项并关闭 #65，用同一带盾武器对同一不可防御攻击做开关对照。来源/状态：由 3DS 静态 ARM #34 转换；默认关闭；Runtime Experimental，需实机验证。 / English: Effect: forces Guard Up, allowing shielded weapons to block attacks that are explicitly normally unblockable. Scope: it does not reduce ordinary block stamina, chip damage, or pushback—that is #33 Guard +2—and a normally blockable attack cannot validate this pack. Verify: enable only this pack, disable #65, and use the same shielded weapon against the same normally unblockable attack in an off/on comparison. Source/status: converted from 3DS static ARM cheat #34; Disabled by default; Runtime Experimental and requires gameplay verification.
 version = 7

@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 35 燃鳞 - Flaming Aura
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/35 燃鳞 - Flaming Aura
-description = 中文：3DS 静态 ARM #35 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。主要改变同区域小型怪物行为，不是面板数值或大型怪物可见光效。 / English: Wii U PPC conversion of 3DS static ARM cheat #35; Disabled by default; Runtime Experimental and requires gameplay verification. Mainly changes small-monster behavior in the same area, not a status-screen value or visible aura on large monsters.
+description = 中文：效果：强制发动“燃鳞/Flame Aura”，让怪物 AI 把猎人视为正在携带火把，并按各自的火把反应改变行为。边界：它不是伤害光环，不会给大型怪物附加燃烧特效，也不是面板数值；不同小怪可能靠近、警戒或逃离，不能只看一种行为。验证：在同一地区选择原本会对火把作出明显反应的小型怪物，对比其接近、回避和攻击节奏。来源/状态：由 3DS 静态 ARM #35 转换；默认关闭；Runtime Experimental，需实机验证。 / English: Effect: forces Flame Aura, making monster AI react to the hunter as though a Torch were being carried. Scope: it is not a damage aura, does not add a visible burn effect to large monsters, and is not a status-screen number; different small monsters may approach, become alert, or flee rather than sharing one response. Verify: use the same area and a small-monster species with a clear native Torch reaction, then compare approach, avoidance, and attack behavior. Source/status: converted from 3DS static ARM cheat #35; Disabled by default; Runtime Experimental and requires gameplay verification.
 version = 7

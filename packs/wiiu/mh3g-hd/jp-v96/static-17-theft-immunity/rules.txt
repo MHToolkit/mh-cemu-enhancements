@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 17 偷盗无效 - Theft Immunity
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/17 偷盗无效 - Theft Immunity
-description = 中文：3DS 静态 ARM #17 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Wii U PPC conversion of 3DS static ARM cheat #17; Disabled by default; Runtime Experimental and requires gameplay verification.  Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts.
+description = 中文：效果：强制发动偷盗无效，阻止具备偷盗行为的怪物从猎人道具袋中拿走物品。边界：只拦截物品被偷，不阻止该攻击造成的伤害、硬直或其他异常，也不会返还启用前已经丢失的物品。验证：携带可被偷物品，让梅拉露等偷盗怪成功命中并检查道具数量。来源/状态：由 3DS 静态 ARM #17 转换；默认关闭；Runtime Experimental，需实机验证。 / English: Effect: forces Anti-Theft so theft-capable monsters cannot remove items from the hunter's pouch. Scope: it blocks item loss only, not damage, flinch, or other effects from the same attack, and it cannot restore items stolen before enabling. Verify: carry stealable items, allow a Melynx or another theft-capable monster to land its theft action, and compare pouch counts. Source/status: converted from 3DS static ARM cheat #17; Disabled by default; Runtime Experimental and requires gameplay verification.
 version = 7

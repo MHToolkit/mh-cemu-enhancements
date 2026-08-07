@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 44 风压（大）无效 - Windproof (High)
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/44 风压（大）无效 - Windproof (High)
-description = 中文：3DS 静态 ARM #44 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。覆盖普通大风压判定；煌黑龙等特殊或脚本化吹飞可能绕过该判定。 / English: Wii U PPC conversion of 3DS static ARM cheat #44; Disabled by default; Runtime Experimental and requires gameplay verification. Covers ordinary high wind pressure; special or scripted knockback such as Alatreon's may bypass those checks.
+description = 中文：效果：强制发动风压（大）无效，跳过原生普通小/大风压造成的踉跄和失控。边界：煌黑龙等特殊或脚本化吹倒可能绕过这些普通风压检查；它也不处理吼叫、地震或直接攻击击退。验证：先用明确的普通大风压攻击做开关对照，不要把煌黑龙特殊吹倒作为唯一判据。来源/状态：由 3DS 静态 ARM #44 转换；默认关闭；Runtime Experimental，需实机验证。 / English: Effect: forces Windproof (High), bypassing the stagger and control loss from native ordinary low/high wind-pressure checks. Scope: special or scripted blowdowns such as Alatreon's may bypass those checks, and this does not cover roars, tremors, or direct-attack knockback. Verify: first compare a known ordinary high-wind-pressure attack with the pack off and on rather than using Alatreon's special blowdown as the sole test. Source/status: converted from 3DS static ARM cheat #44; Disabled by default; Runtime Experimental and requires gameplay verification.
 version = 7

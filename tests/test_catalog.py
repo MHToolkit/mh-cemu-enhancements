@@ -136,6 +136,23 @@ class CatalogTests(unittest.TestCase):
             self.assertIn("中文", patch)
             self.assertIn("English", patch)
 
+            description = next(
+                line for line in rules.splitlines() if line.startswith("description = ")
+            )
+            self.assertTrue(description.startswith("description = 中文：效果："))
+            for required_heading in (
+                "边界：",
+                "验证：",
+                "来源/状态：",
+                "/ English: Effect:",
+                "Scope:",
+                "Verify:",
+                "Source/status:",
+            ):
+                self.assertIn(required_heading, description)
+            self.assertGreaterEqual(len(description), 500)
+            self.assertNotIn("PPC 编译器复制/合并的路径数量", description)
+
     def test_static_arm_conversions_can_be_explicitly_installed_with_44_fps(self):
         result = self.tool.validate_repository(REPO)
         selected_ids = ["mh3g-hd-jp-v96-fps-lock-44"] + [

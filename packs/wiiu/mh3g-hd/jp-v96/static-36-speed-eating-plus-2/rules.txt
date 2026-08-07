@@ -2,5 +2,5 @@
 titleIds = 0005000010104D00
 name = 36 速食者 +2 - Speed Eating +2
 path = MH Cemu Enhancements/MH3G HD JP v96/3DS Static Cheats/36 速食者 +2 - Speed Eating +2
-description = 中文：3DS 静态 ARM #36 的 Wii U PPC 转换；默认关闭；Runtime Experimental，需实机验证。 通过强制 JP v96 中该效果 ID 的全部直接检查来激活语义；PPC 编译器复制/合并的路径数量与 3DS ARM 不完全相同，需要实机逐场景验证。 / English: Wii U PPC conversion of 3DS static ARM cheat #36; Disabled by default; Runtime Experimental and requires gameplay verification.  Activates the semantic effect by forcing every direct JP-v96 check for its effect ID; PPC compiler duplication/consolidation differs from the 3DS ARM build and requires gameplay verification across contexts.
+description = 中文：效果：强制发动速食者 +2，明显缩短肉、药、饮料等受支持消耗品的入口与吞咽动画。边界：不会加快采集、剥取、砥石、放置或收刀，也不会提高道具回复量。验证：固定同一种药和同一种肉，从按下使用到恢复可操作分别计时。来源/状态：由 3DS 静态 ARM #36 转换；默认关闭；Runtime Experimental，需实机验证。 / English: Effect: forces Speed Eating +2, substantially shortening the use/swallow animation for supported meat, medicine, and drink items. Scope: it does not speed gathering, carving, whetstones, placement, or sheathing, and does not increase item potency. Verify: time from use-button press to regained control for the same medicine and the same meat with the pack off and on. Source/status: converted from 3DS static ARM cheat #36; Disabled by default; Runtime Experimental and requires gameplay verification.
 version = 7
