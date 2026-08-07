@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #12 carry-item cap candidate return",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在已知道具触发携带上限读取时，验证 0x0203A284 返回的 r3 是 0x14 字节道具记录，且 r3+3 是 8 位携带上限。只做一次性取证，不修改返回值。",
+  "purpose_en": "On a controlled carry-cap lookup for a known item, prove that 0x0203A284 returns a 0x14-byte item record in r3 and that r3+3 is its 8-bit carry cap. This is one-shot evidence only and does not alter the return value.",
+  "operator_steps_zh": [
+    "让角色停在不会持续刷新道具列表的稳定场景，并记下准备查看或移动的已知道具及其原版携带上限。",
+    "运行 tracer 后立即执行一次该道具的列表查看、背包移动或数量确认动作。",
+    "保存 JSONL；只有命中来源动作、r3 非零、记录 +3 与已知上限一致时才可把该候选升级为 ppc-mapped。"
+  ],
+  "operator_steps_en": [
+    "Park in a stable scene that does not continuously refresh item lists and note a known item plus its native carry cap.",
+    "After starting the tracer, immediately perform one list-view, pouch-transfer, or quantity-confirm action for that item.",
+    "Keep the JSONL; promote the candidate to ppc-mapped only when the hit comes from that action, r3 is nonzero, and record byte +3 matches the known cap."
+  ],
+  "breakpoints": [
+    {
+      "label": "item_record_getter_return",
+      "address": "0x0203a2a0",
+      "expected_word": "0x4e800020"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "returned_item_record",
+      "register": "r3",
+      "offset": 0,
+      "size": 20
+    }
+  ]
+}

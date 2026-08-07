@@ -19,7 +19,7 @@ It distributes no RPX, RPL, WUA, save, MLC, key, texture dump, or other game ass
 
 Target identity: Wii U title `0005000010104D00`, Japan update v96, RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`, Cemu patch module checksum `0x348600a0`.
 
-`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable. Repeated quest-box tests remained unusable; the blue bridge also blanked quest-board dialogue. All quest-box experiments are therefore paused and blocked from installation. The active 3DS cheat source was fully inventoried: 44 FPS has a native Cemu control conversion, and 43 static ARM entries were mapped from the hash-matching 3DS `.code` to independent JP-v96 PPC experimental packs with 179 fixed-address writes. A separately supplied 3DS Felyne-food cheat was semantically mapped to the native JP-v96 meal finalizer and exposed as three complete bilingual `00..41` selectors; it remains Gameplay Pending. Other dynamic pointer, hotkey, and injected-routine entries remain independent-mapping work.
+`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable. Repeated quest-box tests remained unusable; the blue bridge also blanked quest-board dialogue. All quest-box experiments are therefore paused and blocked from installation. The active 3DS cheat source was fully inventoried: 44 FPS has a native Cemu control conversion, and 43 static ARM entries were mapped from the hash-matching 3DS `.code` to independent JP-v96 PPC experimental packs with 179 fixed-address writes. A separately supplied 3DS Felyne-food cheat was semantically mapped to the native JP-v96 meal finalizer and exposed as three complete bilingual `00..41` selectors; it remains Gameplay Pending. The remaining dynamic set is now pinned to exactly 21 source-decoded entries (10 runtime pointers, 6 hotkey routines, and 5 ARM code caves) with fail-closed PPC/GDB trace batches; none is presented as an installable pack before its target mapping and runtime trace exist.
 
 ## Validate and install
 
@@ -89,6 +89,7 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 - [MH3G HD JP v96 PPC ledger](docs/research/mh3g-hd-jp-v96.md)
 - [Complete 3DS-to-Cemu cheat conversion matrix](docs/research/mh3g-3ds-cheat-conversion.md)
 - [43 static ARM-to-PPC mappings and pack IDs](docs/research/mh3g-static-arm-mapping.md)
+- [21 dynamic PPC/GDB mapping entries and probe batches](docs/research/mh3g-dynamic-ppc-mapping.md)
 - [Pack manifest schema](schemas/pack-manifest.schema.json)
 
 The per-pack `patch_*.asm` syntax and `[Control] vsyncFrequency` behavior are based on the Cemu Graphic Pack parser. The user-supplied Bilibili page was not relied upon: its short links were unavailable, and all mappings here are backed by the local 3DS ARM semantic evidence plus Wii U PPC/static-resource analysis.

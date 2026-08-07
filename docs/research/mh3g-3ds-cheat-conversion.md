@@ -31,6 +31,8 @@ This matrix inventories all 73 entries in the active 3DS Gateway/Citra cheat fil
 ## 尚未实现项的边界 / Remaining Boundaries
 
 - `requires-ppc-mapping`：动态指针、热键、注入例程或运行时内存布局不能从 3DS ARM 地址直接照搬到 Wii U PPC，仍需独立定位。
+- 该集合现已收敛为精确 21 项（10 个运行时指针、6 个热键例程、5 个 ARM code-cave）；逐项源语义、PPC/GDB 批次和升级门槛见 [mh3g-dynamic-ppc-mapping.md](mh3g-dynamic-ppc-mapping.md)。21 项源语义均已解码，#8/#12 已取得静态 PPC 候选但尚未完成 GDB 取证；当前没有创建任何动态项 pack。
+- The remaining set is now pinned to exactly 21 entries (10 runtime pointers, 6 hotkey routines, and 5 ARM code caves). See [mh3g-dynamic-ppc-mapping.md](mh3g-dynamic-ppc-mapping.md) for decoded source semantics, PPC/GDB batches, and promotion gates. All 21 source programs are decoded; #8 and #12 have static PPC candidates but still lack GDB evidence, and no dynamic-entry pack exists yet.
 - `not-supported`：Cemu Graphic Pack 没有对应的逐标题原生控制项（本例为关闭 dithering）。
 - `not-applicable`：Wii U/Cemu 没有 3DS 裸眼 3D，对应功能天然无需实现。
 - 60 FPS 条目按用户要求排除；重复条目不重复建包。

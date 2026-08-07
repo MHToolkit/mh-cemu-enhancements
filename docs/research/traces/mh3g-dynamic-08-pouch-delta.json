@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #8 item-pouch decrement candidate entry",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在玩家正常消耗一件背包道具时，验证候选数量变更函数入口的 r4 为道具 ID、r5 为 0xFFFFFFFF（-1）、r6 为 4 字节槽数组、r7 为槽数。只记录，不改寄存器或内存。",
+  "purpose_en": "During one normal pouch-item consumption, prove that the candidate mutator receives item ID in r4, 0xFFFFFFFF (-1) in r5, a four-byte slot array in r6, and its count in r7. Record only; do not alter registers or memory.",
+  "operator_steps_zh": [
+    "进入稳定任务场景，准备一个数量至少为 2、使用后会减少 1 的普通背包道具。",
+    "启动 tracer 后立即只使用一次该道具，不要同时整理、丢弃或领取其他物品。",
+    "只有 JSONL 的命中动作与本次使用一致、r5=0xFFFFFFFF，且 r6 快照包含该道具槽时，才把 delta 参数映射视为运行时成立。"
+  ],
+  "operator_steps_en": [
+    "Enter a stable quest scene with a normal pouch item whose quantity is at least two and decreases by one on use.",
+    "After starting the tracer, use that item exactly once without sorting, discarding, or receiving another item.",
+    "Treat the delta mapping as runtime-proven only when the JSONL hit corresponds to that action, r5 is 0xFFFFFFFF, and the r6 snapshot contains the item slot."
+  ],
+  "breakpoints": [
+    {
+      "label": "item_quantity_mutator_arguments",
+      "address": "0x0219b6f0",
+      "expected_word": "0x7cba2b78"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "item_slot_array",
+      "register": "r6",
+      "offset": 0,
+      "size": 128
+    }
+  ]
+}

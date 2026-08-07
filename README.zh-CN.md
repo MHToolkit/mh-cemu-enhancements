@@ -19,7 +19,7 @@
 
 适用身份：Wii U Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、Cemu patch module checksum `0x348600a0`。
 
-`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务箱多次实测仍不可用，蓝箱调度桥还会使任务看板对话框空白，因此所有任务箱实验现已暂停并阻止安装。活动 3DS 金手指已完整盘点：44 FPS 使用 Cemu 原生控制项；另有 43 条静态 ARM 项已根据哈希一致的 3DS `.code` 与 JP-v96 PPC 语义/前像映射为独立实验包，共 179 条 PPC 写入。另行提供的 3DS 猫饭金手指已按语义映射到 JP-v96 原生用餐结算函数，并提供三个完整双语 `00..41` 下拉槽；当前仍待实机验证。其他动态指针、热键与注入例程仍只记录为待独立映射。
+`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务箱多次实测仍不可用，蓝箱调度桥还会使任务看板对话框空白，因此所有任务箱实验现已暂停并阻止安装。活动 3DS 金手指已完整盘点：44 FPS 使用 Cemu 原生控制项；另有 43 条静态 ARM 项已根据哈希一致的 3DS `.code` 与 JP-v96 PPC 语义/前像映射为独立实验包，共 179 条 PPC 写入。另行提供的 3DS 猫饭金手指已按语义映射到 JP-v96 原生用餐结算函数，并提供三个完整双语 `00..41` 下拉槽；当前仍待实机验证。剩余动态集合现已精确收敛为 21 项（10 个运行时指针、6 个热键例程、5 个 ARM code-cave），全部已解码源语义并拆成 fail-closed PPC/GDB 取证批次；在目标映射和真实 trace 齐全前不会伪装成可安装 pack。
 
 ## 校验、安装、卸载、分发
 
@@ -89,6 +89,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 - [MH3G HD JP v96 PPC 静态证据账本](docs/research/mh3g-hd-jp-v96.md)
 - [完整 3DS → Cemu 金手指转换矩阵](docs/research/mh3g-3ds-cheat-conversion.md)
 - [43 项静态 ARM → PPC 映射与包 ID 清单](docs/research/mh3g-static-arm-mapping.md)
+- [21 项动态 PPC/GDB 映射与取证批次](docs/research/mh3g-dynamic-ppc-mapping.md)
 - [pack manifest schema](schemas/pack-manifest.schema.json)
 
 用户给出的 Bilibili 页面没有作为实现证据：其中 b23 短链不可用。本目录只依据本机 3DS ARM 语义对照、Wii U PPC/静态资源分析，以及 Cemu Graphic Pack parser 的规则实现。
