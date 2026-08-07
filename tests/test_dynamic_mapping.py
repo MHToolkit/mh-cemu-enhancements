@@ -48,11 +48,11 @@ class DynamicMappingTests(unittest.TestCase):
             dict(Counter(row["source_mechanism"] for row in rows)),
         )
         self.assertEqual(
-            {"source-decoded": 19, "ppc-candidate": 2, "ppc-mapped": 0},
+            {"source-decoded": 16, "ppc-candidate": 5, "ppc-mapped": 0},
             self.dynamic["summary"]["mapping_counts"],
         )
         self.assertEqual(
-            {"source-decoded": 19, "ppc-candidate": 2},
+            {"source-decoded": 16, "ppc-candidate": 5},
             dict(Counter(row["mapping_state"] for row in rows)),
         )
         batches = {batch["id"]: batch for batch in self.dynamic["probe_batches"]}
@@ -91,7 +91,7 @@ class DynamicMappingTests(unittest.TestCase):
         candidates = [
             row for row in self.dynamic["entries"] if row["mapping_state"] == "ppc-candidate"
         ]
-        self.assertEqual([8, 12], [row["source_index"] for row in candidates])
+        self.assertEqual([8, 12, 19, 20, 62], [row["source_index"] for row in candidates])
 
         for row in candidates:
             with self.subTest(source_index=row["source_index"]):
@@ -123,6 +123,20 @@ class DynamicMappingTests(unittest.TestCase):
         item_cap = candidates[1]["ppc_candidate"]
         self.assertEqual(20, item_cap["item_record_size"])
         self.assertEqual(3, item_cap["carry_cap_offset"])
+        attack = candidates[2]["ppc_candidate"]
+        self.assertEqual("0x0286769c", attack["derived_attack_load"])
+        self.assertEqual("0xa14906e8", attack["derived_attack_load_preimage"])
+        self.assertEqual("0x06e8", attack["attack_offset"])
+        self.assertEqual(700, attack["native_cap"])
+        defense = candidates[3]["ppc_candidate"]
+        self.assertEqual("0x02867d14", defense["derived_defense_load"])
+        self.assertEqual("0xa00a06ea", defense["derived_defense_load_preimage"])
+        self.assertEqual("0x06ea", defense["defense_offset"])
+        oxygen = candidates[4]["ppc_candidate"]
+        self.assertEqual("0x02863f0c", oxygen["delta_capture"])
+        self.assertEqual("0xa96a065c", oxygen["delta_capture_preimage"])
+        self.assertEqual("0x065c", oxygen["current_oxygen_offset"])
+        self.assertEqual("0x065e", oxygen["maximum_oxygen_offset"])
 
     def test_dynamic_target_is_the_same_fail_closed_jp_v96_identity(self):
         target = self.dynamic["target"]

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #62 oxygen-delta candidate update",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "角色已进入水下后，验证 0x02863EEC 是氧气 delta 更新函数、r4 为自然耗氧的负 delta、r10+0x65C 为当前氧气且 +0x65E 为上限。只记录，不修改寄存器或内存。",
+  "purpose_en": "After the hunter is already underwater, prove that 0x02863EEC is the oxygen-delta updater, r4 is the negative natural-drain delta, r10+0x65C is current oxygen, and +0x65E is its cap. Record only; do not alter registers or memory.",
+  "operator_steps_zh": [
+    "先进入有水下区域的稳定任务并让角色完全入水，再启动 tracer；不要在岸上或任务加载阶段下断点。",
+    "启动后保持自然游动或静止等待一次氧气下降，不使用补氧道具、不出水、不触发任务切换。",
+    "只有 JSONL 命中与自然耗氧时刻一致、r4 是负 delta，且 r10+0x65C 当前值不高于 +0x65E 上限时，才把该候选升级为 ppc-mapped。"
+  ],
+  "operator_steps_en": [
+    "Enter a stable quest with an underwater area and fully submerge before starting the tracer; do not arm it on land or during quest loading.",
+    "After starting, swim normally or wait for one natural oxygen decrease without using oxygen items, leaving the water, or transitioning the quest.",
+    "Promote the candidate to ppc-mapped only when the JSONL hit coincides with natural drain, r4 is a negative delta, and current oxygen at r10+0x65C does not exceed the cap at +0x65E."
+  ],
+  "breakpoints": [
+    {
+      "label": "oxygen_delta_before_add",
+      "address": "0x02863f0c",
+      "expected_word": "0xa96a065c"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_oxygen_fields",
+      "register": "r10",
+      "offset": 1600,
+      "size": 64
+    }
+  ]
+}

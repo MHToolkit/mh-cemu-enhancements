@@ -25,6 +25,7 @@ HEX_RE = re.compile(r"^[0-9A-Fa-f]+$")
 PPC_GPR_COUNT = 32
 PPC_PC_REGISTER = 64
 PPC_LR_REGISTER = 67
+CEMU_GDB_SETTLE_SECONDS = 1.0
 
 
 class ProbeError(RuntimeError):
@@ -71,7 +72,19 @@ def decode_packet(packet: bytes) -> str:
         raise ProbeError(
             f"GDB checksum mismatch: expected {expected:02x}, observed {observed:02x}"
         )
-    return payload.decode("ascii")
+    decoded = bytearray()
+    escaped = False
+    for byte in payload:
+        if escaped:
+            decoded.append(byte ^ 0x20)
+            escaped = False
+        elif byte == ord("}"):
+            escaped = True
+        else:
+            decoded.append(byte)
+    if escaped:
+        raise ProbeError("malformed trailing GDB escape")
+    return decoded.decode("ascii")
 
 
 @dataclass(frozen=True)
@@ -258,7 +271,16 @@ class RSPClient:
                 self.sock.sendall(b"-")
                 raise
             self.sock.sendall(b"+")
-            if payload.startswith("O") and len(payload) > 1:
+            # RSP console-output packets are ``O`` followed by hex-encoded
+            # bytes.  Do not confuse the ordinary command response ``OK`` for
+            # console output, or every successful Cemu command will time out.
+            console_hex = payload[1:]
+            if (
+                payload.startswith("O")
+                and len(console_hex) % 2 == 0
+                and bool(console_hex)
+                and HEX_RE.fullmatch(console_hex) is not None
+            ):
                 continue
             return payload
 
@@ -287,7 +309,10 @@ class RSPClient:
         response = self.request(f"p{register:x}")
         if not response or not HEX_RE.fullmatch(response):
             raise ProbeError(f"invalid register r{register} response: {response!r}")
-        return int.from_bytes(bytes.fromhex(response), "big")
+        # Cemu serializes GPRs and LR in host-swapped byte order, while PC and
+        # the remaining special registers use normal big-endian RSP order.
+        byteorder = "little" if register < PPC_GPR_COUNT or register == PPC_LR_REGISTER else "big"
+        return int.from_bytes(bytes.fromhex(response), byteorder)
 
 
 def _select_thread(client: RSPClient, stop: str) -> str:
@@ -296,6 +321,20 @@ def _select_thread(client: RSPClient, stop: str) -> str:
     client.request(f"Hg{thread}")
     client.request("Hc-1")
     return thread
+
+
+def _select_default_threads(client: RSPClient) -> None:
+    """Select Cemu's default register thread and all continue threads.
+
+    Cemu 2.6 accepts ``Hg0`` while the emulated title is running.  Selecting
+    the concrete thread reported by ``?`` is not equivalent: that thread is a
+    status hint rather than a guaranteed stopped-thread context and can leave
+    the stub waiting forever.  Concrete IDs are selected only after a real
+    breakpoint stop.
+    """
+
+    client.request("Hg0")
+    client.request("Hc-1")
 
 
 def _snapshot(client: RSPClient, spec: TraceSpec) -> dict[str, Any]:
@@ -364,13 +403,25 @@ def run_trace(
     active: dict[int, Breakpoint] = {}
     paused = False
     try:
-        try:
-            stop = client.receive(0.3)
-        except (TimeoutError, socket.timeout):
-            client.interrupt()
-            stop = client.receive(5.0)
-        paused = True
-        thread = _select_thread(client, stop)
+        # Cemu 2.6 does not send an unsolicited stop packet when a client
+        # attaches.  Querying '?' is its non-blocking session handshake; it
+        # returns a default-thread status without pausing the title.  Do not
+        # send Ctrl-C here: doing so turns a read-only attach into a disruptive
+        # pause and selecting that status thread with Hg<tid> can deadlock.
+        time.sleep(CEMU_GDB_SETTLE_SECONDS)
+        stop = client.request("?")
+        match = STOP_THREAD_RE.search(stop)
+        thread = match.group(1) if match else "0"
+        emit(
+            "status",
+            trace=spec.name,
+            target=spec.target,
+            thread=thread,
+            stop=stop,
+            target_running=True,
+        )
+        _select_default_threads(client)
+        emit("session_ready", register_thread="default", continue_threads="all")
 
         observed: dict[str, str] = {}
         for breakpoint in spec.breakpoints:
@@ -442,7 +493,9 @@ def run_trace(
                 client.interrupt()
                 stop = client.receive(5.0)
                 paused = True
-                thread = _select_thread(client, stop)
+                _select_default_threads(client)
+                match = STOP_THREAD_RE.search(stop)
+                thread = match.group(1) if match else "0"
                 emit("cleanup_interrupt", thread=thread, stop=stop)
             except BaseException as exc:
                 emit(

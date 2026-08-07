@@ -25,8 +25,8 @@
       "arm-code-cave": 5
     },
     "mapping_counts": {
-      "source-decoded": 19,
-      "ppc-candidate": 2,
+      "source-decoded": 16,
+      "ppc-candidate": 5,
       "ppc-mapped": 0
     },
     "mapping_state": "Source Decoded / PPC-GDB Pending",
@@ -226,11 +226,28 @@
       "source_semantics_zh": "替换攻击派生值的 16 位读取；临时例程读取基础值、乘 2，并写回原目标偏移。",
       "source_semantics_en": "Replace a 16-bit derived-attack load; the scratch routine reads the base value, doubles it, and writes it to the original target offset.",
       "probe_batch": "direct-native-hooks",
-      "target_strategy_zh": "在 PPC 状态面板/战斗攻击派生值更新函数中确认基础值和写回字段，做可选倍率且避免累乘。",
-      "target_strategy_en": "Prove the base and destination fields in the PPC status/combat attack derivation, then apply a selectable multiplier without compounding each update.",
-      "mapping_state": "source-decoded",
+      "target_strategy_zh": "静态交叉比对已定位 PPC 攻击派生函数 0x02867648：0x02867694 把 16 位攻击值写到玩家状态 +0x6E8，随后按原版上限 700 处理，并把显示浮点值写到 +0x6EC。先在 0x0286769C 捕获一次受控装备攻击变化，证明 r9 对象和两个字段，再设计从未倍率输入计算的窄 hook，避免反复累乘。",
+      "target_strategy_en": "Static cross-architecture matching found PPC attack-derivation function 0x02867648: 0x02867694 writes the 16-bit attack value to player-state +0x6E8, applies the native 700 cap, and stores the display float at +0x6EC. Capture one controlled equipment attack change at 0x0286769C to prove r9 and both fields before designing a narrow hook that starts from an unscaled input and cannot compound.",
+      "mapping_state": "ppc-candidate",
       "runtime_state": "not-traced",
-      "pack_state": "not-created"
+      "pack_state": "not-created",
+      "ppc_candidate": {
+        "function_entry": "0x02867648",
+        "function_entry_preimage": "0x7c0802a6",
+        "derived_attack_store": "0x02867694",
+        "derived_attack_store_preimage": "0xb07f06e8",
+        "derived_attack_load": "0x0286769c",
+        "derived_attack_load_preimage": "0xa14906e8",
+        "player_state_register": "r9",
+        "attack_offset": "0x06e8",
+        "display_float_offset": "0x06ec",
+        "native_cap": 700,
+        "trace_spec": "docs/research/traces/mh3g-dynamic-19-attack-derived.json",
+        "patch_constraint_zh": "不得直接每帧把 +0x6E8 再乘 2，也不得绕过原版 700 上限；在受控攻击变化证明基础输入、写回与显示值的关系前不创建 pack。",
+        "patch_constraint_en": "Never multiply +0x6E8 in place every frame or bypass the native 700 cap. Create no pack until a controlled attack change proves the relationship between the base input, writeback, and display value.",
+        "static_evidence_zh": "目标函数与 3DS 0x008EFFC0 的派生攻击路径对应：先计算并写入 16 位攻击字段，再与 700 比较，最后乘 0.01 写入相邻显示浮点字段；Wii U 玩家字段相对 3DS 布局整体后移 8 字节。",
+        "static_evidence_en": "The target function matches the 3DS 0x008EFFC0 derived-attack path: it computes and writes a 16-bit attack field, compares it with 700, then multiplies by 0.01 and stores an adjacent display float. The Wii U player fields are shifted by eight bytes from the 3DS layout."
+      }
     },
     {
       "source_index": 20,
@@ -241,11 +258,27 @@
       "source_semantics_zh": "与 #19 相同算法作用于防御派生值：读取 16 位基础值、乘 2、写回原目标偏移。",
       "source_semantics_en": "Apply the same algorithm as #19 to derived defense: read the 16-bit base, double it, and write the original destination.",
       "probe_batch": "direct-native-hooks",
-      "target_strategy_zh": "定位 PPC 防御派生值函数，确保补正来自未倍率基础值并保留原版最低值/上限逻辑。",
-      "target_strategy_en": "Locate the PPC defense derivation, ensure scaling starts from an unscaled base, and retain native floor/cap logic.",
-      "mapping_state": "source-decoded",
+      "target_strategy_zh": "静态交叉比对已定位 PPC 防御派生函数 0x02867CB4：0x02867D04 把 16 位防御值写到玩家状态 +0x6EA，随后保留原版最低值逻辑，并把显示浮点值写到 +0x6F0。先在 0x02867D14 捕获一次受控防具变化，证明 r10 对象和字段，再设计不累乘的窄 hook。",
+      "target_strategy_en": "Static cross-architecture matching found PPC defense-derivation function 0x02867CB4: 0x02867D04 writes the 16-bit defense value to player-state +0x6EA, retains the native minimum-value logic, and stores the display float at +0x6F0. Capture one controlled armor change at 0x02867D14 to prove r10 and the fields before designing a non-compounding narrow hook.",
+      "mapping_state": "ppc-candidate",
       "runtime_state": "not-traced",
-      "pack_state": "not-created"
+      "pack_state": "not-created",
+      "ppc_candidate": {
+        "function_entry": "0x02867cb4",
+        "function_entry_preimage": "0x7c0802a6",
+        "derived_defense_store": "0x02867d04",
+        "derived_defense_store_preimage": "0xb07f06ea",
+        "derived_defense_load": "0x02867d14",
+        "derived_defense_load_preimage": "0xa00a06ea",
+        "player_state_register": "r10",
+        "defense_offset": "0x06ea",
+        "display_float_offset": "0x06f0",
+        "trace_spec": "docs/research/traces/mh3g-dynamic-20-defense-derived.json",
+        "patch_constraint_zh": "不得直接每帧把 +0x6EA 再乘 2，也不得移除原版最低值处理；在受控防具变化证明基础输入、写回与显示值的关系前不创建 pack。",
+        "patch_constraint_en": "Never multiply +0x6EA in place every frame or remove the native minimum-value handling. Create no pack until a controlled armor change proves the relationship between the base input, writeback, and display value.",
+        "static_evidence_zh": "目标函数与 3DS 0x008E8E14 的派生防御路径对应：写入 16 位防御字段、执行最低值修正，再把换算后的浮点值写入相邻字段；其玩家布局同样相对 3DS 后移 8 字节。",
+        "static_evidence_en": "The target function matches the 3DS 0x008E8E14 derived-defense path: it writes the 16-bit defense field, applies the minimum-value correction, and stores the converted float in the adjacent field. Its player layout is likewise shifted by eight bytes from 3DS."
+      }
     },
     {
       "source_index": 23,
@@ -391,11 +424,30 @@
       "source_semantics_zh": "一处把氧气相关 +0x54 的读取改为写回，另一处调用临时例程把 +0x56 写为 150；两条原生更新路径都被覆盖。",
       "source_semantics_en": "Change one oxygen-related +0x54 load into a write and redirect another path through a scratch routine that writes 150 to +0x56, covering both native update paths.",
       "probe_batch": "direct-native-hooks",
-      "target_strategy_zh": "在 PPC 水下 HUD/玩家更新中同时定位当前氧气和上限 writer，钳制当前值但保留离水、任务初始化和 HUD 刷新。",
-      "target_strategy_en": "Locate both current-oxygen and maximum writers in PPC underwater HUD/player updates; clamp current oxygen while preserving exit-water, quest initialization, and HUD refresh.",
-      "mapping_state": "source-decoded",
+      "target_strategy_zh": "静态交叉比对已定位 PPC 氧气增减函数 0x02863EEC：r4 是有符号 delta，r10+0x65C 为当前氧气，r10+0x65E 为上限，0x02863F20 写回当前值；HUD 在 0x02601DA8 读取同一上限。进入水下后在 0x02863F0C 捕获真实负 delta，证明对象与调用语义，再只抑制耗氧分支，保留补氧、初始化、离水和 HUD 更新。",
+      "target_strategy_en": "Static cross-architecture matching found PPC oxygen-delta function 0x02863EEC: r4 is the signed delta, r10+0x65C is current oxygen, r10+0x65E is the cap, and 0x02863F20 writes current oxygen; the HUD reads the same cap at 0x02601DA8. After entering water, capture a real negative delta at 0x02863F0C to prove the object and call semantics, then suppress only oxygen consumption while preserving refill, initialization, water exit, and HUD updates.",
+      "mapping_state": "ppc-candidate",
       "runtime_state": "not-traced",
-      "pack_state": "not-created"
+      "pack_state": "not-created",
+      "ppc_candidate": {
+        "function_entry": "0x02863eec",
+        "function_entry_preimage": "0x2c040000",
+        "delta_capture": "0x02863f0c",
+        "delta_capture_preimage": "0xa96a065c",
+        "current_oxygen_write": "0x02863f20",
+        "current_oxygen_write_preimage": "0xb16a065c",
+        "hud_maximum_load": "0x02601da8",
+        "hud_maximum_load_preimage": "0xa8be065e",
+        "delta_register": "r4",
+        "player_state_register": "r10",
+        "current_oxygen_offset": "0x065c",
+        "maximum_oxygen_offset": "0x065e",
+        "trace_spec": "docs/research/traces/mh3g-dynamic-62-oxygen-delta.json",
+        "patch_constraint_zh": "不得把当前氧气或上限无条件常量化；必须先证明水下自然耗氧对应 r4 的负 delta，最终实现只能拦截耗氧并保留正向补氧与生命周期更新。",
+        "patch_constraint_en": "Do not unconditionally force current or maximum oxygen to a constant. First prove that natural underwater drain is a negative r4 delta; the eventual implementation may intercept consumption only and must preserve positive refill and lifecycle updates.",
+        "static_evidence_zh": "PPC 0x02863EEC 与 3DS 氧气 mutator 的控制流、当前/上限半字宽度和钳制关系一致；PPC 0x02847C24/0x02847C94 的两条玩家更新路径及 0x02601DA8 HUD 路径也读取同一 +0x65C/+0x65E 字段对。",
+        "static_evidence_en": "PPC 0x02863EEC matches the 3DS oxygen mutator's control flow, halfword current/cap widths, and clamping relationship. The two player-update paths at PPC 0x02847C24/0x02847C94 and HUD path at 0x02601DA8 also read the same +0x65C/+0x65E field pair."
+      }
     },
     {
       "source_index": 66,

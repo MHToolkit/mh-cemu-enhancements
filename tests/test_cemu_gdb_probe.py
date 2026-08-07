@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+import socket
 import sys
 import tempfile
 import unittest
@@ -63,8 +64,37 @@ class CemuGDBProbeTests(unittest.TestCase):
     def test_packet_codec_round_trips_and_rejects_corruption(self):
         packet = self.probe.encode_packet("m28c7b18,4")
         self.assertEqual("m28c7b18,4", self.probe.decode_packet(packet))
+        escaped = b"a}" + bytes([ord("#") ^ 0x20]) + b"b"
+        framed = b"$" + escaped + f"#{sum(escaped) & 0xff:02x}".encode()
+        self.assertEqual("a#b", self.probe.decode_packet(framed))
         with self.assertRaisesRegex(self.probe.ProbeError, "checksum mismatch"):
             self.probe.decode_packet(packet[:-2] + b"00")
+
+    def test_rsp_ok_is_not_misclassified_as_console_output(self):
+        client_socket, server_socket = socket.socketpair()
+        try:
+            server_socket.sendall(b"+$OK#9a")
+            client = self.probe.RSPClient(client_socket)
+            self.assertEqual("OK", client.receive(1.0))
+        finally:
+            client_socket.close()
+            server_socket.close()
+
+    def test_cemu_register_endianness_matches_stub_serialization(self):
+        class FakeRegisterClient:
+            def request(self, payload, timeout=5.0):
+                values = {
+                    "p3": "78563412",
+                    "p40": "0219b6f0",
+                    "p43": "f0debc9a",
+                }
+                return values[payload]
+
+        client = self.probe.RSPClient.__new__(self.probe.RSPClient)
+        client.request = FakeRegisterClient().request
+        self.assertEqual(0x12345678, client.read_register(3))
+        self.assertEqual(0x0219B6F0, client.read_register(self.probe.PPC_PC_REGISTER))
+        self.assertEqual(0x9ABCDEF0, client.read_register(self.probe.PPC_LR_REGISTER))
 
     def test_trace_spec_pins_identity_preimages_and_snapshot_ranges(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -148,12 +178,21 @@ class CemuGDBProbeTests(unittest.TestCase):
             [
                 "mh3g-dynamic-08-pouch-delta.json",
                 "mh3g-dynamic-12-item-cap-return.json",
+                "mh3g-dynamic-19-attack-derived.json",
+                "mh3g-dynamic-20-defense-derived.json",
+                "mh3g-dynamic-62-oxygen-delta.json",
             ],
             [path.name for path in paths],
         )
         specs = [self.probe.load_spec(path) for path in paths]
-        self.assertEqual([0x0219B6F0, 0x0203A2A0], [s.breakpoints[0].address for s in specs])
-        self.assertEqual([128, 20], [s.register_memory[0].size for s in specs])
+        self.assertEqual(
+            [0x0219B6F0, 0x0203A2A0, 0x0286769C, 0x02867D14, 0x02863F0C],
+            [s.breakpoints[0].address for s in specs],
+        )
+        self.assertEqual(
+            [128, 20, 32, 32, 64],
+            [s.register_memory[0].size for s in specs],
+        )
 
     def test_keyboard_interrupt_removes_armed_breakpoints_and_resumes(self):
         class FakeSocket:
@@ -172,17 +211,19 @@ class CemuGDBProbeTests(unittest.TestCase):
                 self.interrupt_count = 0
                 self.continue_count = 0
                 self.deleted = []
+                self.requests = []
                 FakeClient.instance = self
 
             def receive(self, timeout=None):
                 self.receive_count += 1
                 if self.receive_count == 1:
-                    return "T05thread:00000001;"
-                if self.receive_count == 2:
                     raise KeyboardInterrupt
                 return "T05thread:00000001;"
 
             def request(self, payload, timeout=5.0):
+                self.requests.append(payload)
+                if payload == "?":
+                    return "T05thread:00000001;"
                 if payload.startswith("z0,"):
                     self.deleted.append(payload)
                 return "OK"
@@ -204,14 +245,17 @@ class CemuGDBProbeTests(unittest.TestCase):
             sock = FakeSocket()
             original_connect = self.probe._connect
             original_client = self.probe.RSPClient
+            original_settle = self.probe.CEMU_GDB_SETTLE_SECONDS
             self.probe._connect = lambda host, port, timeout: sock
             self.probe.RSPClient = FakeClient
+            self.probe.CEMU_GDB_SETTLE_SECONDS = 0
             try:
                 with self.assertRaises(KeyboardInterrupt):
                     self.probe.run_trace(trace_spec, output, "127.0.0.1", 1337, 1.0)
             finally:
                 self.probe._connect = original_connect
                 self.probe.RSPClient = original_client
+                self.probe.CEMU_GDB_SETTLE_SECONDS = original_settle
             events = [
                 json.loads(line)["event"] for line in output.read_text().splitlines()
             ]
@@ -221,6 +265,18 @@ class CemuGDBProbeTests(unittest.TestCase):
         self.assertEqual(1, client.interrupt_count)
         self.assertEqual(["z0,28c7b18,4"], client.deleted)
         self.assertEqual(2, client.continue_count)
+        self.assertEqual(
+            [
+                "?",
+                "Hg0",
+                "Hc-1",
+                "Z0,28c7b18,4",
+                "Hg0",
+                "Hc-1",
+                "z0,28c7b18,4",
+            ],
+            client.requests,
+        )
         self.assertTrue(sock.closed)
         self.assertIn("cleanup_interrupt", events)
         self.assertIn("cleanup_breakpoint", events)

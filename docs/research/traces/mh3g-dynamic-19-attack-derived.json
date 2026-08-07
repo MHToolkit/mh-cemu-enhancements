@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #19 derived-attack candidate writeback",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在一次受控的武器攻击变化中，验证 0x02867648 是攻击派生函数、r9 指向玩家状态、+0x6E8 是 16 位攻击值且 +0x6EC 是相邻显示浮点值。只记录，不修改寄存器或内存。",
+  "purpose_en": "During one controlled weapon-attack change, prove that 0x02867648 is the attack-derivation function, r9 points to player state, +0x6E8 is the 16-bit attack value, and +0x6EC is the adjacent display float. Record only; do not alter registers or memory.",
+  "operator_steps_zh": [
+    "在稳定大厅记下当前面板攻击，准备一把攻击明显不同的武器；不要同时更换防具、护石或猫饭。",
+    "启动 tracer 后只更换一次准备好的武器，随后打开一次状态面板，不执行其他会改变攻击的动作。",
+    "只有 JSONL 命中与本次更换一致，且 r9+0x6E8 的半字与面板攻击变化相符、+0x6EC 同步变化时，才把该候选升级为 ppc-mapped。"
+  ],
+  "operator_steps_en": [
+    "In a stable lobby, note the current displayed attack and prepare one weapon with a clearly different attack value; do not also change armor, charms, or food.",
+    "After starting the tracer, equip only that weapon once and open the status panel once without performing another attack-changing action.",
+    "Promote the candidate to ppc-mapped only when the JSONL hit corresponds to that change, the halfword at r9+0x6E8 matches the displayed attack transition, and +0x6EC changes consistently."
+  ],
+  "breakpoints": [
+    {
+      "label": "derived_attack_writeback_state",
+      "address": "0x0286769c",
+      "expected_word": "0xa14906e8"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_attack_fields",
+      "register": "r9",
+      "offset": 1760,
+      "size": 32
+    }
+  ]
+}
