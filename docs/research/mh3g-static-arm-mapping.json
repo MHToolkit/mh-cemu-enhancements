@@ -121,7 +121,7 @@
       "name_en": "Underwater Speed ×2",
       "pack_id": "mh3g-hd-jp-v96-static-13-underwater-speed-x2",
       "conversion_confidence": "global-semantic-with-exact-scalars",
-      "ppc_patch_count": 13,
+      "ppc_patch_count": 16,
       "ppc_addresses": [
         "0x028c7368",
         "0x028c73b4",
@@ -130,6 +130,9 @@
         "0x028c74a8",
         "0x028c74d0",
         "0x028c7578",
+        "0x028c7654",
+        "0x028c76dc",
+        "0x028c7744",
         "0x028c7ab0",
         "0x028c7af0",
         "0x028c966c",
@@ -137,7 +140,7 @@
         "0x028c96f8",
         "0x028c971c"
       ],
-      "risk": "中文：强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。请保持相同 FPS 设置与动作，对同一路线计时，不要只凭目测。 / English: Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers. Keep the same FPS setting and action, and time the same underwater route instead of relying on visual judgment alone."
+      "risk": "中文：旧候选只改效果检查与 1.05/1.10 动作倍率，2026-08-07 隔离实测显示动作表现加快但整体位移不明显。修正版新增三条 PPC 坐标积分路径的 0.5→1.0 校正；请关闭 #65，以相同 FPS、摇杆幅度、动作和路线至少计时三次，并检查碰撞与上浮/下潜过冲。 / English: The old candidate changed only effect checks and the 1.05/1.10 action-rate scalars; the 2026-08-07 isolated test showed faster action presentation without clear overall displacement. The correction adds 0.5-to-1.0 changes to all three PPC coordinate-integration paths. Disable #65, time the same route at least three times with identical FPS, stick magnitude, and action, and check collision plus ascent/descent overshoot."
     },
     {
       "source_index": 14,

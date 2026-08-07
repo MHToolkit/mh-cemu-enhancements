@@ -75,6 +75,21 @@
       "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
     },
     {
+      "address": "0x028c7654",
+      "word": "0xc18be224",
+      "meaning": "中文：第一条水下坐标积分路径原本从 0x1007e224 载入 0.5；改为从 0x1007e1f4 载入 1.0，使实际位移增量加倍。 / English: The first underwater coordinate-integration path originally loads 0.5 from 0x1007e224; redirect it to 1.0 at 0x1007e1f4 to double the actual displacement delta."
+    },
+    {
+      "address": "0x028c76dc",
+      "word": "0xc18be224",
+      "meaning": "中文：第二条水下坐标积分分支原本载入 0.5；改为载入 1.0，覆盖另一输入/动作路径。 / English: The second underwater coordinate-integration branch originally loads 0.5; redirect it to 1.0 to cover the alternate input/action path."
+    },
+    {
+      "address": "0x028c7744",
+      "word": "0xc18be224",
+      "meaning": "中文：第三条水下坐标积分分支原本载入 0.5；改为载入 1.0，避免分支回落到原始位移。 / English: The third underwater coordinate-integration branch originally loads 0.5; redirect it to 1.0 so the fallback branch cannot retain the original displacement."
+    },
+    {
       "address": "0x028c7ab0",
       "word": "0x4bfc8fe5",
       "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
@@ -163,7 +178,8 @@
     }
   ],
   "known_risks": [
-    "中文：强制 JP v96 中全部水下速度技能检查并把对应 1.05/1.10 倍率路径改为 2.0；不同水下动作可能仍有独立倍率。对照时只启用本项并关闭 #65（#65 会把通用技能查询强制为真），保持相同 FPS 设置与动作，对同一路线计时，不要只凭目测。 / English: Forces all JP-v96 underwater-speed skill checks and changes the corresponding 1.05/1.10 multiplier paths to 2.0; some underwater actions may use separate multipliers. For an isolated comparison, enable only this pack and disable #65 (which forces the generic skill query true), keep the same FPS setting and action, and time the same underwater route instead of relying on visual judgment alone."
+    "中文：2026-08-07 隔离实测否定了旧候选：仅强制 0xC7 检查并把动作倍率改为 2.0，只会看到动作表现加速，整体位移不明显。修正版额外把同一 PPC 水下处理函数的三条坐标积分路径从 0.5 改为 1.0；这是针对 Wii U 行为新增的位移校正，尚未通过修后实机验收。 / English: The 2026-08-07 isolated test rejected the old candidate: forcing effect 0xC7 and changing only the action-rate scalars to 2.0 produced visible action-rate acceleration without clear overall displacement. The correction additionally changes all three coordinate-integration paths in the same PPC underwater handler from 0.5 to 1.0; this Wii U-specific displacement correction still awaits post-fix gameplay verification.",
+    "中文：只启用本项并关闭 #65，保持 FPS、武器、模拟摇杆幅度、动作与起终点一致，对同一路线计时至少三次；同时检查碰撞、转向、上浮/下潜是否出现过冲。 / English: Enable only this pack and disable #65; keep FPS, weapon, analog-stick magnitude, action, and route endpoints identical, time the same underwater route at least three times, and also check collision, turning, ascent, and descent for overshoot."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
@@ -172,5 +188,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #13“水下速度 2 倍”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #13 \"Underwater Speed ×2\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：把 3DS 静态 ARM 金手指 #13 转换为 JP v96 PPC，并根据 2026-08-07 实测补充三条实际水下坐标积分的 0.5→1.0 位移校正；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #13 to JP-v96 PPC and, following the 2026-08-07 gameplay result, adds 0.5-to-1.0 displacement corrections to all three actual underwater coordinate-integration paths; disabled by default and classified Runtime Experimental."
 }

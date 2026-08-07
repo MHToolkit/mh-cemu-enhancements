@@ -1,3 +1,38 @@
+# #13 underwater displacement correction / #13 水下实际位移修正（2026-08-07，0.1.20）
+
+## Superseding verdict / 覆盖性结论
+
+The previous #13 candidate did **not** pass its intended gameplay acceptance. In the isolated run, the underwater action presentation visibly accelerated, while overall travel speed/displacement did not show the expected 2× change. Therefore the earlier static conclusion that the 3DS effect checks and action-rate scalars were mapped correctly is no longer sufficient evidence for the feature name “Underwater Speed ×2.”
+
+旧版 #13 **未通过目标功能验收**：隔离实测能看到水下动作表现加速，但整体移动速度/位移没有呈现预期的 2 倍变化。因此，之前“效果检查与动作倍率映射正确”的静态结论，不能再作为“水下速度 2 倍”已经实现的证据。本节覆盖 2026-08-06 与 2026-08-05 记录中对 #13 的旧判断；那些记录仅保留为历史。
+
+## Static RCA and correction / 静态根因与修正
+
+1. The source 3DS entry forces effect ID `0xC7` and changes the `1.05/1.10` action-rate paths, which update the per-action state field corresponding to PPC `state + 0x608`. Those writes explain the visible animation/action acceleration but do not directly scale the later coordinate delta.
+2. In the exact JP-v96 PPC counterpart, all three branches that integrate the underwater direction vector into `state + 0xE0/+0xE4/+0xE8` load `0.5` from RPX address `0x1007E224`. Their exact instruction preimages are `C18BE224` at `0x028C7654`, `0x028C76DC`, and `0x028C7744`.
+3. The corrected candidate redirects only those three loads to the adjacent pinned `1.0` constant at `0x1007E1F4` (`lfs f12, -0x1e0c(r11)`). The RPX SHA-256 remains pinned to `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`, so both the code preimages and constant layout fail closed.
+4. The original effect checks and action-rate changes remain in place. The new three writes are a Wii U-specific displacement correction added after runtime evidence exposed the source-semantic gap. The pack remains `Runtime Experimental`; static verification does not prove that every underwater action, collision case, or vertical movement now behaves correctly.
+
+3DS 原项强制 `0xC7` 效果并修改 `1.05/1.10` 动作倍率，对应 PPC 的 `state + 0x608` 动作状态字段，所以会出现“动作加快但整体位移不明显”。JP v96 PPC 的三条实际坐标积分分支在 `0x028C7654`、`0x028C76DC`、`0x028C7744` 从 `0x1007E224` 载入 `0.5`，再把方向向量累加到 `state + 0xE0/+0xE4/+0xE8`。修正版只把这三条载入重定向到同一 RPX 的 `0x1007E1F4 = 1.0`，从而把实际位移增量加倍；仍需实机复测，不能标记为 `Runtime Verified`。
+
+## Required post-fix retest / 修后必须复测
+
+- Enable only #13 and disable #65; keep the same FPS cap in both baseline and enabled runs. / 只启用 #13，并关闭 #65；基线与启用后的 FPS 必须相同。
+- Use the same weapon, full analog-stick magnitude, camera/direction, underwater action, and start/end markers. / 固定武器、满幅摇杆、镜头/方向、水下动作与起终点标记。
+- Time the same route at least three times for baseline and three times with #13; compare medians rather than visual animation speed. / 基线与启用后各跑同一路线至少三次，比较中位耗时，不以动画目测代替位移结果。
+- Separately check forward travel, turning, ascent/descent, wall collision, and stopping for overshoot or input lock. / 另查前进、转向、上浮/下潜、撞墙与停止动作是否过冲或锁输入。
+
+## 2026-08-07 static and isolated-install gates / 静态与隔离安装门禁
+
+1. `pytest tests/ -q` passes **29/29** executed tests with one optional immutable-reference test skipped because its historical default path was cleaned; the equivalent `verify-reference` gate was run explicitly against the RPX freshly extracted from the active WUA.
+2. `validate` accepts all **50** manifests. `verify-reference` accepts the extracted JP-v96 RPX with SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and all declared preimages/anchors, including the three new `C18BE224` assertions.
+3. Cemu's real `PPCAssembler` encodes each new instruction as `C18BE1F4` with zero relocations: `0x028C7654`, `0x028C76DC`, and `0x028C7744` all assemble as `lfs f12, -0x1e0c(r11)`.
+4. Ruff and `git diff --check` pass. The mapping ledger now totals **172** static PPC writes; #13 contains **16** writes/preimages.
+5. With no Cemu game process running, only #13 was refreshed in the isolated underwater-test profile. Its installed tree SHA-256 is `146672c9107795b1533765a16de26c911a1cac98ec44380ceba8982f5bf48f89`, exactly matching the repository source tree; inspection reports `installed=true` and preserves `enabled=true`.
+6. The isolated `settings.xml` SHA-256 remained `229e0e06225027d07b2e1077596011445cb5f477d85835c7cfbb98631b8506ac` before and after installation. No Cemu process was launched and no save/MLC path was modified.
+
+以上结果只证明新位移候选的静态正确性、目标 RPX 身份与安装完整性；只有修后实机路线计时和异常动作检查通过，才能把 #13 升级为运行验收通过。
+
 # Runtime feedback correction / 实测反馈修正（2026-08-06，0.1.19）
 
 ## Root-cause result / 根因结论

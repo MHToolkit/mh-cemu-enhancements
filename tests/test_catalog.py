@@ -194,6 +194,47 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(["0x02865ff8", "0x02866004"], rows[7]["ppc_addresses"])
         self.assertEqual(["0x02890b14"], rows[65]["ppc_addresses"])
 
+    def test_underwater_speed_corrects_displacement_not_only_action_rate(self):
+        """#13 must double the three JP-v96 underwater translation paths."""
+        result = self.tool.validate_repository(REPO)
+        underwater = next(
+            pack
+            for pack in result.packs
+            if pack["id"] == "mh3g-hd-jp-v96-static-13-underwater-speed-x2"
+        )
+
+        preimages = {
+            self.tool._number(item["address"]): self.tool._number(item["word"])
+            for item in underwater["preimages"]
+        }
+        self.assertEqual(
+            {
+                0x028C7654: 0xC18BE224,
+                0x028C76DC: 0xC18BE224,
+                0x028C7744: 0xC18BE224,
+            },
+            {address: preimages[address] for address in (0x028C7654, 0x028C76DC, 0x028C7744)},
+        )
+
+        patch = (REPO / underwater["pack_dir"] / underwater["patch"]).read_text().lower()
+        for address in (0x028C7654, 0x028C76DC, 0x028C7744):
+            self.assertIn(f"0x{address:08x} = lfs f12, -0x1e0c(r11)", patch)
+
+        mapping = json.loads(
+            (REPO / "docs" / "research" / "mh3g-static-arm-mapping.json").read_text()
+        )
+        row = next(entry for entry in mapping["entries"] if entry["source_index"] == 13)
+        self.assertEqual(16, row["ppc_patch_count"])
+        self.assertEqual(
+            ["0x028c7654", "0x028c76dc", "0x028c7744"],
+            [address for address in row["ppc_addresses"] if address in {
+                "0x028c7654", "0x028c76dc", "0x028c7744"
+            }],
+        )
+        risks = "\n".join(underwater["known_risks"])
+        self.assertIn("动作表现加速", risks)
+        self.assertIn("action-rate acceleration", risks.lower())
+
     def test_feedback_sensitive_packs_explain_isolated_gameplay_conditions(self):
         result = self.tool.validate_repository(REPO)
         packs = {

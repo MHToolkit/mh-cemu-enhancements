@@ -10,9 +10,9 @@ Target: **Monster Hunter 3G HD Ver.**, Wii U Japan, title ID `0005000010104D00`,
 
 Quest red-delivery-box and blue-supply-box replacement is paused at the user's request. Every quest-box candidate is retained as research history but is `runtime-blocked` and excluded from installation; related passages below record prior static/runtime evidence only and do not represent a currently available feature.
 
-活动 3DS 金手指已另行完整盘点：44 FPS 使用 Cemu 原生 `[Control] vsyncFrequency` 等效项；43 条静态 ARM 项已根据匹配的 3DS `.code` 与 JP-v96 PPC 语义/前像转换为独立实验包，共 168 条固定地址写入。详见 [3DS → Cemu 金手指转换矩阵](mh3g-3ds-cheat-conversion.md) 与 [43 项静态映射清单](mh3g-static-arm-mapping.md)。
+活动 3DS 金手指已另行完整盘点：44 FPS 使用 Cemu 原生 `[Control] vsyncFrequency` 等效项；43 条静态 ARM 项已根据匹配的 3DS `.code` 与 JP-v96 PPC 语义/前像转换为独立实验包，共 172 条固定地址写入（含 #13 实测后新增的三条 Wii U 水下位移积分校正）。详见 [3DS → Cemu 金手指转换矩阵](mh3g-3ds-cheat-conversion.md) 与 [43 项静态映射清单](mh3g-static-arm-mapping.md)。
 
-The active 3DS cheat list is inventoried separately. 44 FPS uses Cemu's native `[Control] vsyncFrequency`; 43 static ARM entries have also been mapped from the matching 3DS `.code` to independent JP-v96 PPC experimental packs with 168 fixed-address writes. See the [3DS → Cemu cheat conversion matrix](mh3g-3ds-cheat-conversion.md) and [43-entry static mapping ledger](mh3g-static-arm-mapping.md).
+The active 3DS cheat list is inventoried separately. 44 FPS uses Cemu's native `[Control] vsyncFrequency`; 43 static ARM entries have also been mapped from the matching 3DS `.code` to independent JP-v96 PPC experimental packs with 172 fixed-address writes, including three Wii U underwater displacement-integration corrections added to #13 after the gameplay result. See the [3DS → Cemu cheat conversion matrix](mh3g-3ds-cheat-conversion.md) and [43-entry static mapping ledger](mh3g-static-arm-mapping.md).
 
 ## Immutable reference
 

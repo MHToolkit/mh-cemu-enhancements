@@ -32,6 +32,18 @@ moduleMatches = 0x348600a0
 # English: Force the direct PPC check for effect ID 0xC7 to return true.
 0x028c7578 = li r3, 1
 
+# 中文：实测证明只改动作倍率不会提升整体位移；把第一条水下坐标积分路径使用的 0.5 常量重定向到同一 JP v96 RPX 中的 1.0 常量。
+# English: Gameplay showed that action-rate changes alone do not raise overall displacement; redirect the first underwater coordinate-integration path from the JP-v96 0.5 constant to its 1.0 constant.
+0x028c7654 = lfs f12, -0x1e0c(r11)
+
+# 中文：覆盖第二条水下坐标积分分支，同样把每帧位移倍率从 0.5 提升到 1.0。
+# English: Cover the second underwater coordinate-integration branch and likewise raise its per-frame displacement scalar from 0.5 to 1.0.
+0x028c76dc = lfs f12, -0x1e0c(r11)
+
+# 中文：覆盖第三条水下坐标积分分支，避免输入/动作分支回落到原始 0.5 位移倍率。
+# English: Cover the third underwater coordinate-integration branch so alternate input/action flow cannot fall back to the original 0.5 displacement scalar.
+0x028c7744 = lfs f12, -0x1e0c(r11)
+
 # 中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。
 # English: Force the direct PPC check for effect ID 0xC7 to return true.
 0x028c7ab0 = li r3, 1
