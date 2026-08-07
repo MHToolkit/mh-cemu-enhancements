@@ -19,7 +19,7 @@ It distributes no RPX, RPL, WUA, save, MLC, key, texture dump, or other game ass
 
 Target identity: Wii U title `0005000010104D00`, Japan update v96, RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`, Cemu patch module checksum `0x348600a0`.
 
-`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable. Repeated quest-box tests remained unusable; the blue bridge also blanked quest-board dialogue. All quest-box experiments are therefore paused and blocked from installation. The active 3DS cheat source was fully inventoried: 44 FPS has a native Cemu control conversion, and 43 static ARM entries were mapped from the hash-matching 3DS `.code` to independent JP-v96 PPC experimental packs with 176 fixed-address writes. A separately supplied 3DS Felyne-food cheat was semantically mapped to the native JP-v96 meal finalizer and exposed as three complete bilingual `00..41` selectors; it remains Gameplay Pending. Other dynamic pointer, hotkey, and injected-routine entries remain independent-mapping work.
+`Static Verified` means the pack structure, Cemu grammar, module gate, RPX hash, and declared big-endian PPC preimages passed locally. It is not an in-game success claim. User gameplay verified the lobby menu and its equipment, equipment-set, and talisman actions. The 30 FPS result was unstable. Repeated quest-box tests remained unusable; the blue bridge also blanked quest-board dialogue. All quest-box experiments are therefore paused and blocked from installation. The active 3DS cheat source was fully inventoried: 44 FPS has a native Cemu control conversion, and 43 static ARM entries were mapped from the hash-matching 3DS `.code` to independent JP-v96 PPC experimental packs with 179 fixed-address writes. A separately supplied 3DS Felyne-food cheat was semantically mapped to the native JP-v96 meal finalizer and exposed as three complete bilingual `00..41` selectors; it remains Gameplay Pending. Other dynamic pointer, hotkey, and injected-routine entries remain independent-mapping work.
 
 ## Validate and install
 
@@ -50,7 +50,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.21.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.22.zip
 ```
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.

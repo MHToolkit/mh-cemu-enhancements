@@ -8,7 +8,7 @@
 | 6 | 会心不显示 / Critical Display Hidden | `shared-affinity-path` | 4 | `mh3g-hd-jp-v96-static-06-critical-display-hidden` |
 | 7 | HP 无限 / Infinite HP | `exact-static` | 2 | `mh3g-hd-jp-v96-static-07-infinite-hp` |
 | 11 | 里属性觉醒 / Awakening | `global-semantic` | 3 | `mh3g-hd-jp-v96-static-11-awakening` |
-| 13 | 水下速度 2 倍 / Underwater Speed ×2 | `global-semantic-with-exact-scalars` | 20 | `mh3g-hd-jp-v96-static-13-underwater-speed-x2` |
+| 13 | 水下速度 2 倍 / Underwater Speed ×2 | `global-semantic-with-exact-scalars` | 23 | `mh3g-hd-jp-v96-static-13-underwater-speed-x2` |
 | 14 | 金刚体 / Rock Steady | `global-semantic` | 7 | `mh3g-hd-jp-v96-static-14-rock-steady` |
 | 15 | 铁镐和虫网不会损坏 / Unbreakable Pickaxes and Bug Nets | `mixed-exact-and-global-semantic` | 4 | `mh3g-hd-jp-v96-static-15-unbreakable-pickaxes-bug-nets` |
 | 16 | 体力上限 150 / Maximum Health 150 | `global-semantic` | 2 | `mh3g-hd-jp-v96-static-16-max-health-150` |

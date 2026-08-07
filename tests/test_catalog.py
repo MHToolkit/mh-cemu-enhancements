@@ -195,7 +195,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(["0x02890b14"], rows[65]["ppc_addresses"])
 
     def test_underwater_speed_corrects_displacement_not_only_action_rate(self):
-        """#13 must cover every direct translation path in the underwater dispatcher."""
+        """#13 must cover ordinary-swim state 9 without altering its shared entry scalar."""
         result = self.tool.validate_repository(REPO)
         underwater = next(
             pack
@@ -207,7 +207,7 @@ class CatalogTests(unittest.TestCase):
             self.tool._number(item["address"]): self.tool._number(item["word"])
             for item in underwater["preimages"]
         }
-        displacement_preimages = {
+        special_state_displacement_preimages = {
             0x028C6BDC: 0xC18AE224,
             0x028C7654: 0xC18BE224,
             0x028C76DC: 0xC18BE224,
@@ -216,9 +216,18 @@ class CatalogTests(unittest.TestCase):
             0x028C9BDC: 0xC1A9E224,
             0x028C9C9C: 0xC1A9E224,
         }
+        ordinary_swim_preimages = {
+            0x028C7B18: 0xC169E2D0,
+            0x028C7E6C: 0xEC0907F2,
+            0x028C7FE0: 0xEC0907F2,
+        }
+        expected_preimages = {
+            **special_state_displacement_preimages,
+            **ordinary_swim_preimages,
+        }
         self.assertEqual(
-            displacement_preimages,
-            {address: preimages[address] for address in displacement_preimages},
+            expected_preimages,
+            {address: preimages[address] for address in expected_preimages},
         )
 
         patch = (REPO / underwater["pack_dir"] / underwater["patch"]).read_text().lower()
@@ -228,23 +237,30 @@ class CatalogTests(unittest.TestCase):
         self.assertIn("0x028c8c34 = lfs f0, -0x1e0c(r9)", patch)
         for address in (0x028C9BDC, 0x028C9C9C):
             self.assertIn(f"0x{address:08x} = lfs f13, -0x1e0c(r9)", patch)
+        self.assertIn("0x028c7b18 = lfs f11, -0x1e08(r9)", patch)
+        for address in (0x028C7E6C, 0x028C7FE0):
+            self.assertIn(f"0x{address:08x} = fmr f0, f9", patch)
+        self.assertNotIn("0x028c7924 =", patch)
 
         mapping = json.loads(
             (REPO / "docs" / "research" / "mh3g-static-arm-mapping.json").read_text()
         )
         row = next(entry for entry in mapping["entries"] if entry["source_index"] == 13)
-        self.assertEqual(20, row["ppc_patch_count"])
+        self.assertEqual(23, row["ppc_patch_count"])
         self.assertEqual(
-            [f"0x{address:08x}" for address in displacement_preimages],
+            [f"0x{address:08x}" for address in sorted(expected_preimages)],
             [
                 address
                 for address in row["ppc_addresses"]
-                if int(address, 16) in displacement_preimages
+                if int(address, 16) in expected_preimages
             ],
         )
         risks = "\n".join(underwater["known_risks"])
         self.assertIn("动作表现加速", risks)
         self.assertIn("action-rate acceleration", risks.lower())
+        self.assertIn("0.1.21", risks)
+        self.assertIn("状态 9", risks)
+        self.assertIn("original 3ds", risks.lower())
 
     def test_feedback_sensitive_packs_explain_isolated_gameplay_conditions(self):
         result = self.tool.validate_repository(REPO)

@@ -10,9 +10,9 @@ Target: **Monster Hunter 3G HD Ver.**, Wii U Japan, title ID `0005000010104D00`,
 
 Quest red-delivery-box and blue-supply-box replacement is paused at the user's request. Every quest-box candidate is retained as research history but is `runtime-blocked` and excluded from installation; related passages below record prior static/runtime evidence only and do not represent a currently available feature.
 
-活动 3DS 金手指已另行完整盘点：44 FPS 使用 Cemu 原生 `[Control] vsyncFrequency` 等效项；43 条静态 ARM 项已根据匹配的 3DS `.code` 与 JP-v96 PPC 语义/前像转换为独立实验包，共 176 条固定地址写入（#13 根据两轮负向实测，现覆盖同一 40 状态水下动作分派器内全部七条直接坐标积分的 0.5→1.0 校正）。详见 [3DS → Cemu 金手指转换矩阵](mh3g-3ds-cheat-conversion.md) 与 [43 项静态映射清单](mh3g-static-arm-mapping.md)。
+活动 3DS 金手指已另行完整盘点：44 FPS 使用 Cemu 原生 `[Control] vsyncFrequency` 等效项；43 条静态 ARM 项已根据匹配的 3DS `.code` 与 JP-v96 PPC 语义/前像转换为独立实验包，共 179 条固定地址写入。#13 经三轮负向实测后确认普通游泳走状态 9；当前候选只在其两条最终积分处将共用 0.5 等效改为 1.0，并补上该状态漏掉的 1.10→2.0 动作标量。详见 [3DS → Cemu 金手指转换矩阵](mh3g-3ds-cheat-conversion.md) 与 [43 项静态映射清单](mh3g-static-arm-mapping.md)。
 
-The active 3DS cheat list is inventoried separately. 44 FPS uses Cemu's native `[Control] vsyncFrequency`; 43 static ARM entries have also been mapped from the matching 3DS `.code` to independent JP-v96 PPC experimental packs with 176 fixed-address writes. Following two negative gameplay comparisons, #13 now covers all seven direct 0.5-to-1.0 coordinate integrations in the same 40-state underwater-action dispatcher. See the [3DS → Cemu cheat conversion matrix](mh3g-3ds-cheat-conversion.md) and [43-entry static mapping ledger](mh3g-static-arm-mapping.md).
+The active 3DS cheat list is inventoried separately. 44 FPS uses Cemu's native `[Control] vsyncFrequency`; 43 static ARM entries have also been mapped from the matching 3DS `.code` to independent JP-v96 PPC experimental packs with 179 fixed-address writes. After three negative gameplay comparisons, #13 was traced to ordinary-swim state 9. The current candidate changes the entry-shared 0.5 only at that state's two final integrations and adds its missed 1.10-to-2.0 action scalar. See the [3DS → Cemu cheat conversion matrix](mh3g-3ds-cheat-conversion.md) and [43-entry static mapping ledger](mh3g-static-arm-mapping.md).
 
 ## Immutable reference
 

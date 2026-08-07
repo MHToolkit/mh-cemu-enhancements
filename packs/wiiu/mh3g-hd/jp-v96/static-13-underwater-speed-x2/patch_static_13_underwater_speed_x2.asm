@@ -56,6 +56,17 @@ moduleMatches = 0x348600a0
 # English: Force the direct PPC check for effect ID 0xC7 to return true.
 0x028c7af0 = li r3, 1
 
+# 中文：普通游泳状态 9 的 1.10 倍动作标量也必须重定向到 JP v96 已有的 2.0；0.1.21 漏掉了这一条源语义路径。
+# English: Redirect the ordinary-swim state-9 action scalar from 1.10 to the existing JP-v96 2.0 constant; 0.1.21 missed this source-semantic path.
+0x028c7b18 = lfs f11, -0x1e08(r9)
+
+# 中文：普通游泳状态 9 有两条互斥的最终坐标积分分支，都会先把速度乘以入口共用的 0.5。仅在最终乘法处跳过 0.5，等效改为 1.0。
+# English: Ordinary-swim state 9 has two mutually exclusive final coordinate-integration branches that multiply velocity by the entry-shared 0.5. Bypass 0.5 only at the final multiply, making the factor 1.0.
+# 中文：这是为 Wii U 实际位移目标增加的适配；原 3DS #13 只提高动作标量，并未修改对应的最终 0.5 积分。
+# English: This is a Wii U physical-travel adaptation; original 3DS #13 raises action-rate scalars but does not patch the corresponding final 0.5 integration.
+0x028c7e6c = fmr f0, f9
+0x028c7fe0 = fmr f0, f9
+
 # 中文：水下动作分派状态 16/17 的坐标积分原本使用 0.5；改为 1.0。
 # English: Redirect the coordinate integration for underwater action states 16/17 from 0.5 to 1.0.
 0x028c8c34 = lfs f0, -0x1e0c(r9)

@@ -151,8 +151,8 @@
       "name_en": "Underwater movement speed ×2",
       "disposition": "implemented-static-experimental",
       "source_mechanism": "arm-static-patch",
-      "reason_zh": "已从匹配的 3DS .code 语义映射到 JP v96 Wii U PPC；包默认关闭，等待实机验证。映射置信类型：global-semantic-with-exact-scalars。",
-      "reason_en": "Semantically mapped from the matching 3DS .code to JP-v96 Wii U PPC; the pack is disabled by default pending gameplay verification. Mapping confidence: global-semantic-with-exact-scalars.",
+      "reason_zh": "已从匹配的 3DS .code 语义映射到 JP v96 Wii U PPC；原项主要提高动作标量，并不修改最终位移积分。根据三轮负向实测，Cemu 候选额外在普通游泳状态 9 的两条最终积分实施窄范围 0.5→1.0 实际位移适配；包默认关闭，等待修后实机验证。映射置信类型：global-semantic-with-exact-scalars。",
+      "reason_en": "Semantically mapped from the matching 3DS .code to JP-v96 Wii U PPC. The source mainly raises action-rate scalars and does not patch final travel integration. Following three negative gameplay comparisons, the Cemu candidate adds a narrow 0.5-to-1.0 physical-travel adaptation at both final integrations of ordinary-swim state 9; the pack is disabled by default pending post-fix gameplay verification. Mapping confidence: global-semantic-with-exact-scalars.",
       "cemu_state": "Pack: mh3g-hd-jp-v96-static-13-underwater-speed-x2 (Runtime Experimental)",
       "cemu_pack": "mh3g-hd-jp-v96-static-13-underwater-speed-x2"
     },

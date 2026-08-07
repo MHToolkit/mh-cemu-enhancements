@@ -121,7 +121,7 @@
       "name_en": "Underwater Speed ×2",
       "pack_id": "mh3g-hd-jp-v96-static-13-underwater-speed-x2",
       "conversion_confidence": "global-semantic-with-exact-scalars",
-      "ppc_patch_count": 20,
+      "ppc_patch_count": 23,
       "ppc_addresses": [
         "0x028c6bdc",
         "0x028c7368",
@@ -136,6 +136,9 @@
         "0x028c7744",
         "0x028c7ab0",
         "0x028c7af0",
+        "0x028c7b18",
+        "0x028c7e6c",
+        "0x028c7fe0",
         "0x028c8c34",
         "0x028c966c",
         "0x028c96c0",
@@ -144,7 +147,7 @@
         "0x028c9bdc",
         "0x028c9c9c"
       ],
-      "risk": "中文：2026-08-07 两轮隔离对照均显示动作表现加快而普通游泳路线的实际位移不明显；0.1.20 只补了状态 6/7 的三条坐标积分。当前候选覆盖同一 40 状态水下动作分派器内全部七条直接坐标积分的 0.5→1.0，但仍待实机验收。关闭 #65，以相同 FPS、摇杆幅度、动作和路线分别完成至少三次基线/启用计时，并检查碰撞、上浮/下潜、冲刺和闪避过冲。 / English: Two isolated comparisons on 2026-08-07 showed faster action presentation without clear actual displacement on an ordinary swimming route; 0.1.20 added only the three state-6/7 coordinate integrations. This candidate covers all seven direct 0.5-to-1.0 coordinate integrations in the same 40-state underwater-action dispatcher, but still awaits gameplay acceptance. Disable #65, run at least three baseline and three enabled timings with identical FPS, stick magnitude, action, and route, and check collision, ascent/descent, dashing, and evasion for overshoot."
+      "risk": "中文：2026-08-07 三轮隔离对照均显示动作表现加快而普通游泳路线的实际位移不明显；0.1.21 虽补过其他水下状态，但漏掉普通游泳状态 9 中由入口共用 f31=0.5 驱动的两条最终积分。当前候选只在 0x028C7E6C/0x028C7FE0 跳过该 0.5，并补上 0x028C7B18 的 1.10→2.0 动作标量，不修改共用入口。原 3DS 项没有修改最终位移积分，因此这是 Wii U 实际移动目标的窄范围适配，仍待实机验收。关闭 #65，以相同 FPS、摇杆幅度、动作和路线分别完成至少三次基线/启用计时，并检查碰撞、上浮/下潜、冲刺和闪避过冲。 / English: Three isolated comparisons on 2026-08-07 showed faster action presentation without clear actual displacement on an ordinary swimming route. Although 0.1.21 covered other underwater states, it missed the two ordinary-swim state-9 final integrations driven by entry-shared f31=0.5. This candidate bypasses that 0.5 only at 0x028C7E6C/0x028C7FE0 and adds the missed 1.10-to-2.0 action scalar at 0x028C7B18, without changing the shared entry. Original 3DS #13 does not patch final travel integration, so this is a narrow Wii U physical-movement adaptation that still awaits gameplay acceptance. Disable #65, run at least three baseline and three enabled timings with identical FPS, stick magnitude, action, and route, and check collision, ascent/descent, dashing, and evasion for overshoot."
     },
     {
       "source_index": 14,
