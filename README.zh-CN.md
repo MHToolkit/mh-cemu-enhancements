@@ -19,7 +19,7 @@
 
 适用身份：Wii U Title ID `0005000010104D00`、JP update v96、RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`、Cemu patch module checksum `0x348600a0`。
 
-`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务箱多次实测仍不可用，蓝箱调度桥还会使任务看板对话框空白，因此所有任务箱实验现已暂停并阻止安装。活动 3DS 金手指已完整盘点：44 FPS 使用 Cemu 原生控制项；另有 43 条静态 ARM 项已根据哈希一致的 3DS `.code` 与 JP-v96 PPC 语义/前像映射为独立实验包，共 172 条 PPC 写入。另行提供的 3DS 猫饭金手指已按语义映射到 JP-v96 原生用餐结算函数，并提供三个完整双语 `00..41` 下拉槽；当前仍待实机验证。其他动态指针、热键与注入例程仍只记录为待独立映射。
+`Static Verified` 仅表示 Graphic Pack 结构、Cemu 语法、模块门槛、RPX hash 与声明的 PPC 原始字校验已经通过；**不等于游戏内已验证**。大厅包已由用户实测完整菜单、换装、装备组合与护石功能；30 FPS 因实测不稳定降为实验状态。任务箱多次实测仍不可用，蓝箱调度桥还会使任务看板对话框空白，因此所有任务箱实验现已暂停并阻止安装。活动 3DS 金手指已完整盘点：44 FPS 使用 Cemu 原生控制项；另有 43 条静态 ARM 项已根据哈希一致的 3DS `.code` 与 JP-v96 PPC 语义/前像映射为独立实验包，共 176 条 PPC 写入。另行提供的 3DS 猫饭金手指已按语义映射到 JP-v96 原生用餐结算函数，并提供三个完整双语 `00..41` 下拉槽；当前仍待实机验证。其他动态指针、热键与注入例程仍只记录为待独立映射。
 
 ## 校验、安装、卸载、分发
 
@@ -50,7 +50,7 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.20.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.21.zip
 ```
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。

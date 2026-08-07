@@ -40,6 +40,11 @@
   "patch": "patch_static_13_underwater_speed_x2.asm",
   "preimages": [
     {
+      "address": "0x028c6bdc",
+      "word": "0xc18ae224",
+      "meaning": "中文：同一 40 状态水下动作分派器的状态 2/14 坐标积分从 0x1007E224 载入 0.5；改为 0x1007E1F4 的 1.0。 / English: The state-2/14 coordinate integration in the same 40-state underwater-action dispatcher loads 0.5 from 0x1007E224; redirect it to 1.0 at 0x1007E1F4."
+    },
+    {
       "address": "0x028c7368",
       "word": "0x4bfc972d",
       "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
@@ -77,17 +82,17 @@
     {
       "address": "0x028c7654",
       "word": "0xc18be224",
-      "meaning": "中文：第一条水下坐标积分路径原本从 0x1007e224 载入 0.5；改为从 0x1007e1f4 载入 1.0，使实际位移增量加倍。 / English: The first underwater coordinate-integration path originally loads 0.5 from 0x1007e224; redirect it to 1.0 at 0x1007e1f4 to double the actual displacement delta."
+      "meaning": "中文：状态 6/7 的第一条坐标积分路径从 0x1007E224 载入 0.5；改为从 0x1007E1F4 载入 1.0。 / English: Redirect the first state-6/7 coordinate-integration path from 0.5 at 0x1007E224 to 1.0 at 0x1007E1F4."
     },
     {
       "address": "0x028c76dc",
       "word": "0xc18be224",
-      "meaning": "中文：第二条水下坐标积分分支原本载入 0.5；改为载入 1.0，覆盖另一输入/动作路径。 / English: The second underwater coordinate-integration branch originally loads 0.5; redirect it to 1.0 to cover the alternate input/action path."
+      "meaning": "中文：状态 6/7 的第二条坐标积分路径从 0.5 改为 1.0。 / English: Redirect the second state-6/7 coordinate-integration path from 0.5 to 1.0."
     },
     {
       "address": "0x028c7744",
       "word": "0xc18be224",
-      "meaning": "中文：第三条水下坐标积分分支原本载入 0.5；改为载入 1.0，避免分支回落到原始位移。 / English: The third underwater coordinate-integration branch originally loads 0.5; redirect it to 1.0 so the fallback branch cannot retain the original displacement."
+      "meaning": "中文：状态 6/7 的第三条坐标积分路径从 0.5 改为 1.0。 / English: Redirect the third state-6/7 coordinate-integration path from 0.5 to 1.0."
     },
     {
       "address": "0x028c7ab0",
@@ -98,6 +103,11 @@
       "address": "0x028c7af0",
       "word": "0x4bfc8fa5",
       "meaning": "中文：强制效果 ID 0xC7 的 PPC 直接检查返回真。 / English: Force the direct PPC check for effect ID 0xC7 to return true."
+    },
+    {
+      "address": "0x028c8c34",
+      "word": "0xc009e224",
+      "meaning": "中文：同一水下动作分派器的状态 16/17 坐标积分从 0.5 改为 1.0。 / English: Redirect the state-16/17 coordinate integration in the same underwater-action dispatcher from 0.5 to 1.0."
     },
     {
       "address": "0x028c966c",
@@ -118,6 +128,16 @@
       "address": "0x028c971c",
       "word": "0xc00ae2d0",
       "meaning": "中文：把 1.10 倍路径重定向到 JP v96 已有的 2.0 常量。 / English: Redirect the 1.10 path to an existing JP-v96 2.0 constant."
+    },
+    {
+      "address": "0x028c9bdc",
+      "word": "0xc1a9e224",
+      "meaning": "中文：同一水下动作分派器的状态 29 第一条坐标积分路径从 0.5 改为 1.0。 / English: Redirect the first state-29 coordinate-integration path in the same underwater-action dispatcher from 0.5 to 1.0."
+    },
+    {
+      "address": "0x028c9c9c",
+      "word": "0xc1a9e224",
+      "meaning": "中文：同一水下动作分派器的状态 29 第二条坐标积分路径从 0.5 改为 1.0。 / English: Redirect the second state-29 coordinate-integration path in the same underwater-action dispatcher from 0.5 to 1.0."
     }
   ],
   "anchors": [
@@ -178,8 +198,8 @@
     }
   ],
   "known_risks": [
-    "中文：2026-08-07 隔离实测否定了旧候选：仅强制 0xC7 检查并把动作倍率改为 2.0，只会看到动作表现加速，整体位移不明显。修正版额外把同一 PPC 水下处理函数的三条坐标积分路径从 0.5 改为 1.0；这是针对 Wii U 行为新增的位移校正，尚未通过修后实机验收。 / English: The 2026-08-07 isolated test rejected the old candidate: forcing effect 0xC7 and changing only the action-rate scalars to 2.0 produced visible action-rate acceleration without clear overall displacement. The correction additionally changes all three coordinate-integration paths in the same PPC underwater handler from 0.5 to 1.0; this Wii U-specific displacement correction still awaits post-fix gameplay verification.",
-    "中文：只启用本项并关闭 #65，保持 FPS、武器、模拟摇杆幅度、动作与起终点一致，对同一路线计时至少三次；同时检查碰撞、转向、上浮/下潜是否出现过冲。 / English: Enable only this pack and disable #65; keep FPS, weapon, analog-stick magnitude, action, and route endpoints identical, time the same underwater route at least three times, and also check collision, turning, ascent, and descent for overshoot."
+    "中文：2026-08-07 的第二次隔离对照再次否定 0.1.20 候选：动作表现加速，但实际路线位移仍没有明显提升。静态复盘确认旧修正版只覆盖 40 状态水下动作分派器中状态 6/7 的三条坐标积分；当前候选补齐同一分派器状态 2/14、16/17、29 的另外四条直接坐标积分，共覆盖该分派器内全部七条 0.5→坐标写回路径。该补齐尚未通过修后实机验收。 / English: A second isolated comparison on 2026-08-07 rejected the 0.1.20 candidate again: action-rate acceleration was visible, but measured route displacement still did not clearly increase. Static review showed that 0.1.20 covered only the three state-6/7 coordinate integrations in the 40-state underwater-action dispatcher. This candidate adds the four direct coordinate integrations for states 2/14, 16/17, and 29, covering all seven 0.5-to-coordinate-write paths inside that dispatcher. The expanded coverage still awaits post-fix gameplay verification.",
+    "中文：只启用本项并关闭 #65，保持 FPS、武器、模拟摇杆幅度、动作与起终点一致；对同一路线计时：基线和启用后各至少三次并比较中位数，同时检查碰撞、转向、上浮/下潜、冲刺与闪避是否过冲。 / English: Enable only this pack and disable #65; keep FPS, weapon, analog-stick magnitude, action, and route endpoints identical. Time the same underwater route for at least three baseline and three enabled runs, compare medians, and also check collision, turning, ascent/descent, dashing, and evasion for overshoot."
   ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
@@ -188,5 +208,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #13 转换为 JP v96 PPC，并根据 2026-08-07 实测补充三条实际水下坐标积分的 0.5→1.0 位移校正；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #13 to JP-v96 PPC and, following the 2026-08-07 gameplay result, adds 0.5-to-1.0 displacement corrections to all three actual underwater coordinate-integration paths; disabled by default and classified Runtime Experimental."
+  "summary": "中文：把 3DS 静态 ARM 金手指 #13 转换为 JP v96 PPC；根据两轮 2026-08-07 负向实测，除 0xC7 与动作倍率外，现覆盖同一 40 状态水下动作分派器内全部七条直接坐标积分的 0.5→1.0 位移校正；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #13 to JP-v96 PPC. Following two negative gameplay comparisons on 2026-08-07, it now supplements the 0xC7/action-rate mapping with 0.5-to-1.0 corrections for all seven direct coordinate integrations in the same 40-state underwater-action dispatcher; disabled by default and classified Runtime Experimental."
 }

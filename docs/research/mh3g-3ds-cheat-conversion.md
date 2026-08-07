@@ -15,7 +15,7 @@ This matrix inventories all 73 entries in the active 3DS Gateway/Citra cheat fil
 
 ## 已实现 / Implemented
 
-- **43 个独立静态 ARM 转换包**：共 172 条 JP-v96 PPC 固定地址写入；每包双语、默认关闭、`Runtime Experimental / Gameplay Pending`，必须显式选择安装。#13 另含 2026-08-07 实测后新增的三条 Wii U 水下位移积分校正。
+- **43 个独立静态 ARM 转换包**：共 176 条 JP-v96 PPC 固定地址写入；每包双语、默认关闭、`Runtime Experimental / Gameplay Pending`，必须显式选择安装。#13 根据 2026-08-07 两轮负向实测，现补齐同一 40 状态水下动作分派器内全部七条直接坐标积分的位移校正。
 - **#71 锁定 44 FPS / Lock 44 FPS**：`mh3g-hd-jp-v96-fps-lock-44`，使用 `vsyncFrequency = 44`；#73 为重复项，不另建包。
 - 43 项完整映射、PPC 写入数和包 ID 见 [mh3g-static-arm-mapping.md](mh3g-static-arm-mapping.md)。
 - 静态门禁已覆盖：3DS 源 hash、目标 RPX hash、PPC 原指令/锚点、manifest/schema、真实 Cemu PPC 汇编器语法；**这些不等于游戏内已验证**。

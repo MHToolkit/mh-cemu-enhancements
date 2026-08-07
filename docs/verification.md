@@ -1,37 +1,46 @@
-# #13 underwater displacement correction / #13 水下实际位移修正（2026-08-07，0.1.20）
+# #13 full underwater-dispatch displacement candidate / #13 水下分派器完整位移候选（2026-08-07，0.1.21）
 
-## Superseding verdict / 覆盖性结论
+## Superseding runtime verdict / 覆盖性实测结论
 
-The previous #13 candidate did **not** pass its intended gameplay acceptance. In the isolated run, the underwater action presentation visibly accelerated, while overall travel speed/displacement did not show the expected 2× change. Therefore the earlier static conclusion that the 3DS effect checks and action-rate scalars were mapped correctly is no longer sufficient evidence for the feature name “Underwater Speed ×2.”
+The 0.1.20 candidate also did **not** pass the intended gameplay acceptance. In a same-route comparison, the underwater action presentation looked accelerated, but the character did not cover clearly more actual distance. This is a real negative runtime result, not an installation failure: the isolated profile loaded the exact JP-v96 title and the refreshed #13 pack, and the user compared movement in gameplay.
 
-旧版 #13 **未通过目标功能验收**：隔离实测能看到水下动作表现加速，但整体移动速度/位移没有呈现预期的 2 倍变化。因此，之前“效果检查与动作倍率映射正确”的静态结论，不能再作为“水下速度 2 倍”已经实现的证据。本节覆盖 2026-08-06 与 2026-08-05 记录中对 #13 的旧判断；那些记录仅保留为历史。
+0.1.20 候选同样**没有通过目标功能验收**：同路线对照时能看到水下动作表现加速，但角色实际经过的距离没有明显增加。这是有效的运行时负向结果，不是安装失败；隔离配置确实载入了 JP v96 与当时最新的 #13 包，用户也已在游戏内完成移动对照。
 
-## Static RCA and correction / 静态根因与修正
+因此，0.1.20 中“状态 6/7 的三条坐标积分已改为 1.0”只能保留为静态事实，不能再表述为“水下整体位移已经加倍”。当前 0.1.21 仍是新的 **Runtime Experimental** 候选，不是修复成功声明。
 
-1. The source 3DS entry forces effect ID `0xC7` and changes the `1.05/1.10` action-rate paths, which update the per-action state field corresponding to PPC `state + 0x608`. Those writes explain the visible animation/action acceleration but do not directly scale the later coordinate delta.
-2. In the exact JP-v96 PPC counterpart, all three branches that integrate the underwater direction vector into `state + 0xE0/+0xE4/+0xE8` load `0.5` from RPX address `0x1007E224`. Their exact instruction preimages are `C18BE224` at `0x028C7654`, `0x028C76DC`, and `0x028C7744`.
-3. The corrected candidate redirects only those three loads to the adjacent pinned `1.0` constant at `0x1007E1F4` (`lfs f12, -0x1e0c(r11)`). The RPX SHA-256 remains pinned to `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`, so both the code preimages and constant layout fail closed.
-4. The original effect checks and action-rate changes remain in place. The new three writes are a Wii U-specific displacement correction added after runtime evidence exposed the source-semantic gap. The pack remains `Runtime Experimental`; static verification does not prove that every underwater action, collision case, or vertical movement now behaves correctly.
+## RCA and expanded correction / 根因与扩展修正
 
-3DS 原项强制 `0xC7` 效果并修改 `1.05/1.10` 动作倍率，对应 PPC 的 `state + 0x608` 动作状态字段，所以会出现“动作加快但整体位移不明显”。JP v96 PPC 的三条实际坐标积分分支在 `0x028C7654`、`0x028C76DC`、`0x028C7744` 从 `0x1007E224` 载入 `0.5`，再把方向向量累加到 `state + 0xE0/+0xE4/+0xE8`。修正版只把这三条载入重定向到同一 RPX 的 `0x1007E1F4 = 1.0`，从而把实际位移增量加倍；仍需实机复测，不能标记为 `Runtime Verified`。
+1. The original 3DS entry forces effect ID `0xC7` and changes the `1.05/1.10` scalars corresponding to PPC field `state + 0x608`. PPC function `0x028A10F8..0x028A1190` loads that field at `0x028A1118` and copies it to eight animation slots at `+0x2AC`. This directly explains why the action presentation accelerates; it is not evidence that world displacement increased.
+2. The PPC action dispatcher at `0x028CA170` reads the state ID from `state + 0x40` and dispatches 40 action states. The 0.1.20 correction touched only the three direct coordinate integrations in handler `0x028C7244` for states 6/7 (`0x028C7654`, `0x028C76DC`, `0x028C7744`). The negative route comparison shows that covering only this branch family is insufficient for ordinary swimming.
+3. Static enumeration of that same dispatcher found four additional direct integrations that load `0.5` from pinned RPX constant `0x1007E224`, multiply the frame/action scalar, and write the resulting vector into `state + 0xE0/+0xE4/+0xE8`:
+   - states 2/14: `0x028C6BDC`
+   - states 16/17: `0x028C8C34`
+   - state 29, two branches: `0x028C9BDC`, `0x028C9C9C`
+4. 0.1.21 redirects those four loads plus the existing three state-6/7 loads to pinned `1.0` at `0x1007E1F4`. It therefore covers all seven direct `0.5 -> coordinate write-back` paths inside this 40-state dispatcher, while deliberately not touching similar-looking sites outside the dispatcher.
+5. Which one of states 2/14, 16/17, or 29 was used by the user's ordinary-swim route is an inference until a live state trace is recorded. The expanded coverage is statically complete for this dispatcher, but gameplay timing and side-effect checks remain mandatory.
 
-## Required post-fix retest / 修后必须复测
+3DS 原项对 `0xC7` 与 `1.05/1.10` 的修改在 PPC 侧落到 `state + 0x608`；`0x028A1118` 会把该字段复制到八个动画槽，因此“动作加速”有明确数据流证据，但它不等于世界坐标位移加速。0.1.20 只修改了 40 状态动作分派器中状态 6/7 的三条坐标积分，覆盖面不足。0.1.21 补上状态 2/14、16/17、29 的另外四条直接积分，使该分派器内全部七条 `0.5 -> 坐标写回` 路径统一改为 `1.0`；分派器外的相似位置保持不动，以避免盲目扩大影响面。普通游泳实测具体经过哪一个新增状态，在拿到 live trace 前仍属于推断。
 
-- Enable only #13 and disable #65; keep the same FPS cap in both baseline and enabled runs. / 只启用 #13，并关闭 #65；基线与启用后的 FPS 必须相同。
-- Use the same weapon, full analog-stick magnitude, camera/direction, underwater action, and start/end markers. / 固定武器、满幅摇杆、镜头/方向、水下动作与起终点标记。
-- Time the same route at least three times for baseline and three times with #13; compare medians rather than visual animation speed. / 基线与启用后各跑同一路线至少三次，比较中位耗时，不以动画目测代替位移结果。
-- Separately check forward travel, turning, ascent/descent, wall collision, and stopping for overshoot or input lock. / 另查前进、转向、上浮/下潜、撞墙与停止动作是否过冲或锁输入。
+## Required gameplay acceptance / 必须完成的实机验收
 
-## 2026-08-07 static and isolated-install gates / 静态与隔离安装门禁
+- Disable #13 for the baseline, then enable only #13 for the candidate; keep #65 and every other static cheat disabled. / 基线关闭 #13，候选只启用 #13；#65 与其他静态金手指全部关闭。
+- Keep FPS cap, weapon, full-stick magnitude, camera/direction, action, and start/end markers identical. / 固定 FPS、武器、满幅摇杆、镜头/方向、动作与起终点标记。
+- Time the same underwater route at least three times in each mode and compare median elapsed time; animation appearance is not an acceptance metric. / 两种模式对同一路线各计时至少三次并比较中位耗时；动画观感不作为通过标准。
+- Separately check ordinary forward swimming, dash, turning, ascent/descent, evasion, wall collision, stopping, and input recovery for overshoot or lock-up. / 另查普通前游、冲刺、转向、上浮/下潜、闪避、撞墙、停止与输入恢复是否过冲或锁死。
 
-1. `pytest tests/ -q` passes **29/29** executed tests with one optional immutable-reference test skipped because its historical default path was cleaned; the equivalent `verify-reference` gate was run explicitly against the RPX freshly extracted from the active WUA.
-2. `validate` accepts all **50** manifests. `verify-reference` accepts the extracted JP-v96 RPX with SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and all declared preimages/anchors, including the three new `C18BE224` assertions.
-3. Cemu's real `PPCAssembler` encodes each new instruction as `C18BE1F4` with zero relocations: `0x028C7654`, `0x028C76DC`, and `0x028C7744` all assemble as `lfs f12, -0x1e0c(r11)`.
-4. Ruff and `git diff --check` pass. The mapping ledger now totals **172** static PPC writes; #13 contains **16** writes/preimages.
-5. With no Cemu game process running, only #13 was refreshed in the isolated underwater-test profile. Its installed tree SHA-256 is `146672c9107795b1533765a16de26c911a1cac98ec44380ceba8982f5bf48f89`, exactly matching the repository source tree; inspection reports `installed=true` and preserves `enabled=true`.
-6. The isolated `settings.xml` SHA-256 remained `229e0e06225027d07b2e1077596011445cb5f477d85835c7cfbb98631b8506ac` before and after installation. No Cemu process was launched and no save/MLC path was modified.
+## 0.1.21 static and isolated-install gates / 0.1.21 静态与隔离安装门禁
 
-以上结果只证明新位移候选的静态正确性、目标 RPX 身份与安装完整性；只有修后实机路线计时和异常动作检查通过，才能把 #13 升级为运行验收通过。
+1. `pytest tests/ -q` passes **29/29** executed tests; one optional immutable-reference test is skipped because its historical default fixture path is absent. The equivalent reference gate was run explicitly against the active extracted RPX.
+2. `validate` accepts all **50** manifests. `verify-reference` accepts JP-v96 RPX SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every declared preimage/anchor, including the four new words `C18AE224`, `C009E224`, `C1A9E224`, and `C1A9E224`.
+3. Cemu's real `PPCAssembler` assembles all seven displacement instructions with zero relocations: `C18AE1F4`, `C18BE1F4` x3, `C009E1F4`, and `C1A9E1F4` x2.
+4. Ruff and `git diff --check` pass. The static mapping ledger now totals **176** PPC writes; #13 contains **20** writes/preimages, of which seven are direct displacement integrations.
+5. With no Cemu game process running, only #13 was refreshed in the isolated underwater-test profile. Inspection reports `installed=true` and preserves `enabled=true`. Repository and installed pack tree hashes both equal `bae8abb9e5d5f6cce880e64a4f6a7c195c3fb0dd554102a2e1f30e8085f79a12`.
+6. The isolated `settings.xml` SHA-256 remains `229e0e06225027d07b2e1077596011445cb5f477d85835c7cfbb98631b8506ac`; no save/MLC path was modified, and no Cemu process was launched by this verification.
+7. Two independent 0.1.21 package builds are byte-identical; the final archive digest is recorded in `dist/mh-cemu-enhancements-0.1.21.zip.sha256`.
+
+These gates prove exact-binary targeting, assembler validity, dispatcher coverage, and installation integrity only. They do not prove that actual underwater travel is now 2x; the pack remains **Runtime Experimental / Gameplay Pending** until the timed gameplay comparison passes.
+
+以上门禁只证明目标二进制、汇编器编码、分派器覆盖与安装完整性，**不证明实际水下路程已经达到 2 倍**。只有计时实测通过后，才能升级运行时结论。
 
 # Runtime feedback correction / 实测反馈修正（2026-08-06，0.1.19）
 
