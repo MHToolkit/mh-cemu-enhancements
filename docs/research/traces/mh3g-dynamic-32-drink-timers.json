@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #32 hot/cold drink timer-pair candidates",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证每帧更新函数中的两组玩家浮点计时器：+0x974/+0x978 与 +0x980/+0x984。通过高温和低温各一次受控饮用，确定哪组对应热饮、哪组对应冷饮。只记录，不修改。",
+  "purpose_en": "Prove the two player float-timer pairs in the per-frame updater, +0x974/+0x978 and +0x980/+0x984. Use one controlled drink in a hot area and one in a cold area to identify which pair is hot-drink versus cold-drink state. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "第一次在明确高温且未受保护的任务中记录饮用前状态，启动 tracer 后只喝一次对应饮料；第二次在明确低温任务用全新输出文件重复。",
+    "每次保持同一装备、技能和猫饭，不换区，不同时使用笛、旋律或其他环境免疫效果。",
+    "两个断点都应命中；比较饮用前后四个大端 float，仅当一组当前/前值按饮料效果上升并随后按环境速率递减，另一组保持符合环境逻辑时，才标注热/冷身份并升级。"
+  ],
+  "operator_steps_en": [
+    "First record pre-drink state in a clearly hot unprotected quest, start the tracer, and consume only the matching drink. Repeat with a fresh output file in a clearly cold quest.",
+    "Keep equipment, skills, and food constant; do not change areas or use horns, melodies, or other environmental immunity effects concurrently.",
+    "Both breakpoints should hit. Compare all four big-endian floats before and after drinking; label hot/cold identity and promote only when one current/previous pair rises with the drink then decreases at the environmental rate while the other follows the expected environment logic."
+  ],
+  "breakpoints": [
+    {
+      "label": "first_drink_timer_pair",
+      "address": "0x02893154",
+      "expected_word": "0xc1670978"
+    },
+    {
+      "label": "second_drink_timer_pair",
+      "address": "0x028932b4",
+      "expected_word": "0xc1670984"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_drink_timer_pairs",
+      "register": "r7",
+      "offset": 2416,
+      "size": 32
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #23 item-box slot-one runtime layout candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "打开大厅完整道具箱时，验证 0x021F1900 的 r29 指向当前 4 字节箱子记录，第一次命中是首格，记录 +0 为半字道具 ID、+2 为有符号半字数量。只记录，不修改内存。",
+  "purpose_en": "While opening the full lobby item box, prove that r29 at 0x021F1900 points to the current four-byte box record, that the first hit is slot one, and that record +0 is the halfword item ID while +2 is the signed halfword quantity. Record only; do not modify memory.",
+  "operator_steps_zh": [
+    "先在游戏内记下道具箱第一格的道具和数量；不要整理、排序或同时移动其他格。",
+    "启动 tracer 后只打开一次大厅完整道具箱，保留第一次命中；r30 应为 0，r29 的 16 字节快照首个记录应与第一格 ID/数量一致。",
+    "停止 tracer，向第一格存入或取出一个物品，再重复一次并确认同一记录的 +2 数量精确变化 1；这只验证运行时布局，不证明持久写入点。"
+  ],
+  "operator_steps_en": [
+    "Record the item and quantity in item-box slot one in game; do not sort, organize, or move other slots at the same time.",
+    "Start the tracer and open the full lobby item box exactly once, retaining the first hit. r30 should be zero, and the first record in the 16-byte r29 snapshot should match slot one's ID and quantity.",
+    "Stop the tracer, deposit or withdraw one item in slot one, then repeat and confirm that +2 in the same record changes by exactly one. This proves only the runtime layout, not a persistence writer."
+  ],
+  "breakpoints": [
+    {
+      "label": "item_box_quantity_load",
+      "address": "0x021f1900",
+      "expected_word": "0xa8fd0002"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "item_box_current_and_following_records",
+      "register": "r29",
+      "offset": 0,
+      "size": 16
+    }
+  ]
+}

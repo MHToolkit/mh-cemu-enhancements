@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #58 placed-count +0x574 two-limit candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证 0x0289A728 是玩家已放置物准入 helper，r8+0x574 是与 2 比较的 8 位计数，并通过受控放置确定物品类别。只记录，不修改。",
+  "purpose_en": "Prove that 0x0289A728 is a placed-object admission helper, r8+0x574 is an 8-bit counter compared with two, and identify its item category through controlled placement. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "在无放置物的稳定任务启动 tracer，按固定顺序尝试炸弹、陷阱、肉，记录触发命中的具体动作。",
+    "使用全新输出文件，在已有同类对象时再次放置，记录 +0x574、游戏接受/拒绝结果和对象数量。",
+    "确认 +0x574 随同一类别变化、拒绝边界与原生 `<2` 判断一致，并验证对象消失后计数回落，才确认字段身份。"
+  ],
+  "operator_steps_en": [
+    "Start the tracer in a stable quest with no placed objects, then try bombs, traps, and meat in a fixed order and record the exact action that triggers the hit.",
+    "With a fresh output file, place the same category again while an earlier object remains, recording +0x574, acceptance or rejection, and visible object count.",
+    "Confirm identity only when +0x574 follows that category, the rejection boundary agrees with the native less-than-two test, and the counter falls after object removal."
+  ],
+  "breakpoints": [
+    {
+      "label": "placed_count_two_limit",
+      "address": "0x0289a738",
+      "expected_word": "0x88080574"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_placed_counts",
+      "register": "r8",
+      "offset": 1384,
+      "size": 32
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #31 HP-state candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "用真实受伤和回复动作验证 0x02865D08 是 HP 变化函数：命中 0x02865FEC 时 r10 指向玩家状态，r31 为有符号变化量，+0x640/+0x642 为当前/最大 HP。只记录，不修改状态。",
+  "purpose_en": "Use real damage and healing actions to prove that 0x02865D08 is the HP-change function: at 0x02865FEC, r10 points to player state, r31 is the signed delta, and +0x640/+0x642 are current/max HP. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "在任务中先记录可见当前/最大 HP，然后让怪物造成一次可控伤害并运行一次 trace，记录 r31 与 +0x640/+0x642。",
+    "恢复运行后另开一次 trace，使用回复药产生真实回复；要求 r31 符号/数值方向与当前 HP 变化一致且最大 HP 不变。",
+    "本 spec 不证明 A 输入；还必须独立执行归一化输入 spec 并验证 A 为 0x2000，才能讨论按 A 每帧回复的桥接。"
+  ],
+  "operator_steps_en": [
+    "In a quest, note visible current/max HP, take one controlled monster hit, and run one trace while recording r31 and +0x640/+0x642.",
+    "Resume and take a separate trace while using a healing item. Require r31's sign/value direction to match the current-HP transition while maximum HP remains stable.",
+    "This spec does not prove A input. Independently run the normalized-input spec and prove A is 0x2000 before considering a per-frame press-A healing bridge."
+  ],
+  "breakpoints": [
+    {
+      "label": "current_hp_before_write",
+      "address": "0x02865fec",
+      "expected_word": "0xa98a0640"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_hp_window",
+      "register": "r10",
+      "offset": 1592,
+      "size": 32
+    }
+  ]
+}

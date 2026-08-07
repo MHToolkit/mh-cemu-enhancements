@@ -176,21 +176,53 @@ class CemuGDBProbeTests(unittest.TestCase):
         paths = sorted(COMMITTED_TRACES.glob("*.json"))
         self.assertEqual(
             [
+                "mh3g-dynamic-01-03-speed-state.json",
+                "mh3g-dynamic-04-sharpness-state.json",
                 "mh3g-dynamic-08-pouch-delta.json",
+                "mh3g-dynamic-09-pouch-slot-one.json",
                 "mh3g-dynamic-12-item-cap-return.json",
                 "mh3g-dynamic-19-attack-derived.json",
                 "mh3g-dynamic-20-defense-derived.json",
+                "mh3g-dynamic-23-item-box-slot-one.json",
+                "mh3g-dynamic-24-gunlance-counts.json",
+                "mh3g-dynamic-30-bowgun-counts.json",
+                "mh3g-dynamic-31-hp-state.json",
+                "mh3g-dynamic-32-drink-timers.json",
+                "mh3g-dynamic-57-placed-object-threshold.json",
+                "mh3g-dynamic-58-placed-count-three-limit.json",
+                "mh3g-dynamic-58-placed-count-two-limit.json",
+                "mh3g-dynamic-58-placed-count-zero-limit.json",
                 "mh3g-dynamic-62-oxygen-delta.json",
+                "mh3g-dynamic-controller-normalized-input.json",
             ],
             [path.name for path in paths],
         )
         specs = [self.probe.load_spec(path) for path in paths]
         self.assertEqual(
-            [0x0219B6F0, 0x0203A2A0, 0x0286769C, 0x02867D14, 0x02863F0C],
+            [
+                0x028924AC,
+                0x0285F0F4,
+                0x0219B6F0,
+                0x0219B830,
+                0x0203A2A0,
+                0x0286769C,
+                0x02867D14,
+                0x021F1900,
+                0x02856CEC,
+                0x02856D7C,
+                0x02865FEC,
+                0x02893154,
+                0x0218A394,
+                0x0289A618,
+                0x0289A738,
+                0x0289A018,
+                0x02863F0C,
+                0x02BCB9CC,
+            ],
             [s.breakpoints[0].address for s in specs],
         )
         self.assertEqual(
-            [128, 20, 32, 32, 64],
+            [32, 32, 128, 4, 20, 32, 32, 16, 32, 32, 32, 32, 12, 32, 32, 32, 64, 32],
             [s.register_memory[0].size for s in specs],
         )
 

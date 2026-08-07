@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #57 placed-object threshold candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证 0x0218A38C 比较器的 r4 是 12 字节放置物槽、+0 是 ID、+7 是与 r5 比较的状态/阈值，并确定哪些真实动作调用该路径。只记录，不修改。",
+  "purpose_en": "Prove that comparator 0x0218A38C receives a 12-byte placed-object slot in r4, with ID at +0 and a state/threshold byte at +7 compared against r5, and identify which real actions call this path. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "进入稳定任务且场上没有放置物；分别以全新输出文件尝试放置炸弹、陷阱和肉，记录哪个动作命中断点。",
+    "对命中的同一类别重复放置，并在对象仍存在、游戏拒绝、回收或消失后分别重新 trace；断点命中时记录 r4+0 的 ID、r4+7 的值和 GPR r5 请求阈值。",
+    "只有 ID 稳定对应同一类别、+7 与对象生命周期一致、比较结果能解释原生允许/拒绝行为时，才确认字段语义；L/R+左输入门必须另用共用控制器 trace 验证。"
+  ],
+  "operator_steps_en": [
+    "Enter a stable quest with no placed objects. Use a fresh output file while attempting a bomb, trap, and meat separately, and record which action hits the breakpoint.",
+    "Repeat placement for the matching category, then retrace while the object exists, when the game rejects placement, and after pickup or disappearance. At each hit record ID at r4+0, the byte at r4+7, and requested threshold in GPR r5.",
+    "Confirm the field only if the ID stays tied to one category, +7 follows the object lifecycle, and the comparison explains native allow/reject behavior. The L/R+Left input gate requires the separate shared controller trace."
+  ],
+  "breakpoints": [
+    {
+      "label": "placed_object_threshold_compare",
+      "address": "0x0218a394",
+      "expected_word": "0x7c056010"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "placed_object_slot",
+      "register": "r4",
+      "offset": 0,
+      "size": 12
+    }
+  ]
+}
