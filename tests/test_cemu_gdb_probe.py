@@ -84,9 +84,10 @@ class CemuGDBProbeTests(unittest.TestCase):
         class FakeRegisterClient:
             def request(self, payload, timeout=5.0):
                 values = {
-                    "p3": "78563412",
+                    "p3": "12345678",
                     "p40": "0219b6f0",
-                    "p43": "f0debc9a",
+                    "p43": "9abcdef0",
+                    "p1f": "2d8914b0",
                 }
                 return values[payload]
 
@@ -95,6 +96,7 @@ class CemuGDBProbeTests(unittest.TestCase):
         self.assertEqual(0x12345678, client.read_register(3))
         self.assertEqual(0x0219B6F0, client.read_register(self.probe.PPC_PC_REGISTER))
         self.assertEqual(0x9ABCDEF0, client.read_register(self.probe.PPC_LR_REGISTER))
+        self.assertEqual(0x2D8914B0, client.read_register(31))
 
     def test_trace_spec_pins_identity_preimages_and_snapshot_ranges(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -313,6 +315,249 @@ class CemuGDBProbeTests(unittest.TestCase):
         self.assertIn("cleanup_interrupt", events)
         self.assertIn("cleanup_breakpoint", events)
         self.assertEqual("resumed", events[-1])
+
+    def test_wait_register_nonzero_skips_zero_hit_then_captures(self):
+        class FakeSocket:
+            def __init__(self):
+                self.closed = False
+
+            def close(self):
+                self.closed = True
+
+        class FakeClient:
+            instance = None
+
+            def __init__(self, sock):
+                self.sock = sock
+                self.condition_reads = 0
+                self.continue_count = 0
+                FakeClient.instance = self
+
+            def receive(self, timeout=None):
+                return "T05thread:00000001;core:01;swbreak:;"
+
+            def request(self, payload, timeout=5.0):
+                return "OK"
+
+            def read_memory(self, address, size):
+                if address == 0x028C7B18 and size == 4:
+                    return bytes.fromhex("c169e2d0")
+                return bytes(size)
+
+            def read_register(self, register):
+                if register == self.probe.PPC_PC_REGISTER:
+                    return 0x028C7B18
+                if register == 29:
+                    self.condition_reads += 1
+                    return 0 if self.condition_reads == 1 else 0x2000
+                if register == 31:
+                    return 0x10000010
+                return 0
+
+            def continue_(self):
+                self.continue_count += 1
+
+        FakeClient.probe = self.probe
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_spec = self.probe.load_spec(self.write_spec(root))
+            output = root / "trace.jsonl"
+            sock = FakeSocket()
+            original_connect = self.probe._connect
+            original_client = self.probe.RSPClient
+            original_settle = self.probe.CEMU_GDB_SETTLE_SECONDS
+            self.probe._connect = lambda host, port, timeout: sock
+            self.probe.RSPClient = FakeClient
+            self.probe.CEMU_GDB_SETTLE_SECONDS = 0
+            try:
+                self.probe.run_trace(
+                    trace_spec,
+                    output,
+                    "127.0.0.1",
+                    1337,
+                    1.0,
+                    wait_register_nonzero=29,
+                    max_skipped_hits=2,
+                )
+            finally:
+                self.probe._connect = original_connect
+                self.probe.RSPClient = original_client
+                self.probe.CEMU_GDB_SETTLE_SECONDS = original_settle
+            rows = [json.loads(line) for line in output.read_text().splitlines()]
+
+        self.assertEqual(1, sum(row["event"] == "condition_miss" for row in rows))
+        met = next(row for row in rows if row["event"] == "condition_met")
+        self.assertEqual("0x00002000", met["value"])
+        self.assertEqual("0x00000000", met["excluded_value"])
+        self.assertNotIn("required_mask", met)
+        hit = next(row for row in rows if row["event"] == "hit")
+        self.assertEqual("0x00002000", hit["snapshot"]["gpr"]["r29"])
+        self.assertEqual(3, FakeClient.instance.continue_count)
+        self.assertTrue(sock.closed)
+
+    def test_wait_register_not_value_skips_baseline_then_captures_change(self):
+        class FakeSocket:
+            def __init__(self):
+                self.closed = False
+
+            def close(self):
+                self.closed = True
+
+        class FakeClient:
+            instance = None
+
+            def __init__(self, sock):
+                self.sock = sock
+                self.condition_reads = 0
+                self.continue_count = 0
+                FakeClient.instance = self
+
+            def receive(self, timeout=None):
+                return "T05thread:00000001;core:01;swbreak:;"
+
+            def request(self, payload, timeout=5.0):
+                return "OK"
+
+            def read_memory(self, address, size):
+                if address == 0x028C7B18 and size == 4:
+                    return bytes.fromhex("c169e2d0")
+                return bytes(size)
+
+            def read_register(self, register):
+                if register == self.probe.PPC_PC_REGISTER:
+                    return 0x028C7B18
+                if register == 29:
+                    self.condition_reads += 1
+                    return 0x80080000 if self.condition_reads == 1 else 0xA0080000
+                if register == 31:
+                    return 0x10000010
+                return 0
+
+            def continue_(self):
+                self.continue_count += 1
+
+        FakeClient.probe = self.probe
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_spec = self.probe.load_spec(self.write_spec(root))
+            output = root / "trace.jsonl"
+            sock = FakeSocket()
+            original_connect = self.probe._connect
+            original_client = self.probe.RSPClient
+            original_settle = self.probe.CEMU_GDB_SETTLE_SECONDS
+            self.probe._connect = lambda host, port, timeout: sock
+            self.probe.RSPClient = FakeClient
+            self.probe.CEMU_GDB_SETTLE_SECONDS = 0
+            try:
+                self.probe.run_trace(
+                    trace_spec,
+                    output,
+                    "127.0.0.1",
+                    1337,
+                    1.0,
+                    wait_register_not_value=(29, 0x80080000),
+                    max_skipped_hits=2,
+                )
+            finally:
+                self.probe._connect = original_connect
+                self.probe.RSPClient = original_client
+                self.probe.CEMU_GDB_SETTLE_SECONDS = original_settle
+            rows = [json.loads(line) for line in output.read_text().splitlines()]
+
+        miss = next(row for row in rows if row["event"] == "condition_miss")
+        self.assertEqual("not_value", miss["condition"])
+        self.assertEqual("0x80080000", miss["excluded_value"])
+        met = next(row for row in rows if row["event"] == "condition_met")
+        self.assertEqual("0xa0080000", met["value"])
+        self.assertEqual("0x80080000", met["excluded_value"])
+        self.assertNotIn("required_mask", met)
+        hit = next(row for row in rows if row["event"] == "hit")
+        self.assertEqual("0xa0080000", hit["snapshot"]["gpr"]["r29"])
+        self.assertEqual(3, FakeClient.instance.continue_count)
+        self.assertTrue(sock.closed)
+
+    def test_wait_register_mask_ignores_unrelated_high_bits(self):
+        class FakeSocket:
+            def __init__(self):
+                self.closed = False
+
+            def close(self):
+                self.closed = True
+
+        class FakeClient:
+            instance = None
+
+            def __init__(self, sock):
+                self.sock = sock
+                self.condition_reads = 0
+                self.continue_count = 0
+                FakeClient.instance = self
+
+            def receive(self, timeout=None):
+                return "T05thread:00000001;core:01;swbreak:;"
+
+            def request(self, payload, timeout=5.0):
+                return "OK"
+
+            def read_memory(self, address, size):
+                if address == 0x028C7B18 and size == 4:
+                    return bytes.fromhex("c169e2d0")
+                return bytes(size)
+
+            def read_register(self, register):
+                if register == self.probe.PPC_PC_REGISTER:
+                    return 0x028C7B18
+                if register == 29:
+                    self.condition_reads += 1
+                    if self.condition_reads == 1:
+                        return 0x80080000
+                    return 0x80082000
+                if register == 31:
+                    return 0x10000010
+                return 0
+
+            def continue_(self):
+                self.continue_count += 1
+
+        FakeClient.probe = self.probe
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            trace_spec = self.probe.load_spec(self.write_spec(root))
+            output = root / "trace.jsonl"
+            sock = FakeSocket()
+            original_connect = self.probe._connect
+            original_client = self.probe.RSPClient
+            original_settle = self.probe.CEMU_GDB_SETTLE_SECONDS
+            self.probe._connect = lambda host, port, timeout: sock
+            self.probe.RSPClient = FakeClient
+            self.probe.CEMU_GDB_SETTLE_SECONDS = 0
+            try:
+                self.probe.run_trace(
+                    trace_spec,
+                    output,
+                    "127.0.0.1",
+                    1337,
+                    1.0,
+                    wait_register_mask=(29, 0x2000),
+                    max_skipped_hits=2,
+                )
+            finally:
+                self.probe._connect = original_connect
+                self.probe.RSPClient = original_client
+                self.probe.CEMU_GDB_SETTLE_SECONDS = original_settle
+            rows = [json.loads(line) for line in output.read_text().splitlines()]
+
+        miss = next(row for row in rows if row["event"] == "condition_miss")
+        self.assertEqual("mask_set", miss["condition"])
+        self.assertEqual("0x00002000", miss["required_mask"])
+        met = next(row for row in rows if row["event"] == "condition_met")
+        self.assertEqual("0x80082000", met["value"])
+        self.assertEqual("0x00002000", met["required_mask"])
+        self.assertNotIn("excluded_value", met)
+        hit = next(row for row in rows if row["event"] == "hit")
+        self.assertEqual("0x80082000", hit["snapshot"]["gpr"]["r29"])
+        self.assertEqual(3, FakeClient.instance.continue_count)
+        self.assertTrue(sock.closed)
 
 
 if __name__ == "__main__":

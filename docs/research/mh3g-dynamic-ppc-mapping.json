@@ -30,7 +30,13 @@
       "ppc-mapped": 0
     },
     "mapping_state": "Source Decoded / PPC-GDB Pending",
-    "runtime_status": "Not Runtime Verified"
+    "runtime_status": "Partial Runtime Evidence / Not Runtime Verified",
+    "runtime_counts": {
+      "not-traced": 9,
+      "partial-runtime-evidence": 12,
+      "gameplay-traced": 0
+    },
+    "runtime_evidence_ledger": "docs/research/mh3g-dynamic-runtime-evidence.json"
   },
   "probe_batches": [
     {
@@ -79,10 +85,11 @@
       "source_semantics_zh": "3DS L 掩码 0x0200 按住时，把 0x008CC418 改为调用临时 ARM 例程；该例程把 3.0 写入玩家内层状态 +0x600，并立即从同一字段回读，而非修改全局帧率。",
       "source_semantics_en": "While the 3DS L mask 0x0200 is held, redirect 0x008CC418 to a scratch ARM routine that writes 3.0 to inner-player state +0x600 and immediately reloads it; this is not a global frame-rate write.",
       "probe_batch": "controller-action-hooks",
-      "target_strategy_zh": "静态交叉比对已定位玩家每帧更新函数 0x02892294 及 +0x608 倍率字段读取点 0x028924AC；Wii U 玩家布局相对 3DS 后移 8 字节。另在 0x02BCB9CC 捕获归一化输入，确认 L 掩码 0x0100 后，再设计可审计的输入到倍率桥接。",
-      "target_strategy_en": "Static matching found per-frame player updater 0x02892294 and the +0x608 multiplier load at 0x028924AC; the Wii U player layout is shifted eight bytes from 3DS. Separately capture normalized input at 0x02BCB9CC to prove the Wii U L mask 0x0100 before designing an auditable input-to-multiplier bridge.",
+      "target_strategy_zh": "静态交叉比对已定位玩家每帧更新函数 0x02892294 及 +0x608 倍率字段读取点 0x028924AC；运行时已在村庄移动期间命中该消费点，并在 0x02BCB9CC 确认 Wii U L 当前帧掩码为 0x0100。下一步只设计生命周期明确、可松键恢复且不覆盖原生状态的输入到倍率桥接。",
+      "target_strategy_en": "Static matching found per-frame player updater 0x02892294 and the +0x608 multiplier load at 0x028924AC. Runtime evidence hit that consumer during village movement and confirmed the current-frame Wii U L mask as 0x0100 at 0x02BCB9CC. The next step is an input-to-multiplier bridge with proven lifetime, release restoration, and no native-state collision.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["speed-consumer-village-move", "normalized-input-code-window", "input-l-persistent"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -105,8 +112,8 @@
           "docs/research/traces/mh3g-dynamic-01-03-speed-state.json",
           "docs/research/traces/mh3g-dynamic-controller-normalized-input.json"
         ],
-        "patch_constraint_zh": "0x028924AC 只证明倍率字段的消费点，0x02BCB9CC 只证明归一化按键；尚未找到跨函数可安全共享、生命周期稳定且不覆盖游戏状态的桥接存储。两条路径均完成 gameplay trace 前不得创建 pack，也不得把该项描述成全局游戏或 FPS 加速。",
-        "patch_constraint_en": "0x028924AC proves only the multiplier consumer, while 0x02BCB9CC proves only normalized input. No cross-function bridge with safe lifetime and non-conflicting storage has been proven. Create no pack before gameplay traces cover both paths, and do not describe this as global game-speed or FPS acceleration.",
+        "patch_constraint_zh": "0x028924AC 与 0x02BCB9CC 已分别证明倍率消费点和归一化按键，但尚未证明同一受控动作中的跨函数连接，也未找到可安全共享、生命周期稳定且不覆盖游戏状态的桥接存储。在桥接、松键恢复和 2x/3x 对照完成前不得创建 pack，也不得把该项描述成全局 FPS 加速。",
+        "patch_constraint_en": "0x028924AC and 0x02BCB9CC now separately prove the multiplier consumer and normalized input, but no controlled action has linked the two paths and no safe, stable, non-conflicting bridge storage is proven. Create no pack before the bridge, release restoration, and 2x/3x comparison are complete, and do not describe this as global FPS acceleration.",
         "static_evidence_zh": "3DS 临时例程的 `vstr/vldr [r1,#0x200]` 在调用点实际落到内层玩家 +0x600；Wii U 等价更新路径在 +8 布局偏移后从 +0x608 读取浮点数、转为整数、加倍并参与 +0x440 累加器更新。",
         "static_evidence_en": "The 3DS scratch routine's `vstr/vldr [r1,#0x200]` resolves to inner-player +0x600 at the call site. After the eight-byte Wii U layout shift, the equivalent updater loads a float from +0x608, converts and doubles it, then uses it in the +0x440 accumulator update."
       }
@@ -120,10 +127,11 @@
       "source_semantics_zh": "与 #1 同一路径，3DS L 按住时把玩家内层状态 +0x600 写为并回读 2.0 浮点倍率；它不是 FPS 锁定值。",
       "source_semantics_en": "Uses the same path as #1, writing and reloading a 2.0 float multiplier at inner-player state +0x600 while 3DS L is held; it is not an FPS cap value.",
       "probe_batch": "controller-action-hooks",
-      "target_strategy_zh": "复用 #1 的 0x028924AC 倍率消费点与 0x02BCB9CC 归一化输入证据；确认 L 掩码和 +0x608 值变化后，与 #1/#3 共用一个 PPC 状态机。",
-      "target_strategy_en": "Reuse #1's 0x028924AC multiplier consumer and 0x02BCB9CC normalized-input evidence. After proving the L mask and +0x608 value transition, share one PPC state machine with #1/#3.",
+      "target_strategy_zh": "复用 #1 已实测的 0x028924AC 倍率消费点与 0x02BCB9CC L=0x0100 输入证据；下一步捕获 +0x608 的受控 1.0→2.0→1.0 变化，并与 #1/#3 共用一个 PPC 状态机。",
+      "target_strategy_en": "Reuse #1's runtime-observed 0x028924AC multiplier consumer and 0x02BCB9CC L=0x0100 input evidence. Next capture a controlled +0x608 transition from 1.0 to 2.0 and back to 1.0, then share one PPC state machine with #1/#3.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["speed-consumer-village-move", "normalized-input-code-window", "input-l-persistent"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -161,10 +169,11 @@
       "source_semantics_zh": "3DS R 掩码 0x0100 按住时，把同一玩家内层状态 +0x600 写为并回读 1.0，用于恢复该更新倍率的正常值。",
       "source_semantics_en": "While the 3DS R mask 0x0100 is held, write and reload 1.0 at the same inner-player +0x600 field to restore that update multiplier's normal value.",
       "probe_batch": "controller-action-hooks",
-      "target_strategy_zh": "复用 #1/#2 的倍率消费点与输入归一化路径，并用 Wii U R 归一化掩码 0x0200 作为恢复分支；不另建重复 code cave。",
-      "target_strategy_en": "Reuse the #1/#2 multiplier consumer and input normalizer, with Wii U normalized R mask 0x0200 as the restore branch rather than creating a duplicate code cave.",
+      "target_strategy_zh": "复用 #1/#2 的倍率消费点和已实测输入归一化路径，以 Wii U R 当前帧掩码 0x0200 作为恢复分支；下一步证明它把同一 +0x608 状态恢复为 1.0，不另建重复 code cave。",
+      "target_strategy_en": "Reuse the #1/#2 multiplier consumer and runtime-observed input normalizer, using the current-frame Wii U R mask 0x0200 as the restore branch. Next prove that it restores the same +0x608 state to 1.0 rather than creating a duplicate code cave.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["speed-consumer-village-move", "normalized-input-code-window", "input-r-persistent"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -187,8 +196,8 @@
           "docs/research/traces/mh3g-dynamic-01-03-speed-state.json",
           "docs/research/traces/mh3g-dynamic-controller-normalized-input.json"
         ],
-        "patch_constraint_zh": "恢复分支必须和加速分支共享同一状态存储，并验证 R 只恢复 +0x608 而不改变原生输入对象；输入门和倍率路径均未 trace 前不得创建 pack。",
-        "patch_constraint_en": "The restore branch must share state storage with the acceleration branch and prove that R restores only +0x608 without modifying the native input object. Create no pack before both input and multiplier paths are traced.",
+        "patch_constraint_zh": "R=0x0200 已经运行时确认，但恢复分支仍必须和加速分支共享同一安全状态存储，并验证 R 只恢复 +0x608 而不改变原生输入对象；完整倍率恢复动作 trace 前不得创建 pack。",
+        "patch_constraint_en": "R=0x0200 is runtime-confirmed, but the restore branch must still share the same safe state storage as acceleration and prove that R restores only +0x608 without modifying the native input object. Create no pack before the complete multiplier-restoration action is traced.",
         "static_evidence_zh": "源代码只把同一浮点常量改为 1.0；Wii U R 原始 VPAD 位经 0x02BCB6D4 归一化后，在 r29 中对应 0x0200。",
         "static_evidence_en": "The source changes only the same float constant to 1.0. The Wii U raw VPAD R bit is normalized by 0x02BCB6D4 to mask 0x0200 in r29."
       }
@@ -272,7 +281,8 @@
       "target_strategy_zh": "静态交叉比对已把 3DS 容器选择器 0x0098FACC 精确映射到 PPC 0x0219A6E4：主背包从根对象 +0x38 的子对象再取 +0xA8，即首记录位于全局根 0x10315C50 所指对象 +0xE0、数量位于 +0xE2。原生数量 writer 0x0219B6E4 在 0x0219B830 写回记录 +2。通过第一格数量 1→2→3 的受控变化证明 r27 等于根+0xE0，再设计只命中该槽且遵守生命周期的窄 hook。",
       "target_strategy_en": "Static cross-architecture matching maps 3DS container selector 0x0098FACC exactly to PPC 0x0219A6E4. The primary pouch uses +0xA8 from the root's +0x38 subobject, placing its first record at +0xE0 from the object referenced by global root 0x10315C50 and its quantity at +0xE2. Native quantity writer 0x0219B6E4 stores record +2 at 0x0219B830. Prove through controlled first-slot changes 1→2→3 that r27 equals root+0xE0 before designing a narrow lifecycle-safe hook for only that slot.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["inventory-roots-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x0219a6e4",
@@ -369,7 +379,8 @@
       "target_strategy_zh": "静态交叉比对已定位 PPC 攻击派生函数 0x02867648：0x02867694 把 16 位攻击值写到玩家状态 +0x6E8，随后按原版上限 700 处理，并把显示浮点值写到 +0x6EC。先在 0x0286769C 捕获一次受控装备攻击变化，证明 r9 对象和两个字段，再设计从未倍率输入计算的窄 hook，避免反复累乘。",
       "target_strategy_en": "Static cross-architecture matching found PPC attack-derivation function 0x02867648: 0x02867694 writes the 16-bit attack value to player-state +0x6E8, applies the native 700 cap, and stores the display float at +0x6EC. Capture one controlled equipment attack change at 0x0286769C to prove r9 and both fields before designing a narrow hook that starts from an unscaled input and cannot compound.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["player-state-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02867648",
@@ -401,7 +412,8 @@
       "target_strategy_zh": "静态交叉比对已定位 PPC 防御派生函数 0x02867CB4：0x02867D04 把 16 位防御值写到玩家状态 +0x6EA，随后保留原版最低值逻辑，并把显示浮点值写到 +0x6F0。先在 0x02867D14 捕获一次受控防具变化，证明 r10 对象和字段，再设计不累乘的窄 hook。",
       "target_strategy_en": "Static cross-architecture matching found PPC defense-derivation function 0x02867CB4: 0x02867D04 writes the 16-bit defense value to player-state +0x6EA, retains the native minimum-value logic, and stores the display float at +0x6F0. Capture one controlled armor change at 0x02867D14 to prove r10 and the fields before designing a non-compounding narrow hook.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["player-state-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02867cb4",
@@ -432,7 +444,8 @@
       "target_strategy_zh": "静态交叉比对已定位 PPC 道具箱读取函数 0x021F18BC：从 *0x10315C50 的容器根开始，以 +0x1C0 为首记录、4 字节为步长遍历 101 格，记录 +0 为道具 ID、+2 为有符号数量。先在 0x021F1900 打开完整道具箱并捕获首格，再存取一次首格物品以验证对象生命周期；随后必须另行定位原生 writer 与保存同步边界，不能把读取/复制点当成持久写入点。",
       "target_strategy_en": "Static cross-architecture matching found PPC item-box reader 0x021F18BC: starting from the container root at *0x10315C50, it walks 101 four-byte records beginning at +0x1C0, with item ID at record +0 and signed quantity at +2. Open the full item box and capture slot one at 0x021F1900, then deposit or withdraw that slot once to prove object lifetime. The native writer and save-sync boundary must still be found separately; the reader/copy path is not a persistence hook.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["inventory-roots-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x021f18bc",
@@ -596,10 +609,11 @@
       "source_semantics_zh": "当当前 HP 低于 150 且 3DS A 按住时，每个金手指执行周期把 16 位 HP 加 1。",
       "source_semantics_en": "When current HP is below 150 and 3DS A is held, add one to the 16-bit HP value on every cheat-engine execution tick.",
       "probe_batch": "controller-action-hooks",
-      "target_strategy_zh": "静态交叉比对已定位 HP 变更函数 0x02865D08：0x02865FEC 读取玩家状态 +0x640 当前 HP，+0x642 为最大 HP，r31 保存有符号变化量。另在 0x02BCB9CC 捕获 Wii U A 归一化掩码 0x2000；两条路径都经 gameplay trace 后再设计每帧 +1 且按真实上限钳制的桥接。",
-      "target_strategy_en": "Static matching found HP-change function 0x02865D08: 0x02865FEC loads current HP at player-state +0x640, +0x642 is maximum HP, and r31 holds the signed delta. Separately capture Wii U normalized A mask 0x2000 at 0x02BCB9CC; only after gameplay traces prove both paths should a per-frame +1 bridge clamped to the real maximum be designed.",
+      "target_strategy_zh": "静态交叉比对已定位 HP 变更函数 0x02865D08：0x02865FEC 读取玩家状态 +0x640 当前 HP，+0x642 为最大 HP，r31 保存有符号变化量。运行时已确认 Wii U A 当前帧掩码为 0x2000，且玩家字段现场为 100/100；下一步在受伤状态捕获伤害/治疗 writer，再设计按真实上限钳制的跨函数桥接。",
+      "target_strategy_en": "Static matching found HP-change function 0x02865D08: 0x02865FEC loads current HP at player-state +0x640, +0x642 is maximum HP, and r31 holds the signed delta. Runtime evidence confirms current-frame Wii U A mask 0x2000 and a live 100/100 HP field pair. Next capture the damage/healing writer while injured before designing a cross-function bridge clamped to the real maximum.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["normalized-input-code-window", "input-a-persistent", "player-state-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02865d08",
@@ -648,7 +662,8 @@
       "target_strategy_zh": "静态交叉比对已定位 PPC 每帧状态更新函数 0x02892294：玩家状态 +0x974/+0x978 与 +0x980/+0x984 是两组当前/前值浮点计时器，更新路径分别位于 0x02893150..0x02893238 与 0x028932B0..0x02893394。分别在高温/低温任务饮用对应饮料并捕获两组字段，先确定哪一组对应热/冷效果，再选择保持正计时器而不覆盖环境状态的写入点。",
       "target_strategy_en": "Static matching found PPC per-frame state updater 0x02892294: player-state +0x974/+0x978 and +0x980/+0x984 are two current/previous float-timer pairs, updated by 0x02893150..0x02893238 and 0x028932B0..0x02893394. Drink the matching beverage in hot and cold quests and capture both pairs to identify which pair represents each effect before selecting a writer that maintains only a positive timer without overwriting environment state.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["player-state-village", "drink-timers-village-baseline"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -683,10 +698,11 @@
       "source_semantics_zh": "L+左把 ARM `cmp r2,r0` 改为 `cmp r0,r0`，R+左恢复原指令；它切换放置物匹配判定，并非直接遍历删除对象。",
       "source_semantics_en": "L+Left changes ARM `cmp r2,r0` to `cmp r0,r0`, while R+Left restores it; this toggles placed-object matching rather than directly iterating and deleting objects.",
       "probe_batch": "controller-action-hooks",
-      "target_strategy_zh": "静态交叉比对已定位 PPC 放置物 64 槽查找函数 0x02189FF4、阈值比较器 0x0218A38C 和组合入口 0x0218A3A0。槽记录步长为 12，ID 在 +0，状态/阈值字节在 +7；组合入口以 r3/r4/r5 传入管理器、ID 和请求阈值。先对真实放置、重复放置和回收动作 trace 比较器，再用共用输入 trace 证明 L/R/左方向键掩码与可持久状态，最后才设计可恢复的输入门控。",
-      "target_strategy_en": "Static cross-architecture matching found the PPC 64-slot placed-object lookup at 0x02189FF4, threshold comparator at 0x0218A38C, and combined entry at 0x0218A3A0. Records are 12 bytes with ID at +0 and the state/threshold byte at +7; the combined entry receives manager, ID, and requested threshold in r3/r4/r5. Trace real placement, repeated placement, and removal at the comparator first, then prove L/R/Left masks and durable state through the shared input trace before designing a reversible input gate.",
+      "target_strategy_zh": "静态交叉比对已定位 PPC 放置物 64 槽查找函数 0x02189FF4、阈值比较器 0x0218A38C 和组合入口 0x0218A3A0。槽记录步长为 12，ID 在 +0、状态/阈值字节在 +7；运行时已确认 L/R/左当前帧掩码为 0x0100/0x0200/0x0080。下一步只需对真实放置、重复放置和回收动作 trace 比较器及持久状态，再设计可恢复输入门控。",
+      "target_strategy_en": "Static matching found the PPC 64-slot placed-object lookup at 0x02189FF4, threshold comparator at 0x0218A38C, and combined entry at 0x0218A3A0. Records are 12 bytes with ID at +0 and state/threshold byte at +7; runtime evidence confirms current-frame L/R/Left masks 0x0100/0x0200/0x0080. Next trace real placement, repeated placement, and removal at the comparator plus durable toggle state before designing the reversible input gate.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["normalized-input-code-window", "input-l-persistent", "input-r-persistent", "input-left-persistent"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x0218a3a0",
@@ -709,10 +725,11 @@
         "manager_register": "r3",
         "requested_id_register": "r4",
         "requested_threshold_register": "r5",
+        "normalized_left_button_mask": "0x00000080",
         "trace_spec": "docs/research/traces/mh3g-dynamic-57-placed-object-threshold.json",
         "input_trace_spec": "docs/research/traces/mh3g-dynamic-controller-normalized-input.json",
-        "patch_constraint_zh": "不得把组合入口无条件改成成功，也不得在没有稳定跨 hook 状态存储时伪造 L/R+左热键。源金手指是可恢复的指令切换；必须先证明真实调用类别、+7 阈值语义、左方向键掩码和恢复路径，并确认不会影响任务结算或其他 64 槽对象。",
-        "patch_constraint_en": "Do not force the combined entry to unconditional success or invent L/R+Left hotkeys without stable cross-hook state storage. The source cheat is a reversible instruction toggle. First prove real call categories, +7 threshold semantics, the Left-button mask, and the restore path, and confirm that quest settlement and other 64-slot objects remain unaffected.",
+        "patch_constraint_zh": "三个按键掩码已经运行时确认，但不得把组合入口无条件改成成功，也不得在没有稳定跨 hook 状态存储时直接实现热键。源金手指是可恢复的指令切换；仍须证明真实调用类别、+7 阈值语义和恢复路径，并确认不会影响任务结算或其他 64 槽对象。",
+        "patch_constraint_en": "All three button masks are runtime-confirmed, but do not force the combined entry to unconditional success or implement the hotkey without stable cross-hook state storage. The source cheat is a reversible instruction toggle; real call categories, +7 threshold semantics, restoration, and lack of effects on quest settlement or other 64-slot objects remain mandatory.",
         "static_evidence_zh": "3DS 与 PPC 函数都遍历 64 个 12 字节槽、以 +0 的 ID 匹配并读取 +7 的 8 位值。PPC 0x0218A394 用 `subfc/addze` 实现 `记录+7 >= 请求阈值`，组合入口 0x0218A3A0 先查 ID 再唯一调用该比较器；这与 3DS 在 0x00635378 把阈值比较改成恒真的源语义一致。",
         "static_evidence_en": "Both the 3DS and PPC functions scan 64 twelve-byte slots, match the ID at +0, and read the byte at +7. PPC 0x0218A394 implements record+7 >= requested-threshold through subfc/addze, and combined entry 0x0218A3A0 performs the ID lookup before the comparator's sole call. This matches the source semantics of making the threshold comparison always true at 3DS 0x00635378."
       }
@@ -729,7 +746,8 @@
       "target_strategy_zh": "静态交叉比对已把 3DS 三个计数字节精确映射到 Wii U 玩家状态 +0x572/+0x573/+0x574，并定位三个原生准入 helper：0x0289A014 检查 +0x572 是否为零，0x0289A608 检查 +0x573 是否小于 3，0x0289A728 检查 +0x574 是否小于 2。分别连续放置炸弹、陷阱和肉并记录命中 helper、计数变化和拒绝时刻，运行时确认三种物品与字段的对应关系后优先放宽准入判断。",
       "target_strategy_en": "Static matching maps the three 3DS counters exactly to Wii U player-state +0x572/+0x573/+0x574 and finds three native admission helpers: 0x0289A014 tests whether +0x572 is zero, 0x0289A608 tests +0x573 below three, and 0x0289A728 tests +0x574 below two. Repeatedly place bombs, traps, and meat while recording the helper hit, counter transition, and rejection point; after runtime identifies each item-to-field relationship, prefer relaxing the admission checks.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["player-state-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x0289a014",
@@ -768,7 +786,8 @@
       "target_strategy_zh": "静态交叉比对已定位 PPC 氧气增减函数 0x02863EEC：r4 是有符号 delta，r10+0x65C 为当前氧气，r10+0x65E 为上限，0x02863F20 写回当前值；HUD 在 0x02601DA8 读取同一上限。进入水下后在 0x02863F0C 捕获真实负 delta，证明对象与调用语义，再只抑制耗氧分支，保留补氧、初始化、离水和 HUD 更新。",
       "target_strategy_en": "Static cross-architecture matching found PPC oxygen-delta function 0x02863EEC: r4 is the signed delta, r10+0x65C is current oxygen, r10+0x65E is the cap, and 0x02863F20 writes current oxygen; the HUD reads the same cap at 0x02601DA8. After entering water, capture a real negative delta at 0x02863F0C to prove the object and call semantics, then suppress only oxygen consumption while preserving refill, initialization, water exit, and HUD updates.",
       "mapping_state": "ppc-candidate",
-      "runtime_state": "not-traced",
+      "runtime_state": "partial-runtime-evidence",
+      "runtime_evidence_refs": ["player-state-village"],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02863eec",

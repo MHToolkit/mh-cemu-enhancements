@@ -14,13 +14,16 @@ After the static phase, the conversion matrix contains exactly **21** remaining 
 这些 3DS 地址和偏移只作为源语义证据，**绝不直接写入 Wii U**。每个 Cemu
 Graphic Pack 都必须先取得 JP v96 PPC hook、原指令前像和至少一次对应游戏动作的
 GDB trace；在此之前只允许推进到 `ppc-candidate / not-traced / not-created`，不得
-创建可安装 pack。
+创建可安装 pack。若只观察到相关字段、输入位或候选 hook，而完整动作、状态桥和恢复路径
+尚未闭环，则单独记录为 `partial-runtime-evidence`；它不会放宽 pack 门槛。
 
 The 3DS addresses and offsets are source-side semantic evidence only and must
 never be written into Wii U memory. Every Cemu Graphic Pack requires a proven
 JP-v96 PPC hook, an original-word preimage, and at least one GDB trace of the
 matching gameplay action. Before that evidence exists, an entry may advance to
 `ppc-candidate / not-traced / not-created`, but no installable pack may be made.
+A real but incomplete field, input, or hook observation is recorded separately
+as `partial-runtime-evidence`; it does not relax the pack promotion gates.
 
 机器可读的逐项语义、源位置、目标策略和批次见
 [`mh3g-dynamic-ppc-mapping.json`](mh3g-dynamic-ppc-mapping.json)。
@@ -43,8 +46,10 @@ matching gameplay action. Before that evidence exists, an entry may advance to
 1. 固定 `title_id`、`module_checksum`、Cemu RPX hash 与 RPX SHA-256。
 2. 每个 breakpoint 都声明 `expected_word`；任何前像不符立即停止，绝不继续下断点。
 3. 命中时记录 32 个 GPR、PC、LR、固定内存和寄存器相对内存到 JSONL。
-4. breakpoint 为一次性；结束或失败时清理仍在使用的断点并恢复游戏运行。
-   即使 tracer 收到 `Ctrl-C`，也会先中断目标、撤销已下断点并恢复运行后再退出。
+4. 每个 breakpoint 最终只产出一次 `hit`；若指定寄存器等待条件，工具会让同一 software
+   breakpoint 在未匹配时持续恢复/重装，直到匹配或达到 fail-closed 上限。结束或失败时清理
+   仍在使用的断点并恢复游戏运行；即使 tracer 收到 `Ctrl-C`，也会先中断目标、撤销断点并
+   恢复运行后再退出。
 5. 工具不读取或修改 RPX/WUA、MLC、存档、Graphic Pack 配置。
 
 Cemu 2.6 的 GDB stub 在客户端连接时不会主动发送 stop packet。工具使用已由
@@ -80,6 +85,20 @@ python3 scripts/cemu-gdb-probe.py trace \
   --spec /path/to/trace-spec.json \
   --output /path/to/trace.jsonl
 ```
+
+等待某个当前帧按键位真实出现后再保存完整 snapshot：
+
+```bash
+python3 scripts/cemu-gdb-probe.py trace \
+  --spec docs/research/traces/mh3g-dynamic-controller-normalized-input.json \
+  --output /path/to/controller-a.jsonl \
+  --wait-register-mask r29=0x2000 \
+  --max-skipped-hits 1000
+```
+
+`--wait-register-nonzero`、`--wait-register-not-value REGISTER=VALUE` 和
+`--wait-register-mask REGISTER=MASK` 互斥。输入归一化对象存在固定高位/摇杆位，不能把
+“r29 非零”当作按键条件；已知按键应优先使用精确 mask。
 
 ## 每项升级门槛 / Promotion Gates
 
@@ -147,11 +166,26 @@ python3 scripts/cemu-gdb-probe.py trace \
   - #66 当前区域怪物一击必杀/直接捕获：源管理器链和 `+0x1558 = 0x18`
     已解码，但常量与字段语义都不唯一，必须排除怪物生命周期和任务结算状态。
 - 0/21 已完成 PPC 映射；当前没有为动态项创建任何可安装 pack。
-- 0/21 有本分支的新 GDB gameplay trace。
-- 2026-08-08 已用 Cemu 2.6 真实连接验证修正后的 GDB 握手；#8 的
-  `0x0219B6F0 = 0x7CBA2B78` 与 #12 的
-  `0x0203A2A0 = 0x4E800020` 前像均在运行中匹配并成功下断点。该次操作没有捕获
-  对应 gameplay 命中，因此只算 attach/preimage 证据，不算 `GDB traced`。
+- 12/21 已取得 `partial-runtime-evidence`，9/21 仍为 `not-traced`；0/21 达到
+  `gameplay-traced`。逐项原始路径、SHA-256、观测值和限制见
+  [`mh3g-dynamic-runtime-evidence.json`](mh3g-dynamic-runtime-evidence.json) 与
+  [`mh3g-dynamic-runtime-evidence-20260808.md`](mh3g-dynamic-runtime-evidence-20260808.md)。
+- 最新 Nemessix/Cemu 调试提交 `1dcbefc1564f5dfed55dbdbfb7903f3470f15579`
+  已在同一 MH3G JP v96 进程真实验证 persistent breakpoint：A 条件命中前连续重装
+  833 次，随后不重启 Cemu 独立 reconnect，L/R/左方向键分别连续重装 108/157/170 次后
+  命中。当前帧归一化掩码确定为 A=`0x2000`、L=`0x0100`、R=`0x0200`、
+  左=`0x0080`。
+- #1/#2/#3 的 `0x028924AC` 已在村庄移动输入期间真实命中，现场
+  `r7=0x2FF7D610`、`r7+0x608=0x3F800000`（float 1.0）；该证据证明倍率消费点，
+  仍未证明安全输入桥和 2x/3x gameplay 效果。
+- #9/#23 的 live 根 `*0x10315C50=0x2E622A80` 与首记录 `+0xE0/+0x1C0`
+  已和静态布局一致；#19/#20/#31/#58/#62 的候选玩家字段也能读出合理现场值。
+  这些都是被动字段观察，不替代对应 writer 和受控动作 trace。
+- #32 的 `0x02893154/0x028932B4` 已在村庄基线分别命中，两组计时器全零；
+  热饮/冷饮身份仍需高温与低温任务各一次受控 trace。
+- 早期 attach/preimage 门禁仍有效：#8 的 `0x0219B6F0 = 0x7CBA2B78` 与 #12 的
+  `0x0203A2A0 = 0x4E800020` 在运行中匹配并成功下断点，但尚未捕获相应 gameplay
+  动作，因此两项仍是 `not-traced`。
 - 已为 17 个候选准备 17 份动作 trace spec，并另有 1 份共用的归一化输入 spec。
   #1/#2/#3 共用同一倍率 spec；#58 的三个阈值 helper 拆成三份独立 spec，避免在
   错误断点读取无效寄存器。候选地址可以随静态证据进入研究清单，但只有反汇编与

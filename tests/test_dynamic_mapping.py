@@ -11,6 +11,7 @@ import unittest
 REPO = Path(__file__).resolve().parents[1]
 CONVERSION = REPO / "docs" / "research" / "mh3g-3ds-cheat-conversion.json"
 DYNAMIC = REPO / "docs" / "research" / "mh3g-dynamic-ppc-mapping.json"
+RUNTIME_EVIDENCE = REPO / "docs" / "research" / "mh3g-dynamic-runtime-evidence.json"
 TRACE_ROOT = REPO / "docs" / "research" / "traces"
 
 
@@ -18,6 +19,7 @@ class DynamicMappingTests(unittest.TestCase):
     def setUp(self):
         self.conversion = json.loads(CONVERSION.read_text(encoding="utf-8"))
         self.dynamic = json.loads(DYNAMIC.read_text(encoding="utf-8"))
+        self.runtime_evidence = json.loads(RUNTIME_EVIDENCE.read_text(encoding="utf-8"))
 
     def test_all_and_only_requires_ppc_entries_have_a_dynamic_ledger_row(self):
         expected = {
@@ -74,11 +76,14 @@ class DynamicMappingTests(unittest.TestCase):
             self.assertIn(row["probe_batch"], batches)
             self.assertIn(row["source_index"], batches[row["probe_batch"]]["source_indices"])
 
-    def test_no_dynamic_pack_exists_before_ppc_and_runtime_evidence(self):
+    def test_no_dynamic_pack_exists_before_complete_ppc_and_runtime_evidence(self):
         for row in self.dynamic["entries"]:
             with self.subTest(source_index=row["source_index"]):
                 self.assertIn(row["mapping_state"], {"source-decoded", "ppc-candidate"})
-                self.assertEqual("not-traced", row["runtime_state"])
+                self.assertIn(
+                    row["runtime_state"],
+                    {"not-traced", "partial-runtime-evidence"},
+                )
                 self.assertEqual("not-created", row["pack_state"])
                 self.assertNotIn("pack_id", row)
                 self.assertTrue(row["source_sites"])
@@ -86,6 +91,87 @@ class DynamicMappingTests(unittest.TestCase):
                 self.assertGreaterEqual(len(row["source_semantics_en"]), 25)
                 self.assertGreaterEqual(len(row["target_strategy_zh"]), 25)
                 self.assertGreaterEqual(len(row["target_strategy_en"]), 25)
+
+    def test_partial_runtime_evidence_is_pinned_and_fail_closed(self):
+        expected_partial = {1, 2, 3, 9, 19, 20, 23, 31, 32, 57, 58, 62}
+        actual_partial = {
+            row["source_index"]
+            for row in self.dynamic["entries"]
+            if row["runtime_state"] == "partial-runtime-evidence"
+        }
+        self.assertEqual(expected_partial, actual_partial)
+        self.assertEqual(
+            {
+                "not-traced": 9,
+                "partial-runtime-evidence": 12,
+                "gameplay-traced": 0,
+            },
+            self.dynamic["summary"]["runtime_counts"],
+        )
+        self.assertEqual(
+            "docs/research/mh3g-dynamic-runtime-evidence.json",
+            self.dynamic["summary"]["runtime_evidence_ledger"],
+        )
+
+        captures = self.runtime_evidence["captures"]
+        captures_by_id = {capture["id"]: capture for capture in captures}
+        self.assertEqual(len(captures), len(captures_by_id))
+        self.assertEqual(
+            self.dynamic["target"]["title_id"],
+            self.runtime_evidence["target"]["title_id"],
+        )
+        self.assertEqual(
+            self.dynamic["target"]["module_checksum"],
+            self.runtime_evidence["target"]["module_checksum"],
+        )
+        self.assertEqual(
+            self.dynamic["target"]["rpx_sha256"],
+            self.runtime_evidence["target"]["rpx_sha256"],
+        )
+        runtime = self.runtime_evidence["runtime"]
+        self.assertRegex(runtime["nemessix_commit"], r"^[0-9a-f]{40}$")
+        self.assertEqual(
+            "https://github.com/MHToolkit/nemessix/pull/19",
+            runtime["nemessix_pr"],
+        )
+        self.assertTrue(runtime["persistent_breakpoint_evidence_path"].startswith("/"))
+        self.assertRegex(
+            runtime["persistent_breakpoint_evidence_sha256"], r"^[0-9a-f]{64}$"
+        )
+        for capture in captures:
+            with self.subTest(capture=capture["id"]):
+                self.assertRegex(capture["raw_sha256"], r"^[0-9a-f]{64}$")
+                self.assertGreater(capture["raw_size"], 0)
+                self.assertTrue(capture["raw_path"].startswith("/"))
+                self.assertGreaterEqual(len(capture["proves"]), 30)
+                self.assertGreaterEqual(len(capture["does_not_prove"]), 30)
+
+        for row in self.dynamic["entries"]:
+            refs = row.get("runtime_evidence_refs", [])
+            with self.subTest(source_index=row["source_index"]):
+                if row["runtime_state"] == "partial-runtime-evidence":
+                    self.assertGreaterEqual(len(refs), 1)
+                    for ref in refs:
+                        self.assertIn(ref, captures_by_id)
+                        self.assertIn(row["source_index"], captures_by_id[ref]["source_indices"])
+                else:
+                    self.assertEqual([], refs)
+
+        evidence_state = {
+            int(source_index): state
+            for source_index, state in self.runtime_evidence["entry_runtime_state"].items()
+        }
+        self.assertEqual(
+            {source_index: "partial-runtime-evidence" for source_index in expected_partial},
+            evidence_state,
+        )
+        summary = self.runtime_evidence["summary"]
+        self.assertEqual(12, summary["partial_runtime_evidence"])
+        self.assertEqual(0, summary["gameplay_traced"])
+        self.assertEqual(0, summary["ppc_mapped"])
+        self.assertEqual(0, summary["installable_dynamic_packs"])
+        self.assertEqual("passed", summary["persistent_breakpoint_gate"])
+        self.assertGreaterEqual(summary["same_process_independent_attach_count"], 4)
 
     def test_static_ppc_candidates_are_pinned_and_have_trace_specs(self):
         candidates = [
@@ -210,6 +296,9 @@ class DynamicMappingTests(unittest.TestCase):
         self.assertEqual("0x0007", destroy_placed["record_threshold_offset"])
         self.assertEqual(12, destroy_placed["record_size"])
         self.assertEqual(64, destroy_placed["record_count"])
+        self.assertEqual(
+            "0x00000080", destroy_placed["normalized_left_button_mask"]
+        )
         placed = by_source[58]
         self.assertEqual("0x0289a018", placed["zero_limit_check"])
         self.assertEqual("0x0289a618", placed["three_limit_check"])

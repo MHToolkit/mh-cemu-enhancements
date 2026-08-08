@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Fail-closed one-shot tracer for Cemu's GDB remote stub.
+"""Fail-closed tracer for Cemu's GDB remote stub.
 
 The probe never launches Cemu and never edits game, MLC, save, or Graphic Pack
 files.  It connects to an already running ``--enable-gdbstub`` instance, checks
-every declared PPC preimage before arming software breakpoints, records one hit
-per checkpoint as JSON Lines, removes its breakpoints, and resumes the title.
+every declared PPC preimage before arming software breakpoints, records one
+matching hit per checkpoint as JSON Lines, removes its breakpoints, and resumes
+the title.
 """
 
 from __future__ import annotations
@@ -309,10 +310,12 @@ class RSPClient:
         response = self.request(f"p{register:x}")
         if not response or not HEX_RE.fullmatch(response):
             raise ProbeError(f"invalid register r{register} response: {response!r}")
-        # Cemu serializes GPRs and LR in host-swapped byte order, while PC and
-        # the remaining special registers use normal big-endian RSP order.
-        byteorder = "little" if register < PPC_GPR_COUNT or register == PPC_LR_REGISTER else "big"
-        return int.from_bytes(bytes.fromhex(response), byteorder)
+        # Cemu's stub swaps its internally byte-reversed OSContext GPR/LR
+        # storage before formatting the RSP response.  The resulting hex text
+        # is therefore already the logical big-endian PPC value, just like PC
+        # and the remaining special registers.  Reversing it again turns valid
+        # guest pointers such as 0x2d8914b0 into inaccessible 0xb014892d.
+        return int(response, 16)
 
 
 def _select_thread(client: RSPClient, stop: str) -> str:
@@ -387,7 +390,39 @@ def run_trace(
     host: str,
     port: int,
     connect_timeout: float,
+    wait_register_nonzero: int | None = None,
+    wait_register_not_value: tuple[int, int] | None = None,
+    wait_register_mask: tuple[int, int] | None = None,
+    max_skipped_hits: int = 120,
 ) -> None:
+    wait_condition_count = sum(
+        condition is not None
+        for condition in (
+            wait_register_nonzero,
+            wait_register_not_value,
+            wait_register_mask,
+        )
+    )
+    if wait_condition_count > 1:
+        raise ProbeError(
+            "register wait conditions are mutually exclusive"
+        )
+    if wait_register_nonzero is not None and not 0 <= wait_register_nonzero < PPC_GPR_COUNT:
+        raise ProbeError("wait_register_nonzero must identify PPC r0..r31")
+    if wait_register_not_value is not None:
+        wait_register, excluded_value = wait_register_not_value
+        if not 0 <= wait_register < PPC_GPR_COUNT:
+            raise ProbeError("wait_register_not_value must identify PPC r0..r31")
+        if not 0 <= excluded_value <= 0xFFFFFFFF:
+            raise ProbeError("wait_register_not_value comparison is outside u32")
+    if wait_register_mask is not None:
+        wait_register, required_mask = wait_register_mask
+        if not 0 <= wait_register < PPC_GPR_COUNT:
+            raise ProbeError("wait_register_mask must identify PPC r0..r31")
+        if not 1 <= required_mask <= 0xFFFFFFFF:
+            raise ProbeError("wait_register_mask mask must be a nonzero u32")
+    if max_skipped_hits < 1:
+        raise ProbeError("max_skipped_hits must be at least 1")
     if output.exists():
         raise ProbeError(f"refusing to overwrite trace output: {output}")
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -401,6 +436,7 @@ def run_trace(
     sock = _connect(host, port, connect_timeout)
     client = RSPClient(sock)
     active: dict[int, Breakpoint] = {}
+    skipped_hits: dict[int, int] = {}
     paused = False
     try:
         # Cemu 2.6 does not send an unsolicited stop packet when a client
@@ -468,6 +504,59 @@ def run_trace(
             if breakpoint is None:
                 emit("unexpected_stop", thread=thread, stop=stop, snapshot=_snapshot(client, spec))
                 raise ProbeError(f"unexpected stop at {_hex32(pc)}")
+            condition_register = wait_register_nonzero
+            condition_kind = "nonzero"
+            condition_excluded_value = 0
+            if wait_register_not_value is not None:
+                condition_register, condition_excluded_value = wait_register_not_value
+                condition_kind = "not_value"
+            if wait_register_mask is not None:
+                condition_register, condition_required_mask = wait_register_mask
+                condition_kind = "mask_set"
+            if condition_register is not None:
+                condition_value = client.read_register(condition_register)
+                condition_matches = condition_value != condition_excluded_value
+                condition_details: dict[str, str] = {}
+                if condition_kind == "mask_set":
+                    condition_matches = (
+                        condition_value & condition_required_mask
+                    ) == condition_required_mask
+                    condition_details["required_mask"] = _hex32(condition_required_mask)
+                else:
+                    condition_details["excluded_value"] = _hex32(
+                        condition_excluded_value
+                    )
+                if not condition_matches:
+                    count = skipped_hits.get(pc, 0) + 1
+                    skipped_hits[pc] = count
+                    emit(
+                        "condition_miss",
+                        label=breakpoint.label,
+                        address=_hex32(breakpoint.address),
+                        thread=thread,
+                        register=f"r{condition_register}",
+                        condition=condition_kind,
+                        value=_hex32(condition_value),
+                        skipped_hits=count,
+                        **condition_details,
+                    )
+                    if count >= max_skipped_hits:
+                        raise ProbeError(
+                            f"wait condition {condition_kind} did not match for "
+                            f"r{condition_register} after {count} hit(s)"
+                        )
+                    continue
+                emit(
+                    "condition_met",
+                    label=breakpoint.label,
+                    address=_hex32(breakpoint.address),
+                    thread=thread,
+                    register=f"r{condition_register}",
+                    condition=condition_kind,
+                    value=_hex32(condition_value),
+                    skipped_hits=skipped_hits.get(pc, 0),
+                    **condition_details,
+                )
             snapshot = _snapshot(client, spec)
             emit(
                 "hit",
@@ -532,12 +621,38 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     check = subparsers.add_parser("check-spec", help="validate a trace spec without Cemu")
     check.add_argument("--spec", type=Path, required=True)
-    trace = subparsers.add_parser("trace", help="run a fail-closed one-shot trace")
+    trace = subparsers.add_parser("trace", help="run a fail-closed trace")
     trace.add_argument("--spec", type=Path, required=True)
     trace.add_argument("--output", type=Path, required=True)
     trace.add_argument("--host", default="127.0.0.1")
     trace.add_argument("--port", type=int, default=1337)
     trace.add_argument("--connect-timeout", type=float, default=180.0)
+    trace.add_argument(
+        "--wait-register-nonzero",
+        help="ignore breakpoint hits until the selected PPC GPR is nonzero (for example r29)",
+    )
+    trace.add_argument(
+        "--wait-register-not-value",
+        metavar="REGISTER=VALUE",
+        help=(
+            "ignore breakpoint hits while the selected PPC GPR equals VALUE "
+            "(for example r29=0x80080000)"
+        ),
+    )
+    trace.add_argument(
+        "--wait-register-mask",
+        metavar="REGISTER=MASK",
+        help=(
+            "ignore breakpoint hits until all MASK bits are set in the selected "
+            "PPC GPR (for example r29=0x2000)"
+        ),
+    )
+    trace.add_argument(
+        "--max-skipped-hits",
+        type=int,
+        default=120,
+        help="fail closed after this many non-matching hits while waiting (default: 120)",
+    )
     return parser
 
 
@@ -552,7 +667,42 @@ def main(argv: list[str] | None = None) -> int:
                 f"{len(spec.register_memory)} register snapshot(s)"
             )
             return 0
-        run_trace(spec, args.output, args.host, args.port, args.connect_timeout)
+        wait_register = None
+        if args.wait_register_nonzero is not None:
+            wait_register = _register_number(
+                args.wait_register_nonzero, "--wait-register-nonzero"
+            )
+        wait_register_not_value = None
+        if args.wait_register_not_value is not None:
+            register_raw, separator, value_raw = args.wait_register_not_value.partition("=")
+            if not separator:
+                raise ProbeError(
+                    "--wait-register-not-value must use REGISTER=VALUE syntax"
+                )
+            wait_register_not_value = (
+                _register_number(register_raw, "--wait-register-not-value"),
+                _number(value_raw, "--wait-register-not-value"),
+            )
+        wait_register_mask = None
+        if args.wait_register_mask is not None:
+            register_raw, separator, mask_raw = args.wait_register_mask.partition("=")
+            if not separator:
+                raise ProbeError("--wait-register-mask must use REGISTER=MASK syntax")
+            wait_register_mask = (
+                _register_number(register_raw, "--wait-register-mask"),
+                _number(mask_raw, "--wait-register-mask"),
+            )
+        run_trace(
+            spec,
+            args.output,
+            args.host,
+            args.port,
+            args.connect_timeout,
+            wait_register_nonzero=wait_register,
+            wait_register_not_value=wait_register_not_value,
+            wait_register_mask=wait_register_mask,
+            max_skipped_hits=args.max_skipped_hits,
+        )
         return 0
     except ProbeError as exc:
         print(f"ERROR: {exc}")
