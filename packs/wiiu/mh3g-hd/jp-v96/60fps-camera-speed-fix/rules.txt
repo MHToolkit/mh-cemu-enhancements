@@ -2,7 +2,7 @@
 titleIds = 0005000010104D00
 name = 60帧视角速度 / 60FPS Camera Speed
 path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Camera Speed
-description = "在60帧下自定义视角速度。 / Custom camera speed at 60 FPS."
+description = "中文：仅在 60 FPS 下缩放普通与瞄准视角转速；默认预设为 70%，修改预设后需重载游戏。默认关闭，状态为 Runtime Experimental / Gameplay Pending。 / English: Scales normal and aiming camera rotation only at 60 FPS; the default preset is 70%, and changing it requires a title reload. Disabled by default with Runtime Experimental / Gameplay Pending status."
 version = 7
 
 [Default]

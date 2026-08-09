@@ -353,29 +353,37 @@ def validate_repository(repo_root: Path) -> ValidationResult:
     return ValidationResult(packs, errors)
 
 
-def _decompress_rpx_text(rpx: Path) -> tuple[int, bytes]:
+def _decompress_rpx_sections(rpx: Path) -> list[tuple[int, bytes]]:
     data = rpx.read_bytes()
     if data[:4] != b"\x7fELF":
         raise ValueError("reference is not an ELF/RPX")
     elf_header = struct.unpack_from(">16sHHIIIIIHHHHHH", data, 0)
     section_offset = elf_header[6]
     section_count = elf_header[12]
+    sections: list[tuple[int, bytes]] = []
     for index in range(section_count):
         offset = section_offset + index * 40
-        (_, _, flags, virtual_address, file_offset, file_size, _, _, _, _) = struct.unpack_from(
+        (_, section_type, flags, virtual_address, file_offset, file_size, _, _, _, _) = struct.unpack_from(
             ">IIIIIIIIII", data, offset
         )
-        if virtual_address != 0x02000020:
+        # SHT_NOBITS, non-allocated, and zero-address sections have no immutable
+        # runtime bytes to verify.
+        if section_type == 8 or not flags & 0x2 or virtual_address == 0 or file_size == 0:
             continue
         raw = data[file_offset:file_offset + file_size]
+        if len(raw) != file_size:
+            raise ValueError(f"section {index} extends beyond the RPX file")
         if flags & 0x08000000:
+            if len(raw) < 4:
+                raise ValueError(f"compressed section {index} is missing its size header")
             expected_size = struct.unpack_from(">I", raw, 0)[0]
-            result = zlib.decompress(raw[4:])
-            if len(result) != expected_size:
-                raise ValueError("compressed text section has an unexpected size")
-            return virtual_address, result
-        return virtual_address, raw
-    raise ValueError("RPX text section at 0x02000020 not found")
+            raw = zlib.decompress(raw[4:])
+            if len(raw) != expected_size:
+                raise ValueError(f"compressed section {index} has an unexpected size")
+        sections.append((virtual_address, raw))
+    if not sections:
+        raise ValueError("RPX contains no file-backed virtual sections")
+    return sorted(sections)
 
 
 def verify_reference(reference_rpx: Path, packs: Iterable[dict[str, Any]]) -> list[str]:
@@ -395,18 +403,29 @@ def verify_reference(reference_rpx: Path, packs: Iterable[dict[str, Any]]) -> li
     elif actual_hash != next(iter(expected_hashes)):
         errors.append(f"RPX SHA-256 mismatch: expected {next(iter(expected_hashes))}, got {actual_hash}")
     try:
-        text_base, text = _decompress_rpx_text(reference_rpx)
+        sections = _decompress_rpx_sections(reference_rpx)
     except (OSError, ValueError, struct.error, zlib.error) as exc:
-        return errors + [f"cannot read RPX text section: {exc}"]
+        return errors + [f"cannot read RPX sections: {exc}"]
     for pack in pack_list:
         for assertion in [*pack.get("preimages", []), *pack.get("anchors", [])]:
             address = _number(assertion["address"])
             expected = _number(assertion["word"])
-            relative = address - text_base
-            if relative < 0 or relative + 4 > len(text):
-                errors.append(f"{pack['id']}: preimage address 0x{address:08x} outside text")
+            containing_section = next(
+                (
+                    (section_base, section_data)
+                    for section_base, section_data in sections
+                    if section_base <= address and address + 4 <= section_base + len(section_data)
+                ),
+                None,
+            )
+            if containing_section is None:
+                errors.append(
+                    f"{pack['id']}: preimage address 0x{address:08x} "
+                    "outside file-backed RPX sections"
+                )
                 continue
-            actual = struct.unpack_from(">I", text, relative)[0]
+            section_base, section_data = containing_section
+            actual = struct.unpack_from(">I", section_data, address - section_base)[0]
             if actual != expected:
                 errors.append(
                     f"{pack['id']}: preimage mismatch at 0x{address:08x}: "
