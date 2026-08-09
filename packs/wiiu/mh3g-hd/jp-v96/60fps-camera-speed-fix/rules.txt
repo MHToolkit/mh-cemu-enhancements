@@ -1,0 +1,63 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 60帧视角速度 / 60FPS Camera Speed
+path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Camera Speed
+description = "在60帧下自定义视角速度。 / Custom camera speed at 60 FPS."
+version = 7
+
+[Default]
+$cam_speed = 256
+
+[Preset]
+name = 100% (原始速度)
+$cam_speed = 256
+
+
+[Preset]
+name = 80%
+$cam_speed = 205
+
+[Preset]
+name = 75%
+$cam_speed = 192
+
+[Preset]
+name = 70%
+$cam_speed = 179
+default = 1
+
+[Preset]
+name = 65%
+$cam_speed = 166
+
+[Preset]
+name = 60%
+$cam_speed = 154
+
+[Preset]
+name = 55%
+$cam_speed = 141
+
+[Preset]
+name = 50%
+$cam_speed = 128
+
+[Preset]
+name = 45%
+$cam_speed = 115
+
+[Preset]
+name = 40%
+$cam_speed = 102
+
+[Preset]
+name = 110%
+$cam_speed = 282
+
+[Preset]
+name = 115%
+$cam_speed = 294
+
+[Preset]
+name = 120%
+$cam_speed = 307
