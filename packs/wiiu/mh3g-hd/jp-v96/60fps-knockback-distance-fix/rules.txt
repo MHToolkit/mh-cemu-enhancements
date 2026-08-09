@@ -2,8 +2,5 @@
 titleIds = 0005000010104D00
 name = 60帧风压吹飞距离修复 / 60FPS Knockback Distance
 path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Knockback Distance
-description = "在60帧运行下吹飞距离与30帧一致。 / Fix knockback distance at 60 FPS to match 30 FPS."
+description = "中文：仅在 60 FPS 下把普通风压吹飞常量由 -18.0 调整为 -9.0，使位移接近 30 FPS；特殊或脚本吹飞可能不走此常量。默认关闭，状态为 Runtime Experimental / Gameplay Pending。 / English: At 60 FPS only, changes the ordinary wind-pressure launch constant from -18.0 to -9.0 so travel approximates 30 FPS; special or scripted knockback may bypass it. Disabled by default with Runtime Experimental / Gameplay Pending status."
 version = 7
-
-[Option]
-name = Enable

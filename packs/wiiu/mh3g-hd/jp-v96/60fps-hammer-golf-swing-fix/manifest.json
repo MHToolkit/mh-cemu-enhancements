@@ -19,14 +19,15 @@
       "address": "0x0287f43c",
       "word": "0xED6C002A",
       "meaning": "原 fadds f11, f12, f0 (锤子旋转角度累加)。/ Original fadds f11, f12, f0 (hammer spin angle accumulation)."
-    },
+    }
+  ],
+  "anchors": [
     {
       "address": "0x0287f440",
       "word": "0x3908FFFF",
-      "meaning": "原 subi r8, r8, 0x1 (旋转圈数递减)。/ Original subi r8, r8, 0x1 (spin count decrement)."
+      "meaning": "分支会跳过、并由 codecave 原样重放的 subi r8, r8, 0x1。/ The branch skips this subi r8, r8, 0x1 and the codecave replays it exactly once."
     }
   ],
-  "anchors": [],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
     "module_checksum": "0x348600a0",

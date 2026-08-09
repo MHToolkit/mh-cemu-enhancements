@@ -10,7 +10,7 @@
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
-  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-knockback-distance",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-knockback-distance-fix",
   "install_folder": "MH3G HD JP v96 - 60FPS Knockback Distance",
   "rules": "rules.txt",
   "patch": "patch_stamina.asm",

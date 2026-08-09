@@ -1,0 +1,109 @@
+name: Release merged main changes
+
+on:
+  pull_request_target:
+    branches:
+      - main
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mh-cemu-enhancements-main-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Tag and publish validated dist
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out the merged commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Validate catalog and tests
+        run: |
+          python3 scripts/mh-cemu-enhancements.py validate
+          python3 -m unittest discover -s tests -v
+
+      - name: Choose an idempotent release version
+        id: version
+        run: |
+          version="$(python3 scripts/next_release_version.py)"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
+
+      - name: Build and compare deterministic archives
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          release_dir="${RUNNER_TEMP}/release"
+          mkdir -p "${release_dir}"
+          python3 scripts/mh-cemu-enhancements.py package \
+            --output "${release_dir}/mh-cemu-enhancements-${VERSION}.zip"
+          python3 scripts/mh-cemu-enhancements.py package \
+            --output "${release_dir}/reproducibility-check.zip"
+          cmp \
+            "${release_dir}/mh-cemu-enhancements-${VERSION}.zip" \
+            "${release_dir}/reproducibility-check.zip"
+          rm "${release_dir}/reproducibility-check.zip"
+          (
+            cd "${release_dir}"
+            sha256sum "mh-cemu-enhancements-${VERSION}.zip" \
+              > "mh-cemu-enhancements-${VERSION}.zip.sha256"
+          )
+
+      - name: Create or verify the tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          target_sha="$(git rev-parse HEAD)"
+          if git rev-parse --verify --quiet "refs/tags/${TAG}" >/dev/null; then
+            tagged_sha="$(git rev-list -n 1 "${TAG}")"
+            test "${tagged_sha}" = "${target_sha}"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag --annotate "${TAG}" --message "${TAG}" "${target_sha}"
+            git push origin "refs/tags/${TAG}"
+          fi
+
+      - name: Create or refresh the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          release_dir="${RUNNER_TEMP}/release"
+          latest_tag="$(git tag --list 'v[0-9]*' --sort=-version:refname | head -n 1)"
+          if [[ "${TAG}" = "${latest_tag}" ]]; then
+            latest_flag="--latest"
+          else
+            latest_flag="--latest=false"
+          fi
+          assets=(
+            "${release_dir}/mh-cemu-enhancements-${VERSION}.zip"
+            "${release_dir}/mh-cemu-enhancements-${VERSION}.zip.sha256"
+          )
+          if gh release view "${TAG}" >/dev/null 2>&1; then
+            gh release upload "${TAG}" "${assets[@]}" --clobber
+            gh release edit "${TAG}" "${latest_flag}"
+          else
+            gh release create "${TAG}" "${assets[@]}" \
+              --verify-tag \
+              --generate-notes \
+              "${latest_flag}" \
+              --title "MH Cemu Enhancements ${TAG}"
+          fi

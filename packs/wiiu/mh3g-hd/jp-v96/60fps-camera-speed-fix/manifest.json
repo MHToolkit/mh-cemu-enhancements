@@ -10,7 +10,7 @@
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
-  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-camera-speed",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-camera-speed-fix",
   "install_folder": "MH3G HD JP v96 - 60FPS Camera Speed",
   "rules": "rules.txt",
   "patch": "patch_camera.asm",
@@ -26,7 +26,18 @@
       "meaning": "原 li r25, 0x34b (瞄准视角速度加载)。/ Original li r25, 0x34b (aim camera speed load)."
     }
   ],
-  "anchors": [],
+  "anchors": [
+    {
+      "address": "0x02286f74",
+      "word": "0x2C000000",
+      "meaning": "Hook 前的 cmpwi r0, 0；codecave 必须保留其 CR 结果。/ cmpwi r0, 0 before the hook; the codecave must preserve its CR result."
+    },
+    {
+      "address": "0x02286f7c",
+      "word": "0x4182002C",
+      "meaning": "紧随 Hook 的 beq 使用 0x02286f74 产生的 CR。/ The beq immediately after the hook consumes the CR produced at 0x02286f74."
+    }
+  ],
   "source": {
     "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
     "module_checksum": "0x348600a0",
