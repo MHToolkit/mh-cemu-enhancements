@@ -10,6 +10,7 @@ It distributes no RPX, RPL, WUA, save, MLC, key, texture dump, or other game ass
 | --- | --- | --- | --- |
 | Lock 30 FPS | `Runtime Experimental` | `available` | no |
 | Lock 44 FPS (3DS conversion) | `Runtime Experimental` | `available` | no |
+| 3 fixes for 60-FPS behavior | `Runtime Experimental` | `available` | no (explicit per-pack selection) |
 | 43 static ARM-to-PPC conversion packs | `Runtime Experimental` | `available` | no (explicit per-pack selection) |
 | Lobby full item box | `Runtime Verified` | `available` | no |
 | Custom Felyne food skills (three slots, `00..41`) | `Runtime Experimental` | `available` | no (explicit selection) |
@@ -53,12 +54,16 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /absolute/path/to/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /absolute/path/to/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.24.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-preview.zip
 ```
 
 ### Automatic main releases
 
 `.github/workflows/release-on-main-pr-merge.yml` runs only when a pull request targeting `main` is actually merged. It validates the catalog, runs the complete unit suite, builds the archive twice and requires byte-for-byte equality, creates an annotated `vX.Y.Z` tag, and publishes the ZIP plus its SHA-256 sidecar as the latest GitHub Release. A closed-but-unmerged pull request and ordinary branch pushes do not trigger a release. Re-running the same merged commit reuses its existing tag; later merges increment the patch version unless the repository contains a newer untagged dist version prepared by maintainers.
+
+The release ZIP has a fixed `mh-cemu-enhancements/` root and stores packs under seven ordered categories: `01-frame-rate`, `02-speed-and-actions`, `03-skills-and-immunities`, `04-combat-and-weapons`, `05-balance-breaking`, `06-quality-of-life`, and `07-item-box-and-interface`. The source repository keeps its generic flat pack paths; only the distribution deterministically rewrites its catalog, manifests, and pack paths. A bilingual `PACK-INDEX.md` is generated at the ZIP root, with the machine-readable equivalent in `catalog/distribution-index.json`. The extracted distribution must pass the same repository validator. See [Release ZIP layout and category policy](docs/release-layout.md).
+
+The ZIP excludes `.github`, `tests`, `dist`, editor caches, and every prohibited game asset. Categories improve distribution browsing only: install continues to use each pack's stable `install_folder`, so the archive refactor does not by itself change existing Cemu saved-enable paths. Run install from the extracted `mh-cemu-enhancements/` root instead of manually copying whole categories.
 
 Install writes only its owned Graphic Pack directory with a receipt. For a standard Cemu macOS data root that is `<cemu-root>/graphicPacks/mh-cemu-enhancements/`; for the supplied Nemessix-isolated outer root (`.../Library/Application Support/Nemessix Dev/cemu`) it is `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`, which is the Cemu user-data path scanned by the bundled build. Re-running install replaces only that owned directory; uninstall is idempotent and removes only that directory. If that directory has no receipt, it is renamed to a local backup before replacement. A receipted installation made by the pre-fix isolated layout is migrated from `<cemu-root>/graphicPacks/mh-cemu-enhancements/` on the next install, or removed by uninstall.
 
@@ -94,6 +99,7 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 
 - [Architecture and status vocabulary](docs/architecture.md)
 - [Catalog boundary decision](docs/adr/0001-catalog-and-pack-boundaries.md)
+- [Release ZIP layout and category policy](docs/release-layout.md)
 - [MH3G HD JP v96 PPC ledger](docs/research/mh3g-hd-jp-v96.md)
 - [Complete 3DS-to-Cemu cheat conversion matrix](docs/research/mh3g-3ds-cheat-conversion.md)
 - [43 static ARM-to-PPC mappings and pack IDs](docs/research/mh3g-static-arm-mapping.md)
@@ -103,4 +109,4 @@ Run the printed command manually, then open **Graphic Packs**, select the desire
 
 The per-pack `patch_*.asm` syntax and `[Control] vsyncFrequency` behavior are based on the Cemu Graphic Pack parser. The user-supplied Bilibili page was not relied upon: its short links were unavailable, and all mappings here are backed by the local 3DS ARM semantic evidence plus Wii U PPC/static-resource analysis.
 
-Future GitHub destination: `MHToolkit/mh-cemu-enhancements`. This local repository intentionally has no remote configured or published by this project.
+Remote repository: `MHToolkit/mh-cemu-enhancements`. Feature branches do not create tags or releases; only pull requests merged into `main` trigger the release workflow above.

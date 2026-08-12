@@ -1,3 +1,13 @@
+# Categorized release layout gate / 分类发行目录门禁（2026-08-12）
+
+- The feature branch first merged current `origin/main`, so the distribution classification covers all 56 manifests: 53 available packs plus three retained `runtime-blocked` task-box evidence packs. / 功能分支先合入当前 `origin/main`，因此发行分类覆盖完整 56 个 manifest：53 个可用包，以及三个保留作证据的 `runtime-blocked` 任务箱包。
+- Every manifest now declares exactly one primary category from the seven-entry bilingual catalog. Repository source paths remain the generic five-level layout; only the packaged catalog, manifest `pack_dir`, and pack files gain the ordered category directory. / 每个 manifest 现都从七项双语分类目录中声明且只声明一个主分类。仓库源码路径继续保留通用五级布局；只有打包后的 catalog、manifest `pack_dir` 与插件文件会增加带序号的分类目录。
+- The release has one fixed `mh-cemu-enhancements/` root, generates `PACK-INDEX.md` and `catalog/distribution-index.json`, and excludes CI, tests, dist history, editor metadata, caches, and prohibited game assets. / 发行包使用固定 `mh-cemu-enhancements/` 根目录，自动生成 `PACK-INDEX.md` 与 `catalog/distribution-index.json`，并排除 CI、测试、历史 dist、编辑器元数据、缓存及受禁游戏资产。
+- Repository validation accepts all 56 source manifests. The complete suite discovers 55 tests, with 54 passed and one optional historical-reference test skipped; it includes byte-identical double packaging, category membership/count assertions, extraction, a second full validation against the rewritten release tree, and an install smoke test from that categorized tree into the unchanged flat Cemu-owned destination. Ruff and `git diff --check` also pass. / 仓库校验接受全部 56 个源码 manifest。完整测试发现 55 项，其中 54 项通过、一个依赖历史 reference 的可选项跳过；覆盖双构建逐字节一致、分类成员与数量、解压、针对重写后发行树的第二次完整校验，以及从该分类树安装到保持扁平结构的 Cemu 自有目录的冒烟测试。Ruff 与 `git diff --check` 同样通过。
+- Explicit verification against `/private/tmp/MH3G_Cafe.rpx` succeeds for the pinned SHA-256 and every declared code/data preimage and anchor. / 使用 `/private/tmp/MH3G_Cafe.rpx` 显式复核后，固定 SHA-256 以及全部代码/数据 preimage 与 anchor 均通过。
+- Installation destinations deliberately remain keyed by stable `install_folder`, preserving existing Cemu saved-enable paths. Categorization changes archive storage only and does not weaken explicit selection, `runtime-blocked`, preimage, backup, or receipt gates. / 安装目标继续故意使用稳定的 `install_folder`，从而保留既有 Cemu 启用路径。分类只改变发行包存储，不削弱显式选择、`runtime-blocked`、前像、备份或 receipt 门禁。
+- No tag or GitHub Release is created from this feature branch. The existing main-only merged-PR workflow will consume the new deterministic package function after a future PR is merged. / 当前功能分支不会创建 Tag 或 GitHub Release；待后续 PR 合入后，现有仅面向 main 已合并 PR 的工作流才会使用新的确定性打包函数。
+
 # 0.1.24 main distribution and automatic release gate / 0.1.24 主分支发行与自动发布门禁（2026-08-09）
 
 ## Merge corrections / 合并后修正

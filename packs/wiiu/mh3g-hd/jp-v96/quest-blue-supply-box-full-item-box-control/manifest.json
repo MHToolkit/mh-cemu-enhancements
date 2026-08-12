@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "item-box-interface",
   "default_install": false,
   "availability": "runtime-blocked",
   "availability_reason": "无条件调度桥在任务中热加载后仍未打开完整仓库，并使任务看板对话框变空白；该候选只保留为失败证据。 / The unconditional dispatch bridge still failed to open the full item box after hot-loading in a quest and blanked the quest board dialogue; this candidate is retained only as failure evidence.",

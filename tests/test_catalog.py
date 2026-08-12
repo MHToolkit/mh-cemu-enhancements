@@ -10,6 +10,7 @@ import struct
 import sys
 import tempfile
 import unittest
+import zipfile
 from pathlib import Path
 
 
@@ -78,6 +79,57 @@ FPS60_FIX_PACKS = {
 
 def static_pack_id(source_index: int, slug: str) -> str:
     return f"mh3g-hd-jp-v96-static-{source_index:02d}-{slug}"
+
+
+DISTRIBUTION_CATEGORY_FOLDERS = {
+    "frame-rate": "01-frame-rate",
+    "speed": "02-speed-and-actions",
+    "skills-immunities": "03-skills-and-immunities",
+    "combat-weapons": "04-combat-and-weapons",
+    "balance-breaking": "05-balance-breaking",
+    "quality-of-life": "06-quality-of-life",
+    "item-box-interface": "07-item-box-and-interface",
+}
+
+DISTRIBUTION_CATEGORY_PACKS = {
+    "frame-rate": {
+        "mh3g-hd-jp-v96-fps-lock-30",
+        "mh3g-hd-jp-v96-fps-lock-44",
+        *FPS60_FIX_PACKS,
+    },
+    "speed": {
+        static_pack_id(index, STATIC_ARM_PACKS[index])
+        for index in (13, 36, 53, 59, 60, 61)
+    },
+    "skills-immunities": {
+        "mh3g-hd-jp-v96-custom-felyne-food-skills",
+        *(
+            static_pack_id(index, STATIC_ARM_PACKS[index])
+            for index in (11, 14, 17, 18, 21, 26, 27, 33, 34, 35, 38, 41, 44, 45, 46, 47, 48, 51, 63, 64)
+        ),
+    },
+    "combat-weapons": {
+        static_pack_id(index, STATIC_ARM_PACKS[index])
+        for index in (5, 6, 29, 49, 50, 52, 72)
+    },
+    "balance-breaking": {
+        *EXTERNAL_EQUIPMENT_PACKS,
+        *(
+            static_pack_id(index, STATIC_ARM_PACKS[index])
+            for index in (7, 15, 16, 37, 39, 40, 65)
+        ),
+    },
+    "quality-of-life": {
+        static_pack_id(index, STATIC_ARM_PACKS[index])
+        for index in (54, 55, 56)
+    },
+    "item-box-interface": {
+        "mh3g-hd-jp-v96-lobby-full-item-box",
+        "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
+        "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
+        "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
+    },
+}
 
 
 def load_tool():
@@ -608,11 +660,39 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertEqual([pack_id], [pack["id"] for pack in selected])
 
-    def test_manifest_schema_is_json_and_exposes_required_statuses(self):
+    def test_distribution_categories_form_an_explicit_complete_partition(self):
+        result = self.tool.validate_repository(REPO)
+        self.assertEqual([], result.errors, "\n".join(result.errors))
+        categories = json.loads((REPO / "catalog" / "categories.json").read_text())[
+            "categories"
+        ]
+        self.assertEqual(
+            DISTRIBUTION_CATEGORY_FOLDERS,
+            {category["id"]: category["folder"] for category in categories},
+        )
+        expected_ids = set().union(*DISTRIBUTION_CATEGORY_PACKS.values())
+        self.assertEqual({pack["id"] for pack in result.packs}, expected_ids)
+        for category, expected_pack_ids in DISTRIBUTION_CATEGORY_PACKS.items():
+            self.assertEqual(
+                expected_pack_ids,
+                {
+                    pack["id"]
+                    for pack in result.packs
+                    if pack["distribution_category"] == category
+                },
+            )
+        self.assertTrue(all(len(Path(pack["pack_dir"]).parts) == 5 for pack in result.packs))
+
+    def test_manifest_schema_is_json_and_exposes_required_statuses_and_categories(self):
         schema = json.loads((REPO / "schemas" / "pack-manifest.schema.json").read_text())
         self.assertEqual(
             ["Static Verified", "Runtime Experimental", "Runtime Verified"],
             schema["properties"]["status"]["enum"],
+        )
+        self.assertIn("distribution_category", schema["required"])
+        self.assertEqual(
+            list(DISTRIBUTION_CATEGORY_FOLDERS),
+            schema["properties"]["distribution_category"]["enum"],
         )
 
     def test_rules_paths_expose_each_pack_as_an_independent_cemu_leaf(self):
@@ -652,6 +732,11 @@ class CatalogTests(unittest.TestCase):
                 edit(path)
                 return self.tool.validate_repository(copied).errors
 
+        def write_json_field(path: Path, field: str, value):
+            document = json.loads(path.read_text())
+            document[field] = value
+            path.write_text(json.dumps(document, indent=2) + "\n")
+
         lobby_manifest = "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box/manifest.json"
         errors = validate_after(
             lobby_manifest,
@@ -677,6 +762,17 @@ class CatalogTests(unittest.TestCase):
         )
         self.assertTrue(any("pack_dir does not match" in error for error in errors))
 
+        errors = validate_after(
+            lobby_manifest,
+            lambda path: path.write_text(
+                path.read_text().replace(
+                    '"distribution_category": "item-box-interface"',
+                    '"distribution_category": "uncategorized"',
+                )
+            ),
+        )
+        self.assertTrue(any("unknown distribution_category" in error for error in errors))
+
         fps44_manifest = "packs/wiiu/mh3g-hd/jp-v96/fps-lock-44/manifest.json"
         errors = validate_after(
             fps44_manifest,
@@ -691,7 +787,7 @@ class CatalogTests(unittest.TestCase):
 
         errors = validate_after(
             fps44_manifest,
-            lambda path: path.write_text(path.read_text().replace('"source_cheat_entries": [71, 73]', '"source_cheat_entries": ["71"]')),
+            lambda path: write_json_field(path, "source_cheat_entries", ["71"]),
         )
         self.assertTrue(any("source_cheat_entries" in error for error in errors))
 
@@ -1464,7 +1560,7 @@ class CatalogTests(unittest.TestCase):
             self.assertFalse(legacy.exists())
             self.assertTrue((foreign / "rules.txt").is_file())
 
-    def test_archive_is_reproducible_and_contains_no_game_assets(self):
+    def test_archive_is_reproducible_categorized_and_self_validating(self):
         result = self.tool.validate_repository(REPO)
         self.assertEqual([], result.errors, "\n".join(result.errors))
         with tempfile.TemporaryDirectory() as tmp:
@@ -1474,9 +1570,77 @@ class CatalogTests(unittest.TestCase):
             self.tool.package_repository(REPO, two)
             self.assertEqual(self.tool.sha256_file(one), self.tool.sha256_file(two))
             names = self.tool.zip_member_names(one)
-            self.assertNotIn("mh3g_cafe.rpx", names)
-            self.assertFalse(any(name.startswith(".ruff_cache/") for name in names))
-            self.assertFalse(any(name.startswith(".idea/") for name in names))
+            root = "mh-cemu-enhancements/"
+            self.assertTrue(names)
+            self.assertTrue(all(name.startswith(root) for name in names))
+            self.assertFalse(any(name.endswith("mh3g_cafe.rpx") for name in names))
+            self.assertFalse(any("/.ruff_cache/" in name for name in names))
+            self.assertFalse(any("/.idea/" in name for name in names))
+            self.assertFalse(any(name.startswith(root + ".github/") for name in names))
+            self.assertFalse(any(name.startswith(root + "tests/") for name in names))
+            self.assertIn(root + "PACK-INDEX.md", names)
+            self.assertIn(root + "catalog/distribution-index.json", names)
+
+            with zipfile.ZipFile(one) as archive:
+                archive.extractall(Path(tmp) / "extracted")
+                distribution_index = json.loads(
+                    archive.read(root + "catalog/distribution-index.json")
+                )
+            extracted_root = Path(tmp) / "extracted" / "mh-cemu-enhancements"
+            extracted_result = self.tool.validate_repository(extracted_root)
+            self.assertEqual([], extracted_result.errors, "\n".join(extracted_result.errors))
+            self.assertEqual(56, distribution_index["pack_count"])
+            self.assertEqual(53, distribution_index["available_pack_count"])
+            self.assertEqual(3, distribution_index["runtime_blocked_pack_count"])
+            self.assertEqual(
+                DISTRIBUTION_CATEGORY_FOLDERS,
+                {
+                    category["id"]: category["folder"]
+                    for category in distribution_index["categories"]
+                },
+            )
+            for pack in extracted_result.packs:
+                category_folder = DISTRIBUTION_CATEGORY_FOLDERS[
+                    pack["distribution_category"]
+                ]
+                parts = Path(pack["pack_dir"]).parts
+                self.assertEqual(6, len(parts))
+                self.assertEqual(category_folder, parts[4])
+                self.assertIn(root + pack["pack_dir"] + "/manifest.json", names)
+
+            self.assertNotIn(
+                root + "packs/wiiu/mh3g-hd/jp-v96/fps-lock-30/manifest.json",
+                names,
+            )
+            self.assertIn(
+                root
+                + "packs/wiiu/mh3g-hd/jp-v96/01-frame-rate/"
+                + "fps-lock-30/manifest.json",
+                names,
+            )
+
+            selected = self.tool.select_packs(
+                extracted_result.packs,
+                ["mh3g-hd-jp-v96-fps-lock-30"],
+                include_experimental=True,
+            )
+            cemu_root = Path(tmp) / "release-install-smoke"
+            self.tool.install(
+                extracted_root,
+                cemu_root,
+                selected,
+                reference_rpx=None,
+                verify=False,
+            )
+            self.assertTrue(
+                (
+                    cemu_root
+                    / "graphicPacks"
+                    / "mh-cemu-enhancements"
+                    / "MH3G HD JP v96 - Lock 30 FPS"
+                    / "rules.txt"
+                ).is_file()
+            )
 
 
 if __name__ == "__main__":

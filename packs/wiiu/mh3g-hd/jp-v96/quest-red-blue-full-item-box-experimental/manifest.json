@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "item-box-interface",
   "default_install": false,
   "availability": "runtime-blocked",
   "availability_reason": "当前任务已暂停：红蓝箱替换仍缺少可复现的正确任务场景 UI 生命周期，不能作为安装候选。 / Paused in the current task: the red/blue-box replacement still lacks a reproducible correct quest-scene UI lifecycle and must not be selected for installation.",

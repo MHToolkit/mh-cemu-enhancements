@@ -4,6 +4,7 @@
   "type": "object",
   "required": [
     "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
+    "distribution_category",
     "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license"
   ],
   "properties": {
@@ -15,6 +16,17 @@
     "region": { "type": "string" },
     "update": { "type": "string" },
     "status": { "enum": ["Static Verified", "Runtime Experimental", "Runtime Verified"] },
+    "distribution_category": {
+      "enum": [
+        "frame-rate",
+        "speed",
+        "skills-immunities",
+        "combat-weapons",
+        "balance-breaking",
+        "quality-of-life",
+        "item-box-interface"
+      ]
+    },
     "default_install": { "type": "boolean" },
     "auto_experimental_install": { "type": "boolean" },
     "availability": { "enum": ["available", "runtime-blocked"] },

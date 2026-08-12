@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Verified",
+  "distribution_category": "item-box-interface",
   "default_install": false,
   "availability": "available",
   "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box",

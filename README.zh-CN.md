@@ -10,6 +10,7 @@
 | --- | --- | --- | --- |
 | 锁定 30 FPS | `Runtime Experimental` | `available` | 否 |
 | 锁定 44 FPS（3DS 转换） | `Runtime Experimental` | `available` | 否 |
+| 3 个 60 FPS 行为修复 | `Runtime Experimental` | `available` | 否（逐项显式选择） |
 | 43 个 3DS 静态 ARM 转换包 | `Runtime Experimental` | `available` | 否（逐项显式选择） |
 | 集会所/酒场完整家中箱子 | `Runtime Verified` | `available` | 否 |
 | 猫饭技能自定义（三槽、`00..41`） | `Runtime Experimental` | `available` | 否（显式选择） |
@@ -52,12 +53,16 @@ python3 scripts/mh-cemu-enhancements.py install \
 
 python3 scripts/mh-cemu-enhancements.py uninstall --cemu-root /绝对路径/cemu-data-root
 python3 scripts/mh-cemu-enhancements.py inspect --cemu-root /绝对路径/cemu-data-root
-python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-0.1.24.zip
+python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancements-preview.zip
 ```
 
 ### `main` 自动发布
 
 `.github/workflows/release-on-main-pr-merge.yml` 只在目标分支为 `main` 的 PR **确实合并**后运行：先校验目录并执行完整单测，再独立构建两次 ZIP 并要求字节完全一致，随后创建带注释的 `vX.Y.Z` Tag，并把 ZIP 与 SHA-256 sidecar 发布为最新 GitHub Release。仅关闭但未合并的 PR、普通分支 push 都不会触发发布。同一合并提交重跑时会复用已有 Tag；后续合并默认递增 patch 版本，除非维护者已在仓库中准备了版本更高但尚未打 Tag 的 dist。
+
+Release ZIP 使用固定顶层目录 `mh-cemu-enhancements/`，并把插件按 `01-frame-rate`、`02-speed-and-actions`、`03-skills-and-immunities`、`04-combat-and-weapons`、`05-balance-breaking`、`06-quality-of-life`、`07-item-box-and-interface` 七类存放。源码仓库仍保留通用的扁平 pack 路径，只有打包成品会确定性重写 catalog、manifest 和文件路径。ZIP 根目录会生成双语 `PACK-INDEX.md`，机器可读明细位于 `catalog/distribution-index.json`；解压后的成品会再次通过同一套 `validate`。完整规则见 [Release ZIP 目录与分类规则](docs/release-layout.md)。
+
+ZIP 不包含 `.github`、`tests`、`dist`、编辑器缓存等仓库专用内容，也不会包含任何游戏资产。分类只影响发行包的可读性；安装器仍用稳定的 `install_folder` 写入 Cemu 自有目录，因此不会仅因 ZIP 重构而改变既有 Cemu 启用路径。推荐在解压后的 `mh-cemu-enhancements/` 根目录运行安装命令，不要手工整类复制。
 
 安装器只写入自有的 Graphic Pack 目录及其中 receipt：标准 Cemu macOS 数据根是 `<cemu-root>/graphicPacks/mh-cemu-enhancements/`；提供的 Nemessix 隔离外层根（`.../Library/Application Support/Nemessix Dev/cemu`）则必须写入 `<cemu-root>/data/graphicPacks/mh-cemu-enhancements/`，这是 bundled Cemu 实际扫描的 user-data 路径。重复安装只替换该自有目录；卸载也只移除该目录，重复卸载成功返回。若目录原先不存在 receipt，会先原地改名备份。此前错误写入隔离根 `<cemu-root>/graphicPacks/mh-cemu-enhancements/` 的旧版 receipt 安装会在下一次安装时自动迁移；直接卸载也会移除该自有旧目录。
 
@@ -93,6 +98,7 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 
 - [架构、状态语义与安全边界](docs/architecture.md)
 - [通用目录决策](docs/adr/0001-catalog-and-pack-boundaries.md)
+- [Release ZIP 目录与分类规则](docs/release-layout.md)
 - [MH3G HD JP v96 PPC 静态证据账本](docs/research/mh3g-hd-jp-v96.md)
 - [完整 3DS → Cemu 金手指转换矩阵](docs/research/mh3g-3ds-cheat-conversion.md)
 - [43 项静态 ARM → PPC 映射与包 ID 清单](docs/research/mh3g-static-arm-mapping.md)
@@ -102,4 +108,4 @@ python3 scripts/mh-cemu-enhancements.py isolated-launch-command \
 
 用户给出的 Bilibili 页面没有作为实现证据：其中 b23 短链不可用。本目录只依据本机 3DS ARM 语义对照、Wii U PPC/静态资源分析，以及 Cemu Graphic Pack parser 的规则实现。
 
-未来建议远端：`MHToolkit/mh-cemu-enhancements`。当前只创建本地仓库，不创建、不发布远端。
+远端仓库：`MHToolkit/mh-cemu-enhancements`。功能分支不会自动打 Tag 或创建 Release；只有合并到 `main` 的 PR 会触发上述发布工作流。

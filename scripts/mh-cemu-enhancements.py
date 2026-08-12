@@ -26,8 +26,12 @@ from xml.etree import ElementTree
 
 
 CATALOG_PATH = Path("catalog/packs.json")
+CATEGORY_CATALOG_PATH = Path("catalog/categories.json")
 MANIFEST_SCHEMA_PATH = Path("schemas/pack-manifest.schema.json")
 INSTALL_DIRECTORY = Path("mh-cemu-enhancements")
+RELEASE_ROOT = Path("mh-cemu-enhancements")
+RELEASE_ROOT_FILES = {"LICENSE", "README.md", "README.zh-CN.md"}
+RELEASE_TOP_LEVEL_DIRECTORIES = {"catalog", "docs", "packs", "schemas", "scripts"}
 NEMESSIX_ISOLATED_ROOT_SUFFIX = (
     "Library",
     "Application Support",
@@ -154,6 +158,69 @@ def _load_json(path: Path) -> Any:
         return json.load(source)
 
 
+def _load_distribution_categories(repo_root: Path) -> tuple[list[dict[str, Any]], list[str]]:
+    path = repo_root / CATEGORY_CATALOG_PATH
+    try:
+        document = _load_json(path)
+    except (OSError, json.JSONDecodeError) as exc:
+        return [], [f"cannot parse category catalog {path}: {exc}"]
+    errors: list[str] = []
+    if document.get("schema_version") != 1:
+        errors.append("category catalog schema_version must be 1")
+    categories = document.get("categories")
+    if not isinstance(categories, list) or not categories:
+        return [], errors + ["category catalog categories must be a non-empty list"]
+    required = {
+        "id",
+        "folder",
+        "order",
+        "label_en",
+        "label_zh_cn",
+        "description_en",
+        "description_zh_cn",
+    }
+    seen_ids: set[str] = set()
+    seen_folders: set[str] = set()
+    seen_orders: set[int] = set()
+    for category in categories:
+        if not isinstance(category, dict):
+            errors.append("category catalog contains a non-object entry")
+            continue
+        missing = sorted(required - category.keys())
+        if missing:
+            errors.append(f"category entry missing fields: {', '.join(missing)}")
+            continue
+        category_id = category["id"]
+        folder = category["folder"]
+        order = category["order"]
+        if (
+            not isinstance(category_id, str)
+            or re.fullmatch(r"[a-z0-9][a-z0-9-]+", category_id) is None
+            or category_id in seen_ids
+        ):
+            errors.append(f"duplicate or invalid category id {category_id!r}")
+        if (
+            not isinstance(folder, str)
+            or re.fullmatch(r"[0-9]{2}-[a-z0-9][a-z0-9-]+", folder) is None
+            or folder in seen_folders
+        ):
+            errors.append(f"duplicate or invalid category folder {folder!r}")
+        if not isinstance(order, int) or not 1 <= order <= 99 or order in seen_orders:
+            errors.append(f"duplicate or invalid category order {order!r}")
+        elif isinstance(folder, str) and not folder.startswith(f"{order:02d}-"):
+            errors.append(f"category folder {folder!r} does not match order {order}")
+        for field in ("label_en", "label_zh_cn", "description_en", "description_zh_cn"):
+            if not isinstance(category[field], str) or not category[field].strip():
+                errors.append(f"category {category_id!r} has invalid {field}")
+        if isinstance(category_id, str):
+            seen_ids.add(category_id)
+        if isinstance(folder, str):
+            seen_folders.add(folder)
+        if isinstance(order, int):
+            seen_orders.add(order)
+    return sorted(categories, key=lambda category: category.get("order", 999)), errors
+
+
 def _rules_has_required_syntax(path: Path, title_id: str) -> list[str]:
     errors: list[str] = []
     text = path.read_text(encoding="utf-8")
@@ -190,6 +257,18 @@ def validate_repository(repo_root: Path) -> ValidationResult:
     status_enum = schema.get("properties", {}).get("status", {}).get("enum")
     if status_enum != ["Static Verified", "Runtime Experimental", "Runtime Verified"]:
         errors.append("manifest schema must declare the three supported status values")
+    categories, category_errors = _load_distribution_categories(repo_root)
+    errors.extend(category_errors)
+    category_by_id = {
+        category["id"]: category
+        for category in categories
+        if isinstance(category, dict) and isinstance(category.get("id"), str)
+    }
+    category_enum = (
+        schema.get("properties", {}).get("distribution_category", {}).get("enum")
+    )
+    if category_enum != list(category_by_id):
+        errors.append("manifest schema distribution_category enum must match category catalog order")
     catalog_file = repo_root / CATALOG_PATH
     if not catalog_file.is_file():
         return ValidationResult([], [f"missing catalog: {catalog_file}"])
@@ -222,7 +301,8 @@ def validate_repository(repo_root: Path) -> ValidationResult:
         packs.append(pack)
         required = {
             "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
-            "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license",
+            "distribution_category", "default_install", "availability", "pack_dir", "install_folder",
+            "rules", "source", "license",
         }
         missing = sorted(required - pack.keys())
         if missing:
@@ -236,14 +316,31 @@ def validate_repository(repo_root: Path) -> ValidationResult:
             errors.append(f"{manifest_rel}: target must pin Wii U title 0005000010104D00")
         path_parts = Path(pack["pack_dir"]).parts
         expected_version_dir = f"{pack['region'].lower()}-{pack['update'].lower()}"
+        distribution_category = pack["distribution_category"]
+        category = (
+            category_by_id.get(distribution_category)
+            if isinstance(distribution_category, str)
+            else None
+        )
+        valid_path_tail = len(path_parts) == 5 or (
+            len(path_parts) == 6
+            and category is not None
+            and path_parts[4] == category["folder"]
+        )
         if (
-            len(path_parts) < 5
+            not valid_path_tail
             or path_parts[0] != "packs"
             or path_parts[1] != pack["platform"]
             or path_parts[2] != pack["title_slug"]
             or path_parts[3] != expected_version_dir
         ):
             errors.append(f"{manifest_rel}: pack_dir does not match platform/title/region/update identity")
+        if category is None:
+            errors.append(
+                f"{manifest_rel}: unknown distribution_category {distribution_category!r}"
+            )
+        if Path(manifest_rel) != Path(pack["pack_dir"]) / "manifest.json":
+            errors.append(f"{manifest_rel}: catalog manifest path must match pack_dir/manifest.json")
         if pack["status"] not in {"Static Verified", "Runtime Experimental", "Runtime Verified"}:
             errors.append(f"{manifest_rel}: unknown status {pack['status']!r}")
         if not isinstance(pack["default_install"], bool):
@@ -529,11 +626,15 @@ def uninstall(cemu_root: Path) -> None:
 
 
 def _distribution_files(repo_root: Path) -> list[Path]:
-    ignored_top = {".git", ".idea", "dist", "__pycache__", ".ruff_cache", ".pytest_cache"}
     result = []
     for path in repo_root.rglob("*"):
         relative = path.relative_to(repo_root)
-        if not path.is_file() or relative.parts[0] in ignored_top or "__pycache__" in relative.parts:
+        if not path.is_file() or "__pycache__" in relative.parts:
+            continue
+        if len(relative.parts) == 1:
+            if relative.name not in RELEASE_ROOT_FILES:
+                continue
+        elif relative.parts[0] not in RELEASE_TOP_LEVEL_DIRECTORIES:
             continue
         if path.name == ".DS_Store" or path.suffix.lower() in FORBIDDEN_ASSET_SUFFIXES:
             continue
@@ -541,15 +642,213 @@ def _distribution_files(repo_root: Path) -> list[Path]:
     return sorted(result, key=lambda item: item.relative_to(repo_root).as_posix())
 
 
+def _release_pack_dir(pack: dict[str, Any], category_by_id: dict[str, dict[str, Any]]) -> Path:
+    source_parts = Path(pack["pack_dir"]).parts
+    category = category_by_id[pack["distribution_category"]]
+    return Path(*source_parts[:4]) / category["folder"] / source_parts[-1]
+
+
+def _pack_display_name(repo_root: Path, pack: dict[str, Any]) -> str:
+    bilingual_name = pack.get("name_bilingual")
+    if isinstance(bilingual_name, str) and bilingual_name.strip():
+        return bilingual_name.strip()
+    rules_path = repo_root / pack["pack_dir"] / pack["rules"]
+    for line in rules_path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("name = "):
+            return line.removeprefix("name = ").strip().strip('"')
+    return pack["install_folder"]
+
+
+def _release_index_documents(
+    repo_root: Path,
+    packs: list[dict[str, Any]],
+    categories: list[dict[str, Any]],
+    release_pack_dirs: dict[str, Path],
+) -> tuple[bytes, bytes]:
+    category_order = {category["id"]: category["order"] for category in categories}
+    entries = []
+    for pack in sorted(
+        packs,
+        key=lambda item: (category_order[item["distribution_category"]], item["id"]),
+    ):
+        entries.append(
+            {
+                "id": pack["id"],
+                "name": _pack_display_name(repo_root, pack),
+                "platform": pack["platform"],
+                "title": pack["title"],
+                "title_id": pack["title_id"],
+                "region": pack["region"],
+                "update": pack["update"],
+                "category": pack["distribution_category"],
+                "status": pack["status"],
+                "availability": pack["availability"],
+                "default_install": pack["default_install"],
+                "manifest": (release_pack_dirs[pack["id"]] / "manifest.json").as_posix(),
+            }
+        )
+
+    indexed_categories = []
+    for category in categories:
+        matching = [entry for entry in entries if entry["category"] == category["id"]]
+        indexed_categories.append(
+            {
+                **category,
+                "pack_count": len(matching),
+                "available_count": sum(
+                    entry["availability"] == "available" for entry in matching
+                ),
+                "runtime_blocked_count": sum(
+                    entry["availability"] == "runtime-blocked" for entry in matching
+                ),
+            }
+        )
+
+    document = {
+        "schema_version": 1,
+        "archive_root": RELEASE_ROOT.as_posix(),
+        "pack_layout": (
+            "packs/<platform>/<title>/<region-update>/<category-folder>/<pack>/"
+        ),
+        "pack_count": len(entries),
+        "available_pack_count": sum(
+            entry["availability"] == "available" for entry in entries
+        ),
+        "runtime_blocked_pack_count": sum(
+            entry["availability"] == "runtime-blocked" for entry in entries
+        ),
+        "categories": indexed_categories,
+        "packs": entries,
+    }
+    json_bytes = (
+        json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    ).encode("utf-8")
+
+    markdown = [
+        "# Pack Distribution Index / 插件发行索引",
+        "",
+        "This file is generated deterministically from the catalog. "
+        "本文件由目录清单确定性生成。",
+        "",
+        "Release layout / 发行布局: "
+        "`packs/<platform>/<title>/<region-update>/<category-folder>/<pack>/`",
+        "",
+        f"Total / 总数: **{len(entries)}**; available / 可用: "
+        f"**{document['available_pack_count']}**; runtime-blocked / 运行时阻塞: "
+        f"**{document['runtime_blocked_pack_count']}**.",
+        "",
+    ]
+    for category in indexed_categories:
+        markdown.extend(
+            [
+                f"## `{category['folder']}` — {category['label_zh_cn']} / "
+                f"{category['label_en']}",
+                "",
+                f"{category['description_zh_cn']} / {category['description_en']}",
+                "",
+                f"Pack count / 插件数: **{category['pack_count']}** "
+                f"(available / 可用: {category['available_count']}; "
+                f"runtime-blocked / 运行时阻塞: {category['runtime_blocked_count']}).",
+                "",
+                "| ID | Name / 名称 | Status | Availability | Manifest |",
+                "| --- | --- | --- | --- | --- |",
+            ]
+        )
+        for entry in entries:
+            if entry["category"] != category["id"]:
+                continue
+            name = entry["name"].replace("|", "\\|")
+            markdown.append(
+                f"| `{entry['id']}` | {name} | {entry['status']} | "
+                f"{entry['availability']} | `{entry['manifest']}` |"
+            )
+        markdown.append("")
+    return json_bytes, ("\n".join(markdown).rstrip() + "\n").encode("utf-8")
+
+
+def _release_members(repo_root: Path) -> dict[Path, bytes]:
+    validation = validate_repository(repo_root)
+    if validation.errors:
+        raise ValueError("repository validation failed:\n" + "\n".join(validation.errors))
+    categories, category_errors = _load_distribution_categories(repo_root)
+    if category_errors:
+        raise ValueError("category validation failed:\n" + "\n".join(category_errors))
+    category_by_id = {category["id"]: category for category in categories}
+    release_pack_dirs = {
+        pack["id"]: _release_pack_dir(pack, category_by_id)
+        for pack in validation.packs
+    }
+    source_pack_dirs = {
+        Path(pack["pack_dir"]): release_pack_dirs[pack["id"]]
+        for pack in validation.packs
+    }
+    manifest_packs = {
+        Path(pack["pack_dir"]) / "manifest.json": pack
+        for pack in validation.packs
+    }
+
+    catalog = _load_json(repo_root / CATALOG_PATH)
+    rewritten_entries = []
+    for entry, pack in zip(catalog["packs"], validation.packs, strict=True):
+        rewritten = dict(entry)
+        rewritten["manifest"] = (
+            release_pack_dirs[pack["id"]] / "manifest.json"
+        ).as_posix()
+        rewritten_entries.append(rewritten)
+    rewritten_catalog = {**catalog, "packs": rewritten_entries}
+
+    members: dict[Path, bytes] = {}
+    for source in _distribution_files(repo_root):
+        relative = source.relative_to(repo_root)
+        destination = relative
+        payload = source.read_bytes()
+        if relative == CATALOG_PATH:
+            payload = (
+                json.dumps(rewritten_catalog, ensure_ascii=False, indent=2) + "\n"
+            ).encode("utf-8")
+        elif relative in manifest_packs:
+            pack = dict(manifest_packs[relative])
+            pack["pack_dir"] = release_pack_dirs[pack["id"]].as_posix()
+            destination = release_pack_dirs[pack["id"]] / "manifest.json"
+            payload = (json.dumps(pack, ensure_ascii=False, indent=2) + "\n").encode(
+                "utf-8"
+            )
+        else:
+            for source_pack_dir, release_pack_dir in source_pack_dirs.items():
+                try:
+                    suffix = relative.relative_to(source_pack_dir)
+                except ValueError:
+                    continue
+                destination = release_pack_dir / suffix
+                break
+        if destination in members:
+            raise ValueError(f"duplicate release member: {destination}")
+        members[destination] = payload
+
+    index_json, index_markdown = _release_index_documents(
+        repo_root, validation.packs, categories, release_pack_dirs
+    )
+    members[Path("catalog/distribution-index.json")] = index_json
+    members[Path("PACK-INDEX.md")] = index_markdown
+    return members
+
+
 def package_repository(repo_root: Path, output: Path) -> Path:
+    repo_root = repo_root.resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
+    members = _release_members(repo_root)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
-        for source in _distribution_files(repo_root):
-            relative = source.relative_to(repo_root).as_posix()
-            info = zipfile.ZipInfo(relative, date_time=(1980, 1, 1, 0, 0, 0))
+        for relative, payload in sorted(members.items(), key=lambda item: item[0].as_posix()):
+            archive_path = (RELEASE_ROOT / relative).as_posix()
+            info = zipfile.ZipInfo(archive_path, date_time=(1980, 1, 1, 0, 0, 0))
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = 0o100644 << 16
-            archive.writestr(info, source.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
+            archive.writestr(
+                info,
+                payload,
+                compress_type=zipfile.ZIP_DEFLATED,
+                compresslevel=9,
+            )
     return output
 
 
