@@ -1,0 +1,32 @@
+{
+  "id": "mh3g-hd-jp-v96-60fps-knockback-distance",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-knockback-distance-fix",
+  "install_folder": "MH3G HD JP v96 - 60FPS Knockback Distance",
+  "rules": "rules.txt",
+  "patch": "patch_stamina.asm",
+  "preimages": [
+    {
+      "address": "0x1007E110",
+      "word": "0xC1900000",
+      "meaning": "原 -18.0f 常数 (30帧风压吹飞距离)。/ Original -18.0f constant (30 FPS knockback distance)."
+    }
+  ],
+  "anchors": [],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "修复60帧下风压吹飞距离过远，使其与30帧一致。 / Fix knockback distance at 60 FPS to match 30 FPS behavior."
+}

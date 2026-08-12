@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 60帧锤子正本垒修复 / 60FPS Hammer Golf Swing Fix
+path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Hammer Golf Swing Fix
+description = "中文：仅在 60 FPS 下把锤子旋转攻击的单帧角度步进翻倍，以恢复正本垒派生；不修改其他锤子动作。默认关闭，状态为 Runtime Experimental / Gameplay Pending。 / English: At 60 FPS only, doubles the hammer spin attack's per-frame angle step to restore the golf-swing follow-up; other hammer actions are unchanged. Disabled by default with Runtime Experimental / Gameplay Pending status."
+version = 7

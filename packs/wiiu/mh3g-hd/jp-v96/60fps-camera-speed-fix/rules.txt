@@ -1,0 +1,63 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 60帧视角速度 / 60FPS Camera Speed
+path = MH Cemu Enhancements/MH3G HD JP v96/60FPS Camera Speed
+description = "中文：仅在 60 FPS 下缩放普通与瞄准视角转速；默认预设为 70%，修改预设后需重载游戏。默认关闭，状态为 Runtime Experimental / Gameplay Pending。 / English: Scales normal and aiming camera rotation only at 60 FPS; the default preset is 70%, and changing it requires a title reload. Disabled by default with Runtime Experimental / Gameplay Pending status."
+version = 7
+
+[Default]
+$cam_speed = 256
+
+[Preset]
+name = 100% (原始速度)
+$cam_speed = 256
+
+
+[Preset]
+name = 80%
+$cam_speed = 205
+
+[Preset]
+name = 75%
+$cam_speed = 192
+
+[Preset]
+name = 70%
+$cam_speed = 179
+default = 1
+
+[Preset]
+name = 65%
+$cam_speed = 166
+
+[Preset]
+name = 60%
+$cam_speed = 154
+
+[Preset]
+name = 55%
+$cam_speed = 141
+
+[Preset]
+name = 50%
+$cam_speed = 128
+
+[Preset]
+name = 45%
+$cam_speed = 115
+
+[Preset]
+name = 40%
+$cam_speed = 102
+
+[Preset]
+name = 110%
+$cam_speed = 282
+
+[Preset]
+name = 115%
+$cam_speed = 294
+
+[Preset]
+name = 120%
+$cam_speed = 307

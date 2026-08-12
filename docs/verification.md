@@ -1,3 +1,19 @@
+# 0.1.24 main distribution and automatic release gate / 0.1.24 主分支发行与自动发布门禁（2026-08-09）
+
+## Merge corrections / 合并后修正
+
+1. The newly merged camera-speed and knockback manifests pointed at directories that did not exist, so the repository could not validate or package them. Their `pack_dir` values now match the actual `*-fix` directories and are covered by regression tests. / 新合并的视角速度与吹飞距离 manifest 指向不存在的目录，导致仓库无法校验和打包；现已对齐真实 `*-fix` 目录并加入回归测试。
+2. The camera codecave overwrote `r0` with `$cam_speed` and then executed `cmpwi r0, 0`, incorrectly replacing the CR result produced by the native `cmpwi` at `0x02286F74`; the following native `beq` at `0x02286F7C` could therefore never take its zero path. The corrected cave performs only non-record arithmetic, uses `srwi` to avoid the `srawi` carry side effect, and preserves the native CR across the hook. Both surrounding words are now pinned as anchors. / 原视角 codecave 把 `$cam_speed` 写入 `r0` 后又执行 `cmpwi r0, 0`，错误覆盖了原生 `0x02286F74` 产生的 CR，导致紧随其后的 `0x02286F7C beq` 无法进入零分支。修正版只使用不记录 CR 的运算，并以 `srwi` 避免 `srawi` 的进位副作用，从而跨 Hook 保留原生 CR；两条上下文指令现均作为 anchor 固定。
+3. The hammer hook changes only `0x0287F43C`; it branches over `0x0287F440` and replays that second instruction exactly once in the cave. The manifest now records `0x0287F440` as an anchor rather than falsely claiming it is overwritten, and the misleading `nop` comment is removed. / 锤子 Hook 实际只改 `0x0287F43C`，分支跳过 `0x0287F440` 后在 cave 中准确重放一次；manifest 现把后者记为 anchor，不再误称其被覆盖，并删除了误导性的 `nop` 注释。
+4. The knockback fix targets immutable data word `0x1007E110`, not `.text`. Reference verification now checks every file-backed RPX virtual section and therefore validates both PPC code and static data preimages instead of rejecting or silently weakening data patches. / 吹飞距离修复目标是不可变数据字 `0x1007E110` 而非 `.text`；参考文件校验现覆盖 RPX 全部有文件内容的虚拟 section，可同时验证 PPC 代码与静态数据 preimage，不再拒绝或弱化数据补丁。
+
+## Static acceptance / 静态验收
+
+- `validate` accepts 53 manifests. The full suite passes 33 tests with one optional historical-path reference test skipped; an explicit `verify-reference` run against an RPX extracted read-only from the user's WUA accepts SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0` and every code/data preimage and anchor. / `validate` 接受 53 个 manifest；完整测试通过 33 项，仅跳过一个依赖已消失历史路径的可选 reference 测试。另以只读方式从用户 WUA 提取 RPX 后显式执行 `verify-reference`，其 SHA-256 为 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`，全部代码/数据 preimage 与 anchor 通过。
+- Cemu's real PPCAssembler accepts every instruction and relocation in the three new packs. Native replay words remain exact (`3B20040B`, `3B20034B`, `ED6C002A`, `3908FFFF`), and the data replacement encodes as `C1100000`. / Cemu 真实 PPCAssembler 接受三个新增包的全部指令与 relocation；原生重放字保持精确（`3B20040B`、`3B20034B`、`ED6C002A`、`3908FFFF`），数据替换编码为 `C1100000`。
+- The three packs remain default-off `Runtime Experimental / Gameplay Pending`; these static gates do not claim gameplay success. No Cemu process was launched, and no Cemu binary, MLC, save, or game image was modified. / 三个包继续默认关闭并保持 `Runtime Experimental / Gameplay Pending`；静态门禁不等于实机通过。本轮未启动 Cemu，也未修改 Cemu 二进制、MLC、存档或游戏镜像。
+- The main-only merged-PR workflow validates and builds twice before tagging, publishes only the asset-free ZIP and SHA-256 sidecar, and is idempotent for reruns of the same merged commit. / 仅面向 `main` 已合并 PR 的工作流会先校验并双构建，再打 Tag；Release 只发布无游戏资产 ZIP 与 SHA-256 sidecar，同一合并提交重跑保持幂等。
+
 # External equipment-cheat static gates / 外部装备金手指静态门禁（2026-08-12，V7）
 
 Production Unlock and No Materials remain **Runtime Verified**. No Money V6 is now formally rejected: a cold-start log proved the exact V6 pack active, live guest-memory reads found `li r3,0` at all eight declared sites, yet a sufficient-material upgrade still displayed `75000z` while production correctly displayed `0z`. This is a patch-logic failure, not an install/toggle/load failure.
@@ -22,7 +38,6 @@ Production Unlock and No Materials remain **Runtime Verified**. No Money V6 is n
 These gates establish exact binary targeting, parser/assembler validity, installation integrity, and the runtime-observed price-field data flow. On 2026-08-12 the user then cold-started the installed V7 pack and confirmed that the previously failing upgrade route now works. This adds gameplay proof for the core production/upgrade-without-money behavior, so V7 is promoted to **Runtime Verified / Gameplay Passed**. The verdict does not claim an independent retest or exhaustive coverage of every equipment category.
 
 以上门禁证明目标二进制、解析器/汇编器、安装完整性，以及运行时真实价格字段的数据流。随后用户于 2026-08-12 冷启动已安装的 V7 并确认：此前失败的强化路径已正常生效。该结果补齐生产/强化无需金钱核心功能的实机证据，因此 V7 升级为 **Runtime Verified / Gameplay Passed**；不冒充独立测试者或全部装备类别穷举。
-
 # #13 ordinary-swim final-integration candidate / #13 普通游泳最终积分候选（2026-08-07，0.1.22）
 
 ## Preliminary gameplay pass / 本机初步实机通过（2026-08-07）

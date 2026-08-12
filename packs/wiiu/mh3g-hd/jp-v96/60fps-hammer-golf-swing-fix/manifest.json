@@ -1,0 +1,38 @@
+{
+  "id": "mh3g-hd-jp-v96-60fps-hammer-golf-swing-fix",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/60fps-hammer-golf-swing-fix",
+  "install_folder": "MH3G HD JP v96 - 60FPS Hammer Golf Swing Fix",
+  "rules": "rules.txt",
+  "patch": "patch_stamina.asm",
+  "preimages": [
+    {
+      "address": "0x0287f43c",
+      "word": "0xED6C002A",
+      "meaning": "原 fadds f11, f12, f0 (锤子旋转角度累加)。/ Original fadds f11, f12, f0 (hammer spin angle accumulation)."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x0287f440",
+      "word": "0x3908FFFF",
+      "meaning": "分支会跳过、并由 codecave 原样重放的 subi r8, r8, 0x1。/ The branch skips this subi r8, r8, 0x1 and the codecave replays it exactly once."
+    }
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "修复60帧下锤子能正常用出正本垒 / Fix hammer golf swing at 60 FPS to use the home run."
+}

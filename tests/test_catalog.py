@@ -6,6 +6,7 @@ import importlib.util
 import json
 import re
 import shutil
+import struct
 import sys
 import tempfile
 import unittest
@@ -14,6 +15,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 SCRIPT = REPO / "scripts" / "mh-cemu-enhancements.py"
+RELEASE_SCRIPT = REPO / "scripts" / "next_release_version.py"
 
 STATIC_ARM_PACKS = {
     5: "sharpness-never-decreases",
@@ -67,6 +69,12 @@ EXTERNAL_EQUIPMENT_PACKS = {
     "mh3g-hd-jp-v96-equipment-crafting-upgrade-no-money",
 }
 
+FPS60_FIX_PACKS = {
+    "mh3g-hd-jp-v96-60fps-camera-speed": "60fps-camera-speed-fix",
+    "mh3g-hd-jp-v96-60fps-hammer-golf-swing-fix": "60fps-hammer-golf-swing-fix",
+    "mh3g-hd-jp-v96-60fps-knockback-distance": "60fps-knockback-distance-fix",
+}
+
 
 def static_pack_id(source_index: int, slug: str) -> str:
     return f"mh3g-hd-jp-v96-static-{source_index:02d}-{slug}"
@@ -81,10 +89,44 @@ def load_tool():
     return module
 
 
+def load_release_tool():
+    spec = importlib.util.spec_from_file_location("next_release_version", RELEASE_SCRIPT)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 class CatalogTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tool = load_tool()
+        cls.release_tool = load_release_tool()
+
+    def test_automatic_release_version_is_monotonic_and_idempotent(self):
+        choose = self.release_tool.choose_release_version
+        self.assertEqual((0, 1, 0), choose([], [], []))
+        self.assertEqual(
+            (0, 1, 24),
+            choose([], ["mh-cemu-enhancements-0.1.24.zip"], []),
+        )
+        self.assertEqual(
+            (0, 1, 25),
+            choose(
+                ["v0.1.24"],
+                ["mh-cemu-enhancements-0.1.24.zip"],
+                [],
+            ),
+        )
+        self.assertEqual(
+            (0, 1, 25),
+            choose(
+                ["v0.1.24", "not-a-release"],
+                ["mh-cemu-enhancements-0.1.24.zip"],
+                ["v0.1.25"],
+            ),
+        )
 
     def test_catalog_and_manifests_validate(self):
         result = self.tool.validate_repository(REPO)
@@ -100,12 +142,82 @@ class CatalogTests(unittest.TestCase):
                 "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
             }
             | EXTERNAL_EQUIPMENT_PACKS
+            | set(FPS60_FIX_PACKS)
             | {
                 static_pack_id(source_index, slug)
                 for source_index, slug in STATIC_ARM_PACKS.items()
             },
             {pack["id"] for pack in result.packs},
         )
+
+    def test_60fps_fixes_are_independent_bilingual_default_off_leaves(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {pack["id"]: pack for pack in result.packs}
+
+        for pack_id, directory in FPS60_FIX_PACKS.items():
+            pack = packs[pack_id]
+            self.assertEqual("Runtime Experimental", pack["status"])
+            self.assertFalse(pack["default_install"])
+            self.assertFalse(pack["auto_experimental_install"])
+            self.assertEqual("available", pack["availability"])
+            self.assertEqual(
+                f"packs/wiiu/mh3g-hd/jp-v96/{directory}",
+                pack["pack_dir"],
+            )
+            self.assertTrue(pack["preimages"])
+            self.assertIn(" / ", pack["summary"])
+
+            package_dir = REPO / pack["pack_dir"]
+            self.assertTrue((package_dir / pack["rules"]).is_file())
+            self.assertTrue((package_dir / pack["patch"]).is_file())
+            rules = (package_dir / pack["rules"]).read_text()
+            self.assertIn(" / ", next(line for line in rules.splitlines() if line.startswith("name = ")))
+            self.assertIn(" / ", next(line for line in rules.splitlines() if line.startswith("description = ")))
+
+    def test_60fps_fixes_preserve_control_flow_and_exact_patch_boundaries(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {pack["id"]: pack for pack in result.packs}
+
+        camera = packs["mh3g-hd-jp-v96-60fps-camera-speed"]
+        self.assertEqual(
+            {
+                0x02286F74: 0x2C000000,
+                0x02286F7C: 0x4182002C,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in camera["anchors"]
+            },
+        )
+        camera_dir = REPO / camera["pack_dir"]
+        camera_patch = (camera_dir / camera["patch"]).read_text().lower()
+        self.assertEqual(2, camera_patch.count("srwi    r25, r25, 8"))
+        self.assertNotIn("cmpwi   r0", camera_patch)
+
+        hammer = packs["mh3g-hd-jp-v96-60fps-hammer-golf-swing-fix"]
+        self.assertEqual(
+            {0x0287F43C: 0xED6C002A},
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in hammer["preimages"]
+            },
+        )
+        self.assertEqual(
+            {0x0287F440: 0x3908FFFF},
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in hammer["anchors"]
+            },
+        )
+        hammer_dir = REPO / hammer["pack_dir"]
+        hammer_patch = (hammer_dir / hammer["patch"]).read_text().lower()
+        self.assertNotIn("0x0287f440 = nop", hammer_patch)
+
+        for pack_id in FPS60_FIX_PACKS:
+            pack = packs[pack_id]
+            rules = (REPO / pack["pack_dir"] / pack["rules"]).read_text()
+            self.assertNotIn("[Option]", rules)
+            self.assertIn("Runtime Experimental", rules)
 
     def test_43_static_arm_conversions_are_independent_bilingual_default_off_leaves(self):
         result = self.tool.validate_repository(REPO)
@@ -600,6 +712,54 @@ class CatalogTests(unittest.TestCase):
         result = self.tool.validate_repository(REPO)
         errors = self.tool.verify_reference(reference, result.packs)
         self.assertEqual([], errors, "\n".join(errors))
+
+    def test_reference_verifier_accepts_file_backed_data_preimages(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            reference = Path(tmp) / "synthetic.rpx"
+            section_offset = 0x40
+            text_offset = 0x100
+            data_offset = 0x110
+            text = struct.pack(">I", 0x3B20040B)
+            data = bytes(0x10) + struct.pack(">I", 0xC1900000)
+            image = bytearray(data_offset + len(data))
+            image[:52] = struct.pack(
+                ">16sHHIIIIIHHHHHH",
+                b"\x7fELF" + bytes(12),
+                2,
+                20,
+                1,
+                0,
+                0,
+                section_offset,
+                0,
+                52,
+                0,
+                0,
+                40,
+                3,
+                0,
+            )
+            headers = (
+                bytes(40)
+                + struct.pack(">IIIIIIIIII", 0, 1, 6, 0x02000020, text_offset, len(text), 0, 0, 4, 0)
+                + struct.pack(">IIIIIIIIII", 0, 1, 2, 0x1007E100, data_offset, len(data), 0, 0, 4, 0)
+            )
+            image[section_offset:section_offset + len(headers)] = headers
+            image[text_offset:text_offset + len(text)] = text
+            image[data_offset:data_offset + len(data)] = data
+            reference.write_bytes(image)
+
+            pack = {
+                "id": "synthetic-text-and-data-pack",
+                "source": {"rpx_sha256": self.tool.sha256_file(reference)},
+                "preimages": [
+                    {"address": "0x02000020", "word": "0x3B20040B"},
+                    {"address": "0x1007E110", "word": "0xC1900000"},
+                ],
+                "anchors": [],
+            }
+
+            self.assertEqual([], self.tool.verify_reference(reference, [pack]))
 
     def test_install_and_uninstall_are_idempotent_and_skip_experimental(self):
         result = self.tool.validate_repository(REPO)

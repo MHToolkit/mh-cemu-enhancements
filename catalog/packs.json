@@ -160,6 +160,15 @@
     },
     {
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/static-72-affinity-100/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/60fps-camera-speed-fix/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/60fps-hammer-golf-swing-fix/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/60fps-knockback-distance-fix/manifest.json"
     }
   ]
 }
