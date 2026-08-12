@@ -324,6 +324,38 @@ class CatalogTests(unittest.TestCase):
             self.assertGreaterEqual(len(description), 500)
             self.assertNotIn("PPC 编译器复制/合并的路径数量", description)
 
+    def test_every_pack_has_effect_first_bilingual_description_and_summary(self):
+        result = self.tool.validate_repository(REPO)
+        self.assertEqual([], result.errors, "\n".join(result.errors))
+        self.assertEqual(56, len(result.packs))
+
+        for pack in result.packs:
+            rules_path = REPO / pack["pack_dir"] / pack["rules"]
+            fields = self.tool._rules_definition_fields(rules_path)
+            self.assertEqual(1, len(fields.get("name", [])), pack["id"])
+            self.assertEqual(1, len(fields.get("path", [])), pack["id"])
+            self.assertEqual(1, len(fields.get("description", [])), pack["id"])
+            description = fields["description"][0]
+            self.assertTrue(description.startswith("中文：效果："), pack["id"])
+            self.assertGreaterEqual(
+                len(description),
+                self.tool.MIN_PACK_DESCRIPTION_LENGTH,
+                pack["id"],
+            )
+            for marker in self.tool.PACK_DESCRIPTION_MARKERS:
+                self.assertIn(marker, description, pack["id"])
+
+            chinese_effect, english_effect = self.tool._description_effects(description)
+            self.assertIn(chinese_effect, pack["summary"], pack["id"])
+            self.assertIn(
+                english_effect.casefold(),
+                pack["summary"].casefold(),
+                pack["id"],
+            )
+            self.assertIn(pack["status"], pack["summary"], pack["id"])
+            if pack["availability"] == "runtime-blocked":
+                self.assertIn("runtime-blocked", pack["summary"], pack["id"])
+
     def test_static_arm_conversions_can_be_explicitly_installed_with_44_fps(self):
         result = self.tool.validate_repository(REPO)
         selected_ids = ["mh3g-hd-jp-v96-fps-lock-44"] + [
@@ -690,6 +722,8 @@ class CatalogTests(unittest.TestCase):
             schema["properties"]["status"]["enum"],
         )
         self.assertIn("distribution_category", schema["required"])
+        self.assertIn("summary", schema["required"])
+        self.assertEqual("string", schema["properties"]["summary"]["type"])
         self.assertEqual(
             list(DISTRIBUTION_CATEGORY_FOLDERS),
             schema["properties"]["distribution_category"]["enum"],
@@ -772,6 +806,29 @@ class CatalogTests(unittest.TestCase):
             ),
         )
         self.assertTrue(any("unknown distribution_category" in error for error in errors))
+
+        lobby_rules = "packs/wiiu/mh3g-hd/jp-v96/lobby-full-item-box/rules.txt"
+        errors = validate_after(
+            lobby_rules,
+            lambda path: path.write_text(
+                re.sub(
+                    r"^description = .*?$",
+                    "description = too short / 说明过短",
+                    path.read_text(),
+                    count=1,
+                    flags=re.MULTILINE,
+                )
+            ),
+        )
+        self.assertTrue(any("description must contain at least" in error for error in errors))
+        self.assertTrue(any("structured marker" in error for error in errors))
+
+        errors = validate_after(
+            lobby_manifest,
+            lambda path: write_json_field(path, "summary", "占位摘要 / Placeholder summary"),
+        )
+        self.assertTrue(any("effect-first and bilingual" in error for error in errors))
+        self.assertTrue(any("Chinese effect" in error for error in errors))
 
         fps44_manifest = "packs/wiiu/mh3g-hd/jp-v96/fps-lock-44/manifest.json"
         errors = validate_after(
@@ -1586,12 +1643,24 @@ class CatalogTests(unittest.TestCase):
                 distribution_index = json.loads(
                     archive.read(root + "catalog/distribution-index.json")
                 )
+                pack_index = archive.read(root + "PACK-INDEX.md").decode("utf-8")
             extracted_root = Path(tmp) / "extracted" / "mh-cemu-enhancements"
             extracted_result = self.tool.validate_repository(extracted_root)
             self.assertEqual([], extracted_result.errors, "\n".join(extracted_result.errors))
             self.assertEqual(56, distribution_index["pack_count"])
             self.assertEqual(53, distribution_index["available_pack_count"])
             self.assertEqual(3, distribution_index["runtime_blocked_pack_count"])
+            self.assertEqual(56, len(distribution_index["packs"]))
+            for indexed_pack in distribution_index["packs"]:
+                self.assertTrue(indexed_pack["summary"].startswith("中文："))
+                self.assertTrue(
+                    indexed_pack["description"].startswith("中文：效果：")
+                )
+                for marker in self.tool.PACK_DESCRIPTION_MARKERS:
+                    self.assertIn(marker, indexed_pack["description"])
+                self.assertIn(indexed_pack["id"], pack_index)
+                self.assertIn(indexed_pack["summary"], pack_index)
+                self.assertIn(indexed_pack["description"], pack_index)
             self.assertEqual(
                 DISTRIBUTION_CATEGORY_FOLDERS,
                 {

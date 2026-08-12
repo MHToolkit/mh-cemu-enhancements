@@ -5,7 +5,7 @@
   "required": [
     "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
     "distribution_category",
-    "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license"
+    "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license", "summary"
   ],
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
@@ -70,7 +70,8 @@
         "module_checksum": { "type": "string", "pattern": "^0x[0-9a-fA-F]{8}$" }
       }
     },
-    "license": { "type": "string" }
+    "license": { "type": "string" },
+    "summary": { "type": "string", "minLength": 1 }
   },
   "$defs": {
     "wordAssertions": {

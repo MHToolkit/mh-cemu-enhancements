@@ -54,5 +54,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #59“剥取、采集动作与获取加快”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #59 \"Faster Carving, Gathering, and Acquisition\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：直接把共享剥取/采集动作倍率从 1.3 提到 2.0，并把获取结算倍率从 1.1 提到 1.5，使剥取、采集和拾取流程整体更快。 状态：Runtime Experimental，默认关闭。 / English: Directly changes the shared carve/gather action multiplier from 1.3 to 2.0 and acquisition multiplier from 1.1 to 1.5, speeding carving, gathering, and pickup flow. Status: Runtime Experimental; disabled by default."
 }

@@ -22,5 +22,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and pack rules; no game assets included.",
-  "summary": "把活动 3DS 金手指中的两条重复 44 FPS 条目转换为 Cemu 的受支持 vsyncFrequency=44 控制项；默认关闭，不与 30 FPS 同时启用。 / Converts the two duplicate 44-FPS entries from the active 3DS cheat source into Cemu's supported vsyncFrequency=44 control; disabled by default and mutually exclusive with 30 FPS."
+  "summary": "中文：通过本标题专属 Graphic Pack 控制项把 Cemu 的 VSync 目标设为 44 FPS，复现活动 3DS 金手指中两条重复“44 帧”条目的帧率语义；它不改 RPX 指令或 Cemu 全局配置。 状态：Runtime Experimental，默认关闭。 / English: Uses a title-scoped Graphic Pack control to set Cemu's VSync target to 44 FPS, reproducing the frame-rate semantic of the two duplicate active 3DS “44 FPS” entries; it patches no RPX instruction and changes no global Cemu setting. Status: Runtime Experimental; disabled by default."
 }

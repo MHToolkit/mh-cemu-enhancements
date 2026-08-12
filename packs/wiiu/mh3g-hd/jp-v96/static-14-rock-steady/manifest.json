@@ -115,5 +115,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #14“金刚体”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #14 \"Rock Steady\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动原生“金刚体”复合技能，减轻击倒反应，并同时提供风压（小）无效、耳栓（包含煌黑龙吼叫）与水流（小）无效。 状态：Runtime Experimental，默认关闭。 / English: Forces the native Rock Steady compound skill, reducing knockdown reactions while also granting Windproof (Low), Earplugs including Alatreon roars, and Current Resistance (Low). Status: Runtime Experimental; disabled by default."
 }

@@ -85,5 +85,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #26“细菌感染无效”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #26 \"Bio Status Immunity\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动“细菌学/Bio Master”相关检查，目标是免疫碎龙黏菌（爆破前状态）与臭气，并提高异臭球驱赶效果及相关调和成功率。 状态：Runtime Experimental，默认关闭。 / English: Forces the Biology/Bio Master checks, intended to prevent Brachydios slimeblight and stench while improving Dung Bomb efficacy and its related combination success. Status: Runtime Experimental; disabled by default."
 }

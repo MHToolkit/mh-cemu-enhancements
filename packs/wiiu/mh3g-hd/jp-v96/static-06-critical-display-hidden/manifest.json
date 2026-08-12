@@ -83,6 +83,6 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #6“会心不显示”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #6 \"Critical Display Hidden\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental.",
+  "summary": "中文：虽然 3DS 源名称写作“会心不显示”，实际代码会把两条会心加成路径由 30 改为 100，当前行为等同于 #72“会心率 100%”，并不会隐藏会心特效。 状态：Runtime Experimental，默认关闭。 / English: Despite the 3DS source label “Critical Display Hidden,” the code changes two affinity-add paths from 30 to 100; it currently behaves like #72 Affinity 100% and does not hide critical-hit effects. Status: Runtime Experimental; disabled by default.",
   "exclusive_group": "mh3g-hd-jp-v96-affinity-override"
 }

@@ -103,5 +103,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #38“蓄力缩短”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #38 \"Focus\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动集中/Focus；大剑、弓、锤的蓄力时间约缩短 20%，太刀、双刀和斩击斧的相关槽增长约加快 20%。 状态：Runtime Experimental，默认关闭。 / English: Forces Focus; Great Sword, Bow, and Hammer charge time is about 20% shorter, while relevant Long Sword, Dual Blade, and Switch Axe gauges fill about 20% faster. Status: Runtime Experimental; disabled by default."
 }

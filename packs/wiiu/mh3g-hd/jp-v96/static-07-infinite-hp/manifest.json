@@ -50,5 +50,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #7“HP 无限”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #7 \"Infinite HP\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：同时阻止受伤后的常规当前 HP 写回，以及超量伤害把 HP 强制归零的致死写回，目标是在普通与一击致死伤害下都保持当前 HP。 状态：Runtime Experimental，默认关闭。 / English: Blocks both the normal current-HP writeback after damage and the lethal zero-clamp used for overkill, aiming to preserve HP against ordinary and otherwise fatal hits. Status: Runtime Experimental; disabled by default."
 }

@@ -59,14 +59,32 @@ not promoted, hidden, or made installable merely by being assigned a category.
 During packaging, `catalog/packs.json`, every packaged manifest `pack_dir`, and all pack
 file paths are rewritten to the categorized release location. The extracted release is
 then validated again as a self-contained repository. `PACK-INDEX.md` is the bilingual
-human index; `catalog/distribution-index.json` contains the same category, status,
-availability, count, and path data for tools. Neither file contains a timestamp, so two
-builds of the same commit remain byte-identical.
+human index and includes every pack's concise summary plus its full effect/scope/verify/
+source-status description. `catalog/distribution-index.json` contains the same summary,
+description, category, status, availability, count, and path data for tools. Neither file
+contains a timestamp, so two builds of the same commit remain byte-identical.
 
 打包时会同步重写 ZIP 内的 `catalog/packs.json`、每个 manifest 的 `pack_dir` 以及全部包文件
-路径，随后对解压后的成品再次执行完整目录校验。`PACK-INDEX.md` 是中英双语人工索引，
-`catalog/distribution-index.json` 则为工具提供同一套分类、状态、可用性、数量和路径数据。
-两者都不写入时间戳，因此同一提交连续构建两次仍可保持逐字节一致。
+路径，随后对解压后的成品再次执行完整目录校验。`PACK-INDEX.md` 是中英双语人工索引，会列出
+每个 Pack 的精简摘要和“效果、边界、验证、来源/状态”完整说明；
+`catalog/distribution-index.json` 则为工具提供同一套摘要、完整说明、分类、状态、可用性、数量
+和路径数据。两者都不写入时间戳，因此同一提交连续构建两次仍可保持逐字节一致。
+
+## Per-pack description contract / 单包说明契约
+
+Every `rules.txt` `[Definition]` must contain exactly one non-empty `name`, `path`, and
+`description`. The description must be at least 500 characters and use the fixed
+bilingual sections `中文：效果：…边界：…验证：…来源/状态：… / English: Effect: …
+Scope: … Verify: … Source/status: …`. The manifest `summary` must lead with the same
+Chinese and English effect text and state the real runtime status. A blocked pack must
+also say `runtime-blocked` explicitly. Repository validation, unit tests, and validation
+of the extracted release all enforce this contract.
+
+每个 `rules.txt` 的 `[Definition]` 必须各有且仅有一个非空 `name`、`path` 与 `description`。
+说明不得少于 500 字符，并固定采用“`中文：效果：…边界：…验证：…来源/状态：… /
+English: Effect: … Scope: … Verify: … Source/status: …`”双语结构。manifest 的 `summary`
+必须以相同的中英文实际效果开头并写明真实运行状态；阻塞包还必须明确标注
+`runtime-blocked`。源码校验、单元测试以及解压后发行树复验都会执行该契约。
 
 The release ZIP excludes repository-only CI/tests/editor metadata and every prohibited
 game-asset suffix. GitHub's source archive remains available for development history and

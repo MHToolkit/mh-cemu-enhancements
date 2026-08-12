@@ -78,5 +78,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把外部 3DS Gateway“装备生产全解锁”的 49 字解锁位表写入语义，转换为 JP v96 原生 PPC 解锁位读取的一条窄范围失败分支旁路；2026-08-11 实机反馈功能正常且无异常，默认关闭，Runtime Verified。 / English: Converts the external 3DS Gateway Unlock All Equipment Production cheat's forty-nine-word unlock-table write into a narrow bypass of the native JP-v96 PPC unlock-bit failure branch; gameplay feedback on 2026-08-11 confirmed the intended behavior with no anomaly. Disabled by default; Runtime Verified."
+  "summary": "中文：让所有合法装备 ID 通过生产配方的进度解锁位检查，从而显示并允许选择正常流程中尚未解锁的装备生产项目；关闭后恢复原进度，不向存档永久写入解锁表。 状态：Runtime Verified，默认关闭。 / English: Makes every valid equipment ID pass the production-recipe progression-unlock bit test, exposing production entries that normal progression has not unlocked; disabling it restores native progression and does not permanently write the save unlock table. Status: Runtime Verified; disabled by default."
 }

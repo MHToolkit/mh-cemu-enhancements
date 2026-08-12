@@ -216,5 +216,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #63“气候温度适应”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #63 \"Climate and Temperature Adaptation\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：同时强制耐暑与耐寒相关检查，使猎人在炎热/寒冷地图中无需冷饮或热饮也不受环境持续伤害、熔岩热伤害及寒冷额外耐力消耗。 状态：Runtime Experimental，默认关闭。 / English: Forces both heat- and cold-cancel checks so hot/cold maps no longer require Cool/Hot Drinks to avoid environmental health drain, lava heat damage, or cold-driven stamina penalties. Status: Runtime Experimental; disabled by default."
 }

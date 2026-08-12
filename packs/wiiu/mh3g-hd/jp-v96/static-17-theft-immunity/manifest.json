@@ -71,5 +71,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #17“偷盗无效”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #17 \"Theft Immunity\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动偷盗无效，阻止具备偷盗行为的怪物从猎人道具袋中拿走物品。 状态：Runtime Experimental，默认关闭。 / English: Forces Anti-Theft so theft-capable monsters cannot remove items from the hunter's pouch. Status: Runtime Experimental; disabled by default."
 }

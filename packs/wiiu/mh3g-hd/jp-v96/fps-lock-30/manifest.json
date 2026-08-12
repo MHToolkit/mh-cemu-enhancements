@@ -21,5 +21,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and pack rules; no game assets included.",
-  "summary": "用户实测 30 FPS 表现不稳定，暂降为实验状态并默认关闭；不修改 RPX 或 Cemu 全局设置，且不得与 44 FPS 同时启用。 / User testing found unstable 30 FPS behavior, so the pack is experimental and disabled by default; it does not patch RPX code or global Cemu settings, and must not be enabled together with 44 FPS."
+  "summary": "中文：通过本标题专属 Graphic Pack 控制项把 Cemu 的 VSync 目标设为 30 FPS，使 MH3G HD JP v96 以 30 帧上限运行；它不改 RPX 指令，也不改 Cemu 全局配置。 状态：Runtime Experimental，默认关闭。 / English: Uses a title-scoped Graphic Pack control to set Cemu's VSync target to 30 FPS for MH3G HD JP v96; it patches no RPX instruction and changes no global Cemu setting. Status: Runtime Experimental; disabled by default."
 }

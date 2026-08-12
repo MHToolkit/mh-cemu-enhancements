@@ -285,5 +285,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把外部 3DS ARM“装备制造与强化无需材料”转换为 JP v96 的 28 条固定 PPC 写入；2026-08-11 更正实测确认生产与强化会完整忽略材料需求且不扣除实际材料，界面无 99/空白，关闭重启后恢复，默认关闭，Runtime Verified。 / English: Converts the external 3DS ARM Craft and Upgrade Without Materials cheat into twenty-eight fixed JP-v96 PPC writes; corrected gameplay evidence on 2026-08-11 verified that production and upgrade fully ignore material requirements without deducting real materials, UI counts remain normal with no 99/blank display, and disabling plus restarting restores native behavior. Disabled by default; Runtime Verified."
+  "summary": "中文：把装备生产与强化所用的非豁免材料数量判定伪装为 99，并附带装备生产全解锁；2026-08-11 更正实测确认，零材料时也能生产和强化，实际持有的真实材料不会被扣除。 状态：Runtime Verified，默认关闭。 / English: Spoofs the non-exempt material-availability checks used by equipment production and upgrade as 99 and bundles production unlock; corrected gameplay evidence on 2026-08-11 confirmed that both actions work with zero materials and do not deduct real materials already owned. Status: Runtime Verified; disabled by default."
 }

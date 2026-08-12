@@ -2,7 +2,7 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lock 44 FPS (3DS Conversion)
 path = MH Cemu Enhancements/MH3G HD JP v96/Lock 44 FPS (3DS Conversion)
-description = 从 3DS「帧数 44帧 / 44贞」转换；默认关闭，不要与 30 FPS 同时启用。 / Converted from 3DS "44 FPS" entries; disabled by default. Do not enable together with 30 FPS.
+description = 中文：效果：通过本标题专属 Graphic Pack 控制项把 Cemu 的 VSync 目标设为 44 FPS，复现活动 3DS 金手指中两条重复“44 帧”条目的帧率语义；它不改 RPX 指令或 Cemu 全局配置。边界：本项只改变帧率目标，不包含动画、物理、镜头、音频或水下位移补偿；不要与 30 FPS 同时启用，三个按 60 FPS 标定的行为修复也不适用于 44 FPS。验证：只启用本项并完整重载标题，确认持续帧率目标接近 44，再在村庄、酒场、水下移动和至少一场完整任务中对照镜头、输入、音频、战斗速度及帧时间稳定性。来源/状态：由 3DS 源条目 #71 与 #73 的重复 44 FPS 语义转换为 Cemu `vsyncFrequency = 44`；默认关闭；Runtime Experimental，需实机稳定性验证。 / English: Effect: uses a title-scoped Graphic Pack control to set Cemu's VSync target to 44 FPS, reproducing the frame-rate semantic of the two duplicate active 3DS “44 FPS” entries; it patches no RPX instruction and changes no global Cemu setting. Scope: Do not enable together with 30 FPS. This pack changes only the frame-rate target and includes no animation, physics, camera, audio, or underwater-travel compensation; the three fixes calibrated specifically for 60 FPS do not apply at 44 FPS. Verify: enable only this pack, fully reload the title, confirm a sustained target near 44, then compare camera, input, audio, combat speed, and frame-time stability in the village, lobby, underwater travel, and at least one complete quest. Source/status: converts the duplicate 44-FPS semantics of 3DS source entries #71 and #73 into Cemu `vsyncFrequency = 44`; Disabled by default; Runtime Experimental and requires gameplay stability verification.
 version = 7
 
 [Control]

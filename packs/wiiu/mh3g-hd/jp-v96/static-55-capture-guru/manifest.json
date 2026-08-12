@@ -81,5 +81,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #55“观察眼”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #55 \"Capture Guru\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动观察眼/Capture Guru；已被标记的大型怪物达到可捕获血量时，地图图标会闪烁提示。 状态：Runtime Experimental，默认关闭。 / English: Forces Capture Guru; once a marked large monster reaches capturable health, its map icon should blink. Status: Runtime Experimental; disabled by default."
 }

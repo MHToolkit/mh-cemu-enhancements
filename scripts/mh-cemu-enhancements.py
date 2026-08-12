@@ -39,6 +39,17 @@ NEMESSIX_ISOLATED_ROOT_SUFFIX = (
     "cemu",
 )
 FORBIDDEN_ASSET_SUFFIXES = {".rpx", ".rpl", ".wua", ".wux", ".wud", ".cci", ".arc"}
+PACK_DESCRIPTION_MARKERS = (
+    "中文：效果：",
+    "边界：",
+    "验证：",
+    "来源/状态：",
+    "/ English: Effect:",
+    "Scope:",
+    "Verify:",
+    "Source/status:",
+)
+MIN_PACK_DESCRIPTION_LENGTH = 500
 
 
 @dataclasses.dataclass
@@ -221,6 +232,50 @@ def _load_distribution_categories(repo_root: Path) -> tuple[list[dict[str, Any]]
     return sorted(categories, key=lambda category: category.get("order", 999)), errors
 
 
+def _strip_rules_value(value: str) -> str:
+    value = value.strip()
+    if len(value) >= 2 and value[0] == value[-1] == '"':
+        return value[1:-1]
+    return value
+
+
+def _rules_definition_fields(path: Path) -> dict[str, list[str]]:
+    fields: dict[str, list[str]] = {}
+    in_definition = False
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if line.startswith("[") and line.endswith("]"):
+            if in_definition:
+                break
+            in_definition = line == "[Definition]"
+            continue
+        if not in_definition or not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        fields.setdefault(key.strip(), []).append(_strip_rules_value(value))
+    return fields
+
+
+def _description_effects(description: str) -> tuple[str, str]:
+    if not description.startswith("中文：效果："):
+        raise ValueError("description must start with 中文：效果：")
+    chinese_start = len("中文：效果：")
+    chinese_end = description.find("边界：", chinese_start)
+    english_marker = "/ English: Effect:"
+    english_start = description.find(english_marker)
+    if chinese_end < 0 or english_start < 0:
+        raise ValueError("description is missing effect boundaries")
+    english_start += len(english_marker)
+    english_end = description.find("Scope:", english_start)
+    if english_end < 0:
+        raise ValueError("description is missing English Scope boundary")
+    chinese_effect = description[chinese_start:chinese_end].strip()
+    english_effect = description[english_start:english_end].strip()
+    if not chinese_effect or not english_effect:
+        raise ValueError("description effects must be non-empty")
+    return chinese_effect, english_effect
+
+
 def _rules_has_required_syntax(path: Path, title_id: str) -> list[str]:
     errors: list[str] = []
     text = path.read_text(encoding="utf-8")
@@ -230,6 +285,26 @@ def _rules_has_required_syntax(path: Path, title_id: str) -> list[str]:
         errors.append(f"{path}: titleIds does not pin {title_id}")
     if "version = 7" not in text:
         errors.append(f"{path}: missing Graphic Pack version = 7")
+    fields = _rules_definition_fields(path)
+    for field in ("name", "path", "description"):
+        values = fields.get(field, [])
+        if len(values) != 1 or not values[0].strip():
+            errors.append(f"{path}: [Definition] must contain exactly one non-empty {field}")
+    descriptions = fields.get("description", [])
+    if len(descriptions) == 1:
+        description = descriptions[0]
+        if len(description) < MIN_PACK_DESCRIPTION_LENGTH:
+            errors.append(
+                f"{path}: description must contain at least "
+                f"{MIN_PACK_DESCRIPTION_LENGTH} characters"
+            )
+        for marker in PACK_DESCRIPTION_MARKERS:
+            if marker not in description:
+                errors.append(f"{path}: description missing structured marker {marker!r}")
+        try:
+            _description_effects(description)
+        except ValueError as exc:
+            errors.append(f"{path}: {exc}")
     return errors
 
 
@@ -302,7 +377,7 @@ def validate_repository(repo_root: Path) -> ValidationResult:
         required = {
             "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
             "distribution_category", "default_install", "availability", "pack_dir", "install_folder",
-            "rules", "source", "license",
+            "rules", "source", "license", "summary",
         }
         missing = sorted(required - pack.keys())
         if missing:
@@ -343,6 +418,15 @@ def validate_repository(repo_root: Path) -> ValidationResult:
             errors.append(f"{manifest_rel}: catalog manifest path must match pack_dir/manifest.json")
         if pack["status"] not in {"Static Verified", "Runtime Experimental", "Runtime Verified"}:
             errors.append(f"{manifest_rel}: unknown status {pack['status']!r}")
+        summary = pack["summary"]
+        if not isinstance(summary, str) or not summary.strip():
+            errors.append(f"{manifest_rel}: summary must be a non-empty string")
+        elif not summary.startswith("中文：") or " / English:" not in summary:
+            errors.append(f"{manifest_rel}: summary must be effect-first and bilingual")
+        elif pack["status"] not in summary:
+            errors.append(f"{manifest_rel}: summary must state manifest status {pack['status']}")
+        if pack["availability"] == "runtime-blocked" and "runtime-blocked" not in str(summary):
+            errors.append(f"{manifest_rel}: blocked summary must state runtime-blocked")
         if not isinstance(pack["default_install"], bool):
             errors.append(f"{manifest_rel}: default_install must be boolean")
         auto_experimental_install = pack.get("auto_experimental_install", False)
@@ -409,6 +493,21 @@ def validate_repository(repo_root: Path) -> ValidationResult:
             errors.append(f"{manifest_rel}: missing rules file {rules_file}")
         else:
             errors.extend(_rules_has_required_syntax(rules_file, pack["title_id"]))
+            descriptions = _rules_definition_fields(rules_file).get("description", [])
+            if len(descriptions) == 1 and isinstance(summary, str):
+                try:
+                    chinese_effect, english_effect = _description_effects(descriptions[0])
+                except ValueError:
+                    pass
+                else:
+                    if chinese_effect not in summary:
+                        errors.append(
+                            f"{manifest_rel}: summary must contain the Chinese effect from rules.txt"
+                        )
+                    if english_effect.casefold() not in summary.casefold():
+                        errors.append(
+                            f"{manifest_rel}: summary must contain the English effect from rules.txt"
+                        )
         if not (package_dir / "manifest.json").is_file():
             errors.append(f"{manifest_rel}: package directory must include manifest.json")
         for file in package_dir.rglob("*") if package_dir.exists() else []:
@@ -653,10 +752,18 @@ def _pack_display_name(repo_root: Path, pack: dict[str, Any]) -> str:
     if isinstance(bilingual_name, str) and bilingual_name.strip():
         return bilingual_name.strip()
     rules_path = repo_root / pack["pack_dir"] / pack["rules"]
-    for line in rules_path.read_text(encoding="utf-8").splitlines():
-        if line.startswith("name = "):
-            return line.removeprefix("name = ").strip().strip('"')
+    names = _rules_definition_fields(rules_path).get("name", [])
+    if len(names) == 1:
+        return names[0]
     return pack["install_folder"]
+
+
+def _pack_description(repo_root: Path, pack: dict[str, Any]) -> str:
+    rules_path = repo_root / pack["pack_dir"] / pack["rules"]
+    descriptions = _rules_definition_fields(rules_path).get("description", [])
+    if len(descriptions) != 1:
+        raise ValueError(f"{rules_path}: expected exactly one description")
+    return descriptions[0]
 
 
 def _release_index_documents(
@@ -675,6 +782,8 @@ def _release_index_documents(
             {
                 "id": pack["id"],
                 "name": _pack_display_name(repo_root, pack),
+                "summary": pack["summary"],
+                "description": _pack_description(repo_root, pack),
                 "platform": pack["platform"],
                 "title": pack["title"],
                 "title_id": pack["title_id"],
@@ -750,19 +859,27 @@ def _release_index_documents(
                 f"(available / 可用: {category['available_count']}; "
                 f"runtime-blocked / 运行时阻塞: {category['runtime_blocked_count']}).",
                 "",
-                "| ID | Name / 名称 | Status | Availability | Manifest |",
-                "| --- | --- | --- | --- | --- |",
             ]
         )
         for entry in entries:
             if entry["category"] != category["id"]:
                 continue
-            name = entry["name"].replace("|", "\\|")
-            markdown.append(
-                f"| `{entry['id']}` | {name} | {entry['status']} | "
-                f"{entry['availability']} | `{entry['manifest']}` |"
+            markdown.extend(
+                [
+                    f"### `{entry['id']}` — {entry['name']}",
+                    "",
+                    f"- **Status / 状态:** {entry['status']}",
+                    f"- **Availability / 可用性:** {entry['availability']}",
+                    f"- **Default install / 默认安装:** {str(entry['default_install']).lower()}",
+                    f"- **Manifest:** `{entry['manifest']}`",
+                    f"- **Summary / 摘要:** {entry['summary']}",
+                    "",
+                    "**Full description / 完整说明**",
+                    "",
+                    entry["description"],
+                    "",
+                ]
             )
-        markdown.append("")
     return json_bytes, ("\n".join(markdown).rstrip() + "\n").encode("utf-8")
 
 

@@ -74,5 +74,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "大厅换装、装备组合与护石功能已由用户实测通过。 / User gameplay verified lobby equipment, equipment-set, and talisman functions."
+  "summary": "中文：把酒场/港口大厅箱子调用完整仓库初始化器时的模式参数由受限模式 `r5 = 1` 改为完整模式 `r5 = 0`，从该大厅箱子打开家中完整道具箱菜单；换装、装备组合、护石及完整菜单交互已经由用户实测通过。 状态：Runtime Verified，默认关闭。 / English: Changes the mode passed by the Port Tanzia/lobby box to the shared full-item-box initializer from restricted `r5 = 1` to full `r5 = 0`, opening the complete home item-box menu from that lobby box; the user gameplay-verified equipment change, equipment sets, talismans, and the complete menu interaction. Status: Runtime Verified; disabled by default."
 }

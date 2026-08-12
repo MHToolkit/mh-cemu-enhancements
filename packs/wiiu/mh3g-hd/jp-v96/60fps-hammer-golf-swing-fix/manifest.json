@@ -35,5 +35,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "修复60帧下锤子能正常用出正本垒 / Fix hammer golf swing at 60 FPS to use the home run."
+  "summary": "中文：仅应在 60 FPS 运行时启用；把锤子旋转攻击的单帧角度步进翻倍，并准确重放被 Hook 跨过的圈数递减指令，目标是恢复 30 FPS 下可正常派生的“正本垒/高尔夫挥击”时机。 状态：Runtime Experimental，默认关闭。 / English: Enable only while running at 60 FPS; doubles the hammer spin attack's per-frame angle step and exactly replays the loop-count decrement skipped by the hook, aiming to restore the golf-swing/home-run follow-up timing available at 30 FPS. Status: Runtime Experimental; disabled by default."
 }

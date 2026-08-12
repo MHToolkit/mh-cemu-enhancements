@@ -305,5 +305,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "所有任务中的红箱与蓝箱复用大厅 GUI 对象与资源，并在交互当帧一次性初始化、激活、消费状态转换及补齐任务场景缺失的最终 UI 挂接；不再修改全局大厅分发或任务 HUD 逐帧函数，等待单人实测。 / Both quest boxes reuse the lobby GUI objects and resources, then initialize, activate, consume the state transition, and complete the final UI attachment missing from quest scenes once on the interaction frame; the pack no longer modifies global lobby dispatch or the quest-HUD per-frame function, pending single-player gameplay validation."
+  "summary": "中文：该最终研究候选曾让所有任务中的红箱与蓝箱复用大厅 GUI 对象和资源，并在交互当帧一次性初始化、消费 `0x20` 状态转换及补齐任务场景缺失的最终 UI 挂接，目标是让两类任务箱都打开完整家中道具箱。 状态：Runtime Experimental / runtime-blocked，不可安装。 / English: This final research candidate made both red and blue boxes in every quest reuse lobby GUI objects/resources, then initialized once on the interaction frame, consumed the `0x20` state transition, and completed the final UI attachment missing from quest scenes, aiming to open the complete home item box from either quest box. Status: Runtime Experimental / runtime-blocked; not installable."
 }

@@ -209,5 +209,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "提供 0x00..0x41 的三槽双语猫饭技能选择；在随机生成器返回后覆盖原生临时槽，再由原生循环同步菜单与任务运行状态；默认关闭，待实机验证。 / Provides three bilingual 0x00..0x41 Felyne-food skill selectors; replaces native temporary slots after random generation, then lets the native loop mirror menu and quest runtime state; disabled by default and gameplay pending."
+  "summary": "中文：为三个猫饭技能槽分别提供 `00..41` 的完整双语选择，并在随机生成器返回后覆盖原生临时槽 `r31 + 0x68/0x6A/0x6C`，再由游戏原生循环同步用餐完成界面和任务运行状态；默认组合为 `06/36/00`。 状态：Runtime Experimental，默认关闭。 / English: Exposes complete bilingual `00..41` selectors for all three Felyne-food skill slots, overwrites native temporary slots `r31 + 0x68/0x6A/0x6C` after random generation, and lets the native loop mirror them into the completed-meal UI and quest runtime state; the in-pack default is `06/36/00`. Status: Runtime Experimental; disabled by default."
 }

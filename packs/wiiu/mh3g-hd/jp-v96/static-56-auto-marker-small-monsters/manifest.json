@@ -127,5 +127,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #56“自动标记并标记当前区小怪”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #56 \"Auto-Marker plus Current-Area Small Monsters\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制自动标记核心检查，无需染色球即可持续显示大型怪物位置/状态，并尝试把当前区域的小型怪物加入地图标记。 状态：Runtime Experimental，默认关闭。 / English: Forces the core auto-marker checks, continuously showing large-monster position/status without Paintballs and attempting to add current-area small monsters to the map. Status: Runtime Experimental; disabled by default."
 }

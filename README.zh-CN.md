@@ -60,7 +60,7 @@ python3 scripts/mh-cemu-enhancements.py package --output dist/mh-cemu-enhancemen
 
 `.github/workflows/release-on-main-pr-merge.yml` 只在目标分支为 `main` 的 PR **确实合并**后运行：先校验目录并执行完整单测，再独立构建两次 ZIP 并要求字节完全一致，随后创建带注释的 `vX.Y.Z` Tag，并把 ZIP 与 SHA-256 sidecar 发布为最新 GitHub Release。仅关闭但未合并的 PR、普通分支 push 都不会触发发布。同一合并提交重跑时会复用已有 Tag；后续合并默认递增 patch 版本，除非维护者已在仓库中准备了版本更高但尚未打 Tag 的 dist。
 
-Release ZIP 使用固定顶层目录 `mh-cemu-enhancements/`，并把插件按 `01-frame-rate`、`02-speed-and-actions`、`03-skills-and-immunities`、`04-combat-and-weapons`、`05-balance-breaking`、`06-quality-of-life`、`07-item-box-and-interface` 七类存放。源码仓库仍保留通用的扁平 pack 路径，只有打包成品会确定性重写 catalog、manifest 和文件路径。ZIP 根目录会生成双语 `PACK-INDEX.md`，机器可读明细位于 `catalog/distribution-index.json`；解压后的成品会再次通过同一套 `validate`。完整规则见 [Release ZIP 目录与分类规则](docs/release-layout.md)。
+Release ZIP 使用固定顶层目录 `mh-cemu-enhancements/`，并把插件按 `01-frame-rate`、`02-speed-and-actions`、`03-skills-and-immunities`、`04-combat-and-weapons`、`05-balance-breaking`、`06-quality-of-life`、`07-item-box-and-interface` 七类存放。源码仓库仍保留通用的扁平 pack 路径，只有打包成品会确定性重写 catalog、manifest 和文件路径。每个 Pack 都提供“效果、边界、验证、来源/状态”四段式中英双语说明；ZIP 根目录生成的 `PACK-INDEX.md` 会同时列出每项摘要和完整说明，`catalog/distribution-index.json` 也向工具暴露相同字段。解压后的成品会再次通过同一套 `validate`。完整规则见 [Release ZIP 目录与分类规则](docs/release-layout.md)。
 
 ZIP 不包含 `.github`、`tests`、`dist`、编辑器缓存等仓库专用内容，也不会包含任何游戏资产。分类只影响发行包的可读性；安装器仍用稳定的 `install_folder` 写入 Cemu 自有目录，因此不会仅因 ZIP 重构而改变既有 Cemu 启用路径。推荐在解压后的 `mh-cemu-enhancements/` 根目录运行安装命令，不要手工整类复制。
 

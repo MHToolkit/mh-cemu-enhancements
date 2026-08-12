@@ -2,7 +2,7 @@
 titleIds = 0005000010104D00
 name = MH3G HD JP v96 - Lock 30 FPS
 path = MH Cemu Enhancements/MH3G HD JP v96/Lock 30 FPS
-description = 30 FPS 实测不稳定，默认关闭；不要与 44 FPS 同时启用；不修改游戏代码或 Cemu 全局设置。 / Unstable in gameplay testing and disabled by default; do not enable together with 44 FPS; no game-code or global Cemu setting changes.
+description = 中文：效果：通过本标题专属 Graphic Pack 控制项把 Cemu 的 VSync 目标设为 30 FPS，使 MH3G HD JP v96 以 30 帧上限运行；它不改 RPX 指令，也不改 Cemu 全局配置。边界：本项只设定帧率目标，不修复帧率相关的动作、物理、镜头或音频逻辑；不得与 44 FPS 同时启用，三个仅供 60 FPS 使用的行为修复也应保持关闭。既有实测观察到帧率或帧节奏不稳定，因此不能把计数器短暂显示 30 当作稳定通过。验证：只启用本项并完整重载标题，在村庄、酒场和至少一场任务中分别记录 FPS、帧时间、镜头、输入、音频及战斗节奏，持续观察而不是只截取瞬时数值。来源/状态：仓库原生 Cemu `vsyncFrequency = 30` 控制包；默认关闭；Runtime Experimental，稳定性待复测。 / English: Effect: uses a title-scoped Graphic Pack control to set Cemu's VSync target to 30 FPS for MH3G HD JP v96; it patches no RPX instruction and changes no global Cemu setting. Scope: this pack sets only the frame-rate target and does not repair frame-dependent animation, physics, camera, or audio logic; never combine it with 44 FPS, and leave all three 60-FPS-only behavior fixes disabled. Existing gameplay testing observed unstable frame rate or pacing, so a momentary 30 counter is not a stability pass. Verify: enable only this pack, fully reload the title, and record FPS, frame time, camera, input, audio, and combat pacing in the village, lobby, and at least one quest over sustained runs rather than a single counter snapshot. Source/status: repository-native Cemu `vsyncFrequency = 30` control pack; Disabled by default; Runtime Experimental pending a stability retest.
 version = 7
 
 [Control]

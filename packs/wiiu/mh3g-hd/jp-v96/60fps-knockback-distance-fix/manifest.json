@@ -29,5 +29,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "修复60帧下风压吹飞距离过远，使其与30帧一致。 / Fix knockback distance at 60 FPS to match 30 FPS behavior."
+  "summary": "中文：仅应在 60 FPS 运行时启用；把普通风压吹飞使用的静态浮点常量由 `-18.0` 调整为 `-9.0`，目标是抵消 60 FPS 下按帧积分造成的双倍位移，使落点接近 30 FPS 基线。 状态：Runtime Experimental，默认关闭。 / English: Enable only while running at 60 FPS; changes the static float used by ordinary wind-pressure launch from `-18.0` to `-9.0`, aiming to cancel frame-integrated double travel at 60 FPS so the landing point approaches the 30-FPS baseline. Status: Runtime Experimental; disabled by default."
 }

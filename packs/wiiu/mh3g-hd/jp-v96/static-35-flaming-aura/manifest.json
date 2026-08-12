@@ -59,5 +59,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #35“燃鳞”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #35 \"Flaming Aura\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动“燃鳞/Flame Aura”，让怪物 AI 把猎人视为正在携带火把，并按各自的火把反应改变行为。 状态：Runtime Experimental，默认关闭。 / English: Forces Flame Aura, making monster AI react to the hunter as though a Torch were being carried. Status: Runtime Experimental; disabled by default."
 }
