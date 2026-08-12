@@ -1,0 +1,81 @@
+{
+  "id": "mh3g-hd-jp-v96-equipment-production-unlock",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Verified",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_confidence": "exact-callsite-family",
+  "name_bilingual": "装备生产全解锁 / Unlock All Equipment Production",
+  "exclusive_group": "mh3g-hd-jp-v96-equipment-unlock-materials",
+  "source_cheat_name": "装备生产全解锁",
+  "source_gateway_codes": [
+    "B0C394C8 00000000",
+    "50000000 00B5E934",
+    "C0000000 00000030",
+    "000065DC FFFFFFFF",
+    "DC000000 00000004",
+    "D2000000 00000000"
+  ],
+  "source_gateway_semantics": "Follow *0x00C394C8, guard the object identity, then fill 49 words at object+0x65DC with 0xFFFFFFFF. The PPC conversion bypasses only the corresponding valid-ID unlock-bit failure branch and does not mutate save/runtime tables.",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/equipment-production-unlock",
+  "install_folder": "MH3G HD JP v96 - Equipment - Production Unlock",
+  "rules": "rules.txt",
+  "patch": "patch_equipment_production_unlock.asm",
+  "preimages": [
+    {
+      "address": "0x02198fc8",
+      "word": "0x4182000c",
+      "meaning": "中文：装备 ID 已通过 0xFFFF/0x5FD 边界检查后，原逻辑在解锁位为 0 时返回失败；补丁仅取消这条失败分支。 / English: After the equipment ID passes the 0xFFFF/0x5FD bounds checks, the original branch rejects a clear unlock bit; the patch removes only that rejection."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x02198fa8",
+      "word": "0x2805ffff",
+      "meaning": "中文：无效装备 ID 0xFFFF 的原生边界检查，保持不变。 / English: Native invalid-equipment-ID 0xFFFF guard, left unchanged."
+    },
+    {
+      "address": "0x02198fb0",
+      "word": "0x280505fd",
+      "meaning": "中文：最大有效装备 ID 0x5FC 的原生上界检查，保持不变。 / English: Native upper bound limiting valid equipment IDs to 0x5FC, left unchanged."
+    },
+    {
+      "address": "0x02198fbc",
+      "word": "0x7c0c202e",
+      "meaning": "中文：从 PPC 解锁位表读取对应 32 位字。 / English: Loads the corresponding 32-bit word from the PPC unlock-bit table."
+    },
+    {
+      "address": "0x02198fc4",
+      "word": "0x5c0b67ff",
+      "meaning": "中文：提取装备 ID 对应的单个解锁位。 / English: Extracts the single unlock bit for the equipment ID."
+    },
+    {
+      "address": "0x02198fd4",
+      "word": "0x38600000",
+      "meaning": "中文：原生失败返回 0，仍供无效 ID 路径使用。 / English: Native false return, retained for invalid-ID paths."
+    },
+    {
+      "address": "0x02198fdc",
+      "word": "0x388465c4",
+      "meaning": "中文：PPC 包装器把角色子对象加到解锁表基址；与 3DS root+0x18+0x65C4 对应。 / English: PPC wrapper advances the character subobject to the unlock table, matching the 3DS root+0x18+0x65C4 layout."
+    }
+  ],
+  "known_risks": [
+    "中文：本包不向存档写入 49 个全 1 字，而是在每次读取时令所有有效装备 ID 通过解锁位判定；因此关闭后会恢复原进度，不会永久解锁。 / English: This pack does not write forty-nine all-one words into the save/runtime object; it makes every valid equipment ID pass the unlock-bit read, so disabling it restores normal progression without permanent unlocks.",
+    "中文：它只负责生产列表的进度解锁，不提供材料或金钱，也不解锁商店库存、任务、配方以外的系统；“无需材料”包已经包含同一解锁补丁，两者不要同时启用。 / English: It only removes progression gating from equipment production; it grants neither materials nor money and does not unlock shops, quests, or unrelated systems. The No Materials pack already includes the same unlock patch, so do not enable both."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把外部 3DS Gateway“装备生产全解锁”的 49 字解锁位表写入语义，转换为 JP v96 原生 PPC 解锁位读取的一条窄范围失败分支旁路；2026-08-11 实机反馈功能正常且无异常，默认关闭，Runtime Verified。 / English: Converts the external 3DS Gateway Unlock All Equipment Production cheat's forty-nine-word unlock-table write into a narrow bypass of the native JP-v96 PPC unlock-bit failure branch; gameplay feedback on 2026-08-11 confirmed the intended behavior with no anomaly. Disabled by default; Runtime Verified."
+}

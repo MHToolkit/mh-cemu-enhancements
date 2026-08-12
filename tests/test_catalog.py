@@ -61,6 +61,12 @@ STATIC_ARM_PACKS = {
     72: "affinity-100",
 }
 
+EXTERNAL_EQUIPMENT_PACKS = {
+    "mh3g-hd-jp-v96-equipment-production-unlock",
+    "mh3g-hd-jp-v96-equipment-crafting-upgrade-no-materials",
+    "mh3g-hd-jp-v96-equipment-crafting-upgrade-no-money",
+}
+
 
 def static_pack_id(source_index: int, slug: str) -> str:
     return f"mh3g-hd-jp-v96-static-{source_index:02d}-{slug}"
@@ -93,6 +99,7 @@ class CatalogTests(unittest.TestCase):
                 "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
                 "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
             }
+            | EXTERNAL_EQUIPMENT_PACKS
             | {
                 static_pack_id(source_index, slug)
                 for source_index, slug in STATIC_ARM_PACKS.items()
@@ -168,6 +175,161 @@ class CatalogTests(unittest.TestCase):
 
         self.assertEqual(set(selected_ids), {pack["id"] for pack in selected})
         self.assertEqual(44, len(selected))
+
+    def test_external_equipment_cheats_preserve_source_semantics_and_preimages(self):
+        result = self.tool.validate_repository(REPO)
+        packs = {pack["id"]: pack for pack in result.packs}
+        self.assertLessEqual(EXTERNAL_EQUIPMENT_PACKS, packs.keys())
+
+        unlock = packs["mh3g-hd-jp-v96-equipment-production-unlock"]
+        no_materials = packs[
+            "mh3g-hd-jp-v96-equipment-crafting-upgrade-no-materials"
+        ]
+        no_money = packs["mh3g-hd-jp-v96-equipment-crafting-upgrade-no-money"]
+
+        for pack in (unlock, no_materials, no_money):
+            expected_status = "Runtime Verified"
+            self.assertEqual(expected_status, pack["status"])
+            self.assertFalse(pack["default_install"])
+            self.assertFalse(pack["auto_experimental_install"])
+            self.assertEqual("available", pack["availability"])
+            rules = (REPO / pack["pack_dir"] / pack["rules"]).read_text()
+            patch = (REPO / pack["pack_dir"] / pack["patch"]).read_text()
+            self.assertIn("中文", rules)
+            self.assertIn("English", rules)
+            self.assertIn(expected_status, rules)
+            self.assertIn("中文", patch)
+            self.assertIn("English", patch)
+
+        shared_group = "mh3g-hd-jp-v96-equipment-unlock-materials"
+        self.assertEqual(shared_group, unlock["exclusive_group"])
+        self.assertEqual(shared_group, no_materials["exclusive_group"])
+        self.assertNotIn("exclusive_group", no_money)
+
+        self.assertEqual(
+            {0x02198FC8: 0x4182000C},
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in unlock["preimages"]
+            },
+        )
+        unlock_patch = (REPO / unlock["pack_dir"] / unlock["patch"]).read_text().lower()
+        self.assertIn("0x02198fc8 = nop", unlock_patch)
+
+        count_call_preimages = {
+            0x021C4014: 0x4BFD7611,
+            0x021C4060: 0x4BFD75C5,
+            0x021C40B0: 0x4BFD7575,
+            0x021CB7C8: 0x4BFCFE5D,
+            0x021D25F0: 0x4BFC9035,
+            0x021D48B4: 0x4BFC6D71,
+            0x021D4918: 0x4BFC6D0D,
+            0x021D49FC: 0x4BFC6C29,
+            0x021D4A80: 0x4BFC6BA5,
+            0x021D80E0: 0x4BFC3545,
+            0x021ECA44: 0x4BFAEBE1,
+            0x021EEFEC: 0x4BFAC639,
+            0x021EF95C: 0x4BFABCC9,
+            0x021F79A8: 0x4BFA3C7D,
+            0x02206D6C: 0x4BF948B9,
+            0x0220967C: 0x4BF91FA9,
+            0x0221B2B4: 0x4BF80371,
+            0x0221BC38: 0x4BF7F9ED,
+            0x0221C09C: 0x4BF7F589,
+            0x0221C44C: 0x4BF7F1D9,
+            0x0221C548: 0x4BF7F0DD,
+            0x02226FB0: 0x4BF74675,
+            0x02228298: 0x4BF7338D,
+            0x02238858: 0x4BF62DCD,
+            0x0269504C: 0x4BB065D9,
+        }
+        expected_no_materials = {
+            0x02182C30: 0x48018935,
+            0x02182C90: 0x480188D5,
+            0x02198FC8: 0x4182000C,
+            **count_call_preimages,
+        }
+        self.assertEqual(
+            expected_no_materials,
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in no_materials["preimages"]
+            },
+        )
+        self.assertEqual(28, len(no_materials["preimages"]))
+        no_materials_patch = (
+            REPO / no_materials["pack_dir"] / no_materials["patch"]
+        ).read_text().lower()
+        for address in count_call_preimages | {0x02182C30: 0, 0x02182C90: 0}:
+            self.assertIn(f"0x{address:08x} = li r3, 99", no_materials_patch)
+        self.assertIn("0x02198fc8 = nop", no_materials_patch)
+        self.assertNotIn("0x021f74ac =", no_materials_patch)
+        exempt_anchor = next(
+            item
+            for item in no_materials["anchors"]
+            if self.tool._number(item["address"]) == 0x021F74AC
+        )
+        self.assertEqual(0x4BFA4179, self.tool._number(exempt_anchor["word"]))
+
+        self.assertEqual(
+            {
+                0x021CDC7C: 0x4804F69D,
+                0x0220B584: 0x48011D95,
+                0x02206ECC: 0x4801459D,
+                0x0221B694: 0x4BFFFDD5,
+                0x0221C850: 0x4BFFF645,
+                0x0221C96C: 0x4BFFFB69,
+            },
+            {
+                self.tool._number(item["address"]): self.tool._number(item["word"])
+                for item in no_money["preimages"]
+            },
+        )
+        no_money_patch = (REPO / no_money["pack_dir"] / no_money["patch"]).read_text().lower()
+        self.assertIn("0x021cdc7c = li r3, 0", no_money_patch)
+        self.assertIn("0x0220b584 = li r3, 0", no_money_patch)
+        self.assertIn("0x02206ecc = li r3, 0", no_money_patch)
+        self.assertIn("0x0221b694 = li r3, 0", no_money_patch)
+        self.assertIn("0x0221c850 = li r3, 0", no_money_patch)
+        self.assertIn("0x0221c96c = li r3, 0", no_money_patch)
+        self.assertNotIn("0x0215a86c =", no_money_patch)
+        self.assertNotIn("0x0221b6a0 =", no_money_patch)
+        self.assertNotIn("0x0221d224 =", no_money_patch)
+        self.assertNotIn("0x026febec =", no_money_patch)
+        self.assertNotIn("0x026fec14 =", no_money_patch)
+        self.assertNotIn("0x02709644 =", no_money_patch)
+        self.assertNotIn("0x02709668 =", no_money_patch)
+        preserved_anchors = {
+            self.tool._number(item["address"]): self.tool._number(item["word"])
+            for item in no_money["anchors"]
+        }
+        self.assertEqual(0x40800028, preserved_anchors[0x0215A86C])
+        self.assertEqual(0x90740008, preserved_anchors[0x02206ED4])
+        self.assertEqual(0x90650004, preserved_anchors[0x021CDC94])
+        self.assertEqual(0x81480004, preserved_anchors[0x021CDAD0])
+        self.assertEqual(0x7C8A00D0, preserved_anchors[0x021CDAD8])
+        self.assertEqual(0x4BFCF47D, preserved_anchors[0x021CDADC])
+        self.assertEqual(0x9061000C, preserved_anchors[0x0220B58C])
+        self.assertEqual(0x7CDBC12E, preserved_anchors[0x0220BB20])
+        self.assertEqual(0x7D7BC12E, preserved_anchors[0x0220BB90])
+        self.assertEqual(0x8005031C, preserved_anchors[0x0220BF64])
+        self.assertEqual(0x4BF90FE9, preserved_anchors[0x0220BF70])
+        self.assertEqual(0x8106031C, preserved_anchors[0x0220C554])
+        self.assertEqual(0x4BF909F9, preserved_anchors[0x0220C560])
+        self.assertEqual(0x38FD031C, preserved_anchors[0x0220C9F0])
+        self.assertEqual(0x4800FD35, preserved_anchors[0x0220C9FC])
+        self.assertEqual(0x9421FFC0, preserved_anchors[0x0221C730])
+        self.assertEqual(0x3BE00000, preserved_anchors[0x0221C754])
+        self.assertEqual(0x7FEBA92E, preserved_anchors[0x0221C784])
+        self.assertEqual(0x4BF3D579, preserved_anchors[0x0221C79C])
+        self.assertEqual(0x90750000, preserved_anchors[0x0221C854])
+        self.assertEqual(0x90750000, preserved_anchors[0x0221C970])
+        self.assertEqual(0x80A9031C, preserved_anchors[0x026A74F4])
+        self.assertEqual(0x9421FFE0, preserved_anchors[0x0221D224])
+        self.assertEqual(0x4BB1E639, preserved_anchors[0x026FEBEC])
+        self.assertEqual(0x4BB1E611, preserved_anchors[0x026FEC14])
+        self.assertEqual(0x4BB13BE1, preserved_anchors[0x02709644])
+        self.assertEqual(0x4BB13BBD, preserved_anchors[0x02709668])
 
     def test_runtime_feedback_fixes_cover_lethal_hp_and_normal_skill_query_paths(self):
         result = self.tool.validate_repository(REPO)

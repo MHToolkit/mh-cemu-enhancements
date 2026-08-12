@@ -1,3 +1,28 @@
+# External equipment-cheat static gates / 外部装备金手指静态门禁（2026-08-12，V7）
+
+Production Unlock and No Materials remain **Runtime Verified**. No Money V6 is now formally rejected: a cold-start log proved the exact V6 pack active, live guest-memory reads found `li r3,0` at all eight declared sites, yet a sufficient-material upgrade still displayed `75000z` while production correctly displayed `0z`. This is a patch-logic failure, not an install/toggle/load failure.
+
+生产全解锁与无需材料继续保持 **Runtime Verified**。无需金钱 V6 已被正式否定：冷启动日志证明精确 V6 已启用，运行中客机内存也在八个声明地址全部读到 `li r3,0`，但材料充足的强化仍显示 `75000z`，而生产已正确显示 `0z`。因此根因是补丁逻辑，不是安装、勾选或加载。
+
+## No Money V7 runtime target evidence / 无需金钱 V7 运行时目标证据
+
+1. A live guest-heap search located the displayed big-endian upgrade price. Switching the selected entry changed the same field from `75000` to `25000`.
+2. A hardware read watchpoint on that field recovered guest renderer PC `0x026A74E4`; static continuation `0x026A74F4 = lwz r5,0x31C(r9)` reads selected object `+0x31C`.
+3. The candidate record is at the same object `+0x27C`. The tested gunlance record has category `0x0B`, which `0x02159D14` maps to category branch 1.
+4. The active smithy controller passes object `+0x27C` and `+0x31C` to `0x0221C730`. That builder clears ten price words, then repopulates them through exactly two category-local calls: `0x0221C850` followed by `0x0221C854: stw r3,0(r21)`, or `0x0221C96C` followed by `0x0221C970: stw r3,0(r21)`.
+5. V7 replaces those two calls with `li r3,0`, keeps two gameplay-passed production sites plus two narrow legacy upgrade-record sites, and removes all four V5/V6 generic detail-render guesses. Shared equipment value `0x0221D224`, attack-sensitive category dispatch `0x0215A86C`, sale/refund callers, wallet comparison, and wallet adjustment remain native.
+
+## Current verification gates / 当前验证门禁
+
+- Repository validation and exact RPX preimage/anchor verification passed against `/private/tmp/MH3G_Cafe.rpx` (SHA-256 `7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0`).
+- The real Cemu PPC assembler accepted all six V7 `li r3,0` replacements as `0x38600000`, with zero relocations.
+- `pytest tests/ -q` passed 49 executed tests with one optional historical-reference test skipped; `python3 -m unittest discover -s tests -v` passed all 50 discovered tests with that same one skip. Repository validation accepted 53 manifests, explicit pinned-RPX verification passed, and Ruff plus `git diff --check` passed.
+- The standard Cemu profile was refreshed in place from its existing 48-pack receipt; the receipt ID set was preserved exactly, inspection reported No Money enabled, and the installed leaf was V7. The user subsequently cold-started that installation and confirmed the formerly failing upgrade route now works.
+
+These gates establish exact binary targeting, parser/assembler validity, installation integrity, and the runtime-observed price-field data flow. On 2026-08-12 the user then cold-started the installed V7 pack and confirmed that the previously failing upgrade route now works. This adds gameplay proof for the core production/upgrade-without-money behavior, so V7 is promoted to **Runtime Verified / Gameplay Passed**. The verdict does not claim an independent retest or exhaustive coverage of every equipment category.
+
+以上门禁证明目标二进制、解析器/汇编器、安装完整性，以及运行时真实价格字段的数据流。随后用户于 2026-08-12 冷启动已安装的 V7 并确认：此前失败的强化路径已正常生效。该结果补齐生产/强化无需金钱核心功能的实机证据，因此 V7 升级为 **Runtime Verified / Gameplay Passed**；不冒充独立测试者或全部装备类别穷举。
+
 # #13 ordinary-swim final-integration candidate / #13 普通游泳最终积分候选（2026-08-07，0.1.22）
 
 ## Preliminary gameplay pass / 本机初步实机通过（2026-08-07）

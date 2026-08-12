@@ -1,0 +1,223 @@
+{
+  "id": "mh3g-hd-jp-v96-equipment-crafting-upgrade-no-money",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Verified",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_confidence": "runtime-traced-and-gameplay-verified-v7",
+  "name_bilingual": "装备制造与强化无需金钱 / Craft and Upgrade Without Money",
+  "source_cheat_name": "装备制造&强化不需要钱",
+  "source_arm_patches": [
+    {
+      "address": "0x005cc880",
+      "word": "0xe3500000"
+    },
+    {
+      "address": "0x00889b14",
+      "word": "0xea000026"
+    }
+  ],
+  "source_arm_preimages": [
+    {
+      "address": "0x005cc880",
+      "word": "0xe1510000"
+    },
+    {
+      "address": "0x00889b14",
+      "word": "0x379ff101"
+    }
+  ],
+  "source_semantics": "The original ARM cheat globally routes a category-pointer helper to its zero/default path and suppresses the insufficient-money flag. V1 mapped those global effects literally, but gameplay proved that the shared JP-v96 category dispatcher also feeds weapon attack and status-panel display. V2 narrowed production to both direct cost-wrapper call sites and passed gameplay. V3/V4 added two legacy upgrade-record cost callers, but V5/V6 then guessed generic detail-render calls and repeatedly failed: cold-start logs and live guest-memory reads proved every declared V6 write was present while the smithy still showed its native upgrade price. The V7 investigation searched the live guest heap for the displayed big-endian price, set a hardware read watchpoint on the exact field, and recovered guest renderer PC 0x026A74E4; static continuation 0x026A74F4 reads object +0x31C. The selected candidate record lives at the same object +0x27C. Builder 0x0221C730 clears ten output price words, maps every supported equipment category through 0x02159D14, and then populates that price array via exactly two category branches: 0x0221C850 calls 0x0221BE94 for category-map 0 and stores at 0x0221C854; 0x0221C96C calls 0x0221C4D4/0x0221B364 for category-map 1 and stores at 0x0221C970. The tested gunlance record category 0x0B maps to branch 1. V7 returns zero only at those two builder-local calls, retains the two production sites and two narrow legacy upgrade-record sites, and removes all four disproven generic render patches. Generic equipment value, sale/refund callers, attack-sensitive dispatch, and the wallet adjuster remain native. On 2026-08-12 the user cold-started the installed V7 pack and confirmed that the previously failing upgrade path now works; this supplies gameplay proof in addition to the runtime targeting closure.",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/equipment-crafting-upgrade-no-money",
+  "install_folder": "MH3G HD JP v96 - Equipment - Craft Upgrade No Money",
+  "rules": "rules.txt",
+  "patch": "patch_equipment_crafting_upgrade_no_money.asm",
+  "preimages": [
+    {
+      "address": "0x021cdc7c",
+      "word": "0x4804f69d",
+      "meaning": "中文：旧 8 字节强化候选记录的局部费用调用；结果保存到候选 +0x04，供原生钱包比较和确认扣款复用。V7 保留该兼容路径。 / English: Local cost call for the legacy eight-byte upgrade record; its result is saved at candidate +0x04 for native wallet gating and confirmation charging. V7 retains this compatibility path."
+    },
+    {
+      "address": "0x02206ecc",
+      "word": "0x4801459d",
+      "meaning": "中文：已通过实测的生产候选费用调用；下一条保存到候选 +0x08。 / English: Gameplay-passed production-candidate cost call; the next instruction stores it at candidate +0x08."
+    },
+    {
+      "address": "0x0220b584",
+      "word": "0x48011d95",
+      "meaning": "中文：旧详细强化记录的局部费用调用；结果经栈 +0x0C 进入详细记录 +0x31C。V7 保留该兼容路径。 / English: Local cost call for a legacy detailed-upgrade record; its result flows through stack +0x0C into detailed record +0x31C. V7 retains this compatibility path."
+    },
+    {
+      "address": "0x0221b694",
+      "word": "0x4bfffdd5",
+      "meaning": "中文：生产可用性判定中的费用调用；V7 返回 0 并保留原生费用与钱包比较。 / English: Cost call in production availability; V7 returns zero and preserves the native cost-versus-wallet comparison."
+    },
+    {
+      "address": "0x0221c850",
+      "word": "0x4bfff645",
+      "meaning": "中文：真实强化候选生成器 0x0221C730 的类别映射 0 价格调用，目标 0x0221BE94；下一条 0x0221C854 把结果写入已清零的候选价格数组。 / English: Category-map 0 price call inside actual upgrade-candidate builder 0x0221C730, targeting 0x0221BE94; 0x0221C854 immediately stores the result into the pre-cleared candidate price array."
+    },
+    {
+      "address": "0x0221c96c",
+      "word": "0x4bfffb69",
+      "meaning": "中文：真实强化候选生成器的类别映射 1 价格调用，目标 0x0221C4D4/0x0221B364；实测铳枪类别 0x0B 走此分支，下一条 0x0221C970 写入渲染器读取的同一 +0x31C 字段。 / English: Category-map 1 price call in the actual builder, targeting 0x0221C4D4/0x0221B364; the tested gunlance category 0x0B takes this branch, and 0x0221C970 stores into the same +0x31C field read by the renderer."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x0215a86c",
+      "word": "0x40800028",
+      "meaning": "中文：V1 曾破坏攻击力/人物面板的共享类别分派分支；V7 保持原字。 / English: Shared category-dispatch branch whose V1 modification broke attack/status displays; V7 preserves it."
+    },
+    {
+      "address": "0x021cdad0",
+      "word": "0x81480004",
+      "meaning": "中文：旧确认路径重读候选 +0x04 费用。 / English: Legacy confirmation reloads candidate cost at +0x04."
+    },
+    {
+      "address": "0x021cdad8",
+      "word": "0x7c8a00d0",
+      "meaning": "中文：旧确认路径把费用取负；零仍为零。 / English: Legacy confirmation negates the cost; zero remains zero."
+    },
+    {
+      "address": "0x021cdadc",
+      "word": "0x4bfcf47d",
+      "meaning": "中文：旧确认路径调用原生钱包调整器 0x0219CF58；保持原字。 / English: Legacy confirmation calls native wallet adjuster 0x0219CF58; preserved."
+    },
+    {
+      "address": "0x021cdc94",
+      "word": "0x90650004",
+      "meaning": "中文：旧强化候选把局部费用写入 +0x04。 / English: Legacy upgrade candidate stores the local cost at +0x04."
+    },
+    {
+      "address": "0x02206ed4",
+      "word": "0x90740008",
+      "meaning": "中文：生产候选把零费用写入 +0x08。 / English: Production candidate stores zero cost at +0x08."
+    },
+    {
+      "address": "0x0220b58c",
+      "word": "0x9061000c",
+      "meaning": "中文：旧详细路径先把费用写入栈 +0x0C。 / English: Legacy detailed path first saves cost at stack +0x0C."
+    },
+    {
+      "address": "0x0220bb20",
+      "word": "0x7cdbc12e",
+      "meaning": "中文：旧详细路径的一种分支把费用写入对象 +0x31C。 / English: One legacy detailed branch stores cost into object +0x31C."
+    },
+    {
+      "address": "0x0220bb90",
+      "word": "0x7d7bc12e",
+      "meaning": "中文：旧详细路径的另一分支把费用写入对象 +0x31C。 / English: The alternate legacy detailed branch stores cost into object +0x31C."
+    },
+    {
+      "address": "0x0220bf64",
+      "word": "0x8005031c",
+      "meaning": "中文：一条原生确认路径从所选记录 +0x31C 读取费用。 / English: One native confirmation path reads cost from selected record +0x31C."
+    },
+    {
+      "address": "0x0220bf70",
+      "word": "0x4bf90fe9",
+      "meaning": "中文：该确认路径调用原生钱包调整器；保持原字。 / English: That confirmation path calls the native wallet adjuster; preserved."
+    },
+    {
+      "address": "0x0220c554",
+      "word": "0x8106031c",
+      "meaning": "中文：另一条原生确认路径同样读取 +0x31C。 / English: Another native confirmation path reads the same +0x31C field."
+    },
+    {
+      "address": "0x0220c560",
+      "word": "0x4bf909f9",
+      "meaning": "中文：另一确认路径调用同一原生钱包调整器；保持原字。 / English: The alternate confirmation path calls the same native wallet adjuster; preserved."
+    },
+    {
+      "address": "0x0220c9f0",
+      "word": "0x38fd031c",
+      "meaning": "中文：当前加工控制器把对象 +0x31C 作为价格数组传给 0x0221C730。 / English: The active smithy controller passes object +0x31C as the price array to 0x0221C730."
+    },
+    {
+      "address": "0x0220c9fc",
+      "word": "0x4800fd35",
+      "meaning": "中文：当前加工控制器直接调用真实强化候选生成器 0x0221C730。 / English: The active smithy controller directly calls actual upgrade-candidate builder 0x0221C730."
+    },
+    {
+      "address": "0x0221c730",
+      "word": "0x9421ffc0",
+      "meaning": "中文：真实强化候选生成器入口。完整 text 扫描得到七个直接调用者，均传入候选记录与价格输出数组。 / English: Actual upgrade-candidate builder entry. Full-text scan found seven direct callers, all supplying candidate-record and price-output arrays."
+    },
+    {
+      "address": "0x0221c754",
+      "word": "0x3be00000",
+      "meaning": "中文：生成器把 r31 初始化为 0。 / English: Builder initializes r31 to zero."
+    },
+    {
+      "address": "0x0221c784",
+      "word": "0x7feba92e",
+      "meaning": "中文：循环把十个候选价格字清零。 / English: Loop clears all ten candidate price words."
+    },
+    {
+      "address": "0x0221c79c",
+      "word": "0x4bf3d579",
+      "meaning": "中文：生成器调用 0x02159D14，把装备类别映射为价格分支 0 或 1。 / English: Builder calls 0x02159D14 to map equipment category to price branch 0 or 1."
+    },
+    {
+      "address": "0x0221c854",
+      "word": "0x90750000",
+      "meaning": "中文：类别映射 0 分支把 V7 的零返回写入当前候选价格字。 / English: Category-map 0 branch stores V7 zero into the current candidate price word."
+    },
+    {
+      "address": "0x0221c970",
+      "word": "0x90750000",
+      "meaning": "中文：类别映射 1 分支把 V7 的零返回写入当前候选价格字；实测铳枪走此处。 / English: Category-map 1 branch stores V7 zero into the current candidate price word; the tested gunlance takes this path."
+    },
+    {
+      "address": "0x026a74f4",
+      "word": "0x80a9031c",
+      "meaning": "中文：硬件读监视点恢复出的当前价格渲染路径，从所选对象 +0x31C 读取实测价格。 / English: Live hardware-read-watchpoint renderer path loads the observed price from selected object +0x31C."
+    },
+    {
+      "address": "0x0221d224",
+      "word": "0x9421ffe0",
+      "meaning": "中文：共享装备价值函数入口；V7 保持原字，不影响出售、退款和通用详情值。 / English: Shared equipment-value function entry; V7 preserves it so sale, refund, and generic detail values remain native."
+    },
+    {
+      "address": "0x026febec",
+      "word": "0x4bb1e639",
+      "meaning": "中文：V6 曾错误修改的通用详情调用；V7 恢复并保持原字。 / English: Generic detail call incorrectly patched by V6; V7 restores and preserves it."
+    },
+    {
+      "address": "0x026fec14",
+      "word": "0x4bb1e611",
+      "meaning": "中文：V6 曾错误修改的另一通用详情调用；V7 恢复并保持原字。 / English: Alternate generic detail call incorrectly patched by V6; V7 restores and preserves it."
+    },
+    {
+      "address": "0x02709644",
+      "word": "0x4bb13be1",
+      "meaning": "中文：V5/V6 曾错误修改的通用详情调用；V7 恢复并保持原字。 / English: Generic detail call incorrectly patched by V5/V6; V7 restores and preserves it."
+    },
+    {
+      "address": "0x02709668",
+      "word": "0x4bb13bbd",
+      "meaning": "中文：V5/V6 曾错误修改的另一通用详情调用；V7 恢复并保持原字。 / English: Alternate generic detail call incorrectly patched by V5/V6; V7 restores and preserves it."
+    }
+  ],
+  "known_risks": [
+    "中文：2026-08-12 用户在本机冷启动复测已确认 V7 修复此前“生产 0z、强化仍为原价”的故障，核心生产与强化无需金钱功能通过；当前结论不冒充独立测试者或全部装备类别的穷举覆盖。 / English: On 2026-08-12 the user cold-started V7 locally and confirmed it fixed the prior “production 0z but native upgrade price” failure, passing the core money-free production and upgrade behavior; this verdict does not claim an independent retest or exhaustive coverage of every equipment category.",
+    "中文：V7 不绕过材料要求；必须选择材料足够的强化，或另行启用已经通过实测的“无需材料”包。 / English: V7 does not bypass material requirements; use an upgrade with sufficient materials or separately enable the gameplay-verified No Materials pack.",
+    "中文：V7 只修改六个局部费用调用，保留共享装备价值函数、攻击力敏感类别分派、出售/退款和钱包调整器；若后续发现特定装备类别异常，应记录类别、原价与强化路径后再补充。 / English: V7 changes only six local cost calls and preserves shared equipment value, attack-sensitive category dispatch, sale/refund, and the wallet adjuster; if a category-specific anomaly appears later, record the category, native fee, and upgrade route before extending the patch."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：V1 的全局类别分派补丁虽能免费加工，却会把攻击力和人物面板清零；V2 已通过生产，V3/V4 只覆盖旧强化记录，V5/V6 又误把通用详情值调用当成加工价格渲染，连续实测失败。2026-08-12 本机冷启动与客机内存已确认 V6 八点全部写入，但材料充足的强化仍显示 75000z。随后在客机堆中定位显示价格，硬件读监视点恢复出当前渲染器从所选对象 +0x31C 读取价格；同一对象 +0x27C 是候选记录。真实候选生成器 0x0221C730 先清零十个价格字，再在类别映射 0/1 分支分别通过 0x0221C850 与 0x0221C96C 计算并写回价格；实测铳枪类别 0x0B 走后者。V7 保留两个生产和两个旧强化局部费用点，新增这两个真实候选价格调用，并删除四个错误的通用详情补丁。2026-08-12 用户本机冷启动复测确认此前失败的强化路径已正常生效；默认关闭，Runtime Verified / Gameplay Passed。 / English: V1 made processing free via a global category dispatch but zeroed attack/status displays; V2 passed production, V3/V4 covered only legacy upgrade records, and V5/V6 repeatedly misidentified generic detail-value calls as the processing-price renderer. Cold-start and live-memory evidence on 2026-08-12 proved all eight V6 writes were present while a sufficient-material upgrade still showed 75000z. A live heap search plus hardware read watchpoint then recovered the active renderer reading selected object +0x31C, with the candidate record at the same object +0x27C. Actual builder 0x0221C730 clears ten price words and repopulates them through category-map 0/1 calls at 0x0221C850 and 0x0221C96C; tested gunlance category 0x0B takes the latter. V7 keeps two production and two legacy upgrade-local sites, adds these two actual candidate-price calls, and removes four disproven generic-detail patches. On 2026-08-12 the user cold-started the local installation and confirmed that the previously failing upgrade path now works; disabled by default, Runtime Verified / Gameplay Passed."
+}

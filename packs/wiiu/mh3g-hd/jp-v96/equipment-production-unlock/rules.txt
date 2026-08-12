@@ -1,0 +1,6 @@
+[Definition]
+titleIds = 0005000010104D00
+name = 01 装备生产全解锁 - Unlock All Equipment Production
+path = MH Cemu Enhancements/MH3G HD JP v96/Equipment Cheats/01 装备生产全解锁 - Unlock All Equipment Production
+description = 中文：效果：让所有合法装备 ID 通过生产配方的进度解锁位检查，从而显示并允许选择正常流程中尚未解锁的装备生产项目；关闭后恢复原进度，不向存档永久写入解锁表。边界：不提供材料或金钱，不解锁任务、商店库存或其他系统；“无需材料”包已经包含同一解锁写入，不能同时启用。2026-08-11 实机反馈确认功能正常，未观察到崩溃、空白/错误界面或其他异常。来源/状态：由外部 3DS Gateway 指针循环写入语义转换到 JP v96 原生 PPC 解锁位读取；默认关闭；Runtime Verified。 / English: Effect: makes every valid equipment ID pass the production-recipe progression-unlock bit test, exposing production entries that normal progression has not unlocked; disabling it restores native progression and does not permanently write the save unlock table. Scope: it grants neither materials nor money and does not unlock quests, shop stock, or unrelated systems; No Materials already includes the same unlock write and must not be enabled together. Gameplay feedback on 2026-08-11 confirmed the intended behavior with no crash, blank/corrupt UI, or other anomaly. Source/status: converted from the external 3DS Gateway pointer-loop semantics to the native JP-v96 PPC unlock-bit read; Disabled by default; Runtime Verified.
+version = 7
