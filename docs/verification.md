@@ -1,3 +1,83 @@
+# Dynamic 9+2 gameplay feedback / 动态 9+2 实测回执（2026-08-18）
+
+皮皮鸟补齐了 2026-08-12 发出的 11 个独立测试包回执。按“测试包”计，**10 个通过、1 个部分通过**；按源条目计，#1/#2/#3/#4/#8/#9/#10/#12/#20/#23/#24/#25/#31/#57 已取得正向玩法回执，#30 仍只覆盖轻弩而未覆盖重弩。该回执不包含此前排除的 #28 与 #66。
+
+PipiNiao completed the missing gameplay receipts for the eleven test archives sent on 2026-08-12. Counted by archive, **ten pass and one is partial**. Counted by source entry, #1/#2/#3/#4/#8/#9/#10/#12/#20/#23/#24/#25/#31/#57 now have positive gameplay feedback, while #30 still covers Light Bowgun but not Heavy Bowgun. The batch excludes #28 and #66 as previously agreed.
+
+| 测试包 / Pack | 回执 / Verdict | 结论边界 / Boundary |
+| --- | --- | --- |
+| #04 斩味常紫 | 通过 / Pass | 核心效果通过；未冒充所有武器/斩味交互穷举。 |
+| #08 道具袋不减 | 通过 / Pass | 核心道具消耗路径通过。 |
+| #09/#10 大厅与任务背包首格 99 | 通过 / Pass | 两场景组合包通过。 |
+| #12 携带道具上限 99 | 通过（附停用条件） / Pass with disable condition | 启用时效果通过；存在下述原版上限恢复风险。 |
+| #20 防御倍率 2 倍 | 通过 / Pass | 核心面板/派生效果通过。 |
+| #23 道具箱首格 99 | 通过 / Pass | 核心首格写回通过。 |
+| #25 子弹不减 | 通过 / Pass | 本轮回执为整体通过。 |
+| #31 A 键回血 | 通过 / Pass | 核心输入与回血通过。 |
+| #57 设置物破坏/恢复热键 | 通过 / Pass | 两种热键状态通过。 |
+| MH3G-006 速度倍率 V2 | 通过 / Pass | V2 的 `+0x608` 写回与 L/R 切换通过；不等于下述 ZL/ZR V3 已通过。 |
+| MH3G-007 自动装填 V2 | **部分通过 / Partial** | 铳枪、轻弩通过；重弩不生效，因此组合包不得升级为整体 Runtime Verified。 |
+
+## #12 is a disable-safety boundary, not an enabled-mode failure / #12 是停用安全边界，不是启用态失败
+
+#12 在道具记录 getter 返回时把原生非零携带上限提升到 99。玩家已经持有超过原版上限的同格堆叠后，如果关闭 Pack 或以未启用状态重载标题，下一次使用、移动或重新整理该物品时，原版逻辑会按原生上限重新归一化，超出部分可能消失。因此该回执记为“通过但附条件”：**只要仍有超原版上限堆叠就必须保持 #12 启用；停用前先把每格整理到该物品的原版上限以内。** 如果 Cemu 每次启动真的自动丢失勾选状态，则属于另一项配置持久化故障，不能和这一玩法边界混为一谈。
+
+#12 raises native nonzero carry-limit records to 99 when the item-record getter returns. If a stack remains above its vanilla cap and the title is reloaded without the pack, the next use, move, or normalization can clamp the stack back to the vanilla limit and discard the excess. The correct verdict is therefore “pass with a disable condition”: keep #12 enabled while any over-cap stack exists, and reduce every stack to its vanilla cap before disabling. If Cemu literally forgets the saved checkbox on each launch, that is a separate configuration-persistence defect rather than this gameplay boundary.
+
+## MH3G-007 remains partial / MH3G-007 仍为部分通过
+
+V2 假设“重弩类型 5 + 同步 `+0x46C`”即可补齐重弩，但玩法失败后的全部交叉引用审计已证明这不只是“回填太晚”，而是字段判定错误：`+0x46C` 只出现在 `0x02858464/0x0285870C` 的特殊物品/涂层消耗流程，没有重弩类型 5 生命周期证据。真正的闭环是：原生装填在 `0x02856DB8` 把当前弹数写入 `+0x480 + 弹种×2`；射击在 `0x0285770C` 递减通用 `+0x45A`，再于 `0x02857788` 写回同一索引半字；两条明确的重弩类型 5 路径又在 `0x02891B20` 和 `0x028947AC` 从该半字的低字节 `+0x481 + 弹种×2` 恢复 `+0x45A`。
+
+V3 据此保留已通过的铳枪/轻弩通用回填，并从每帧路径同时写重弩 `+0x45A` 与 `+0x480 + 弹种×2`。虽然固定 JP-v96 PPC 文本的 11 个前像/字段锚点和真实 Cemu PPCAssembler 均通过，**2026-08-21 的实际玩法已经否定 V3**：左上弹数异常，重弩从蹲姿切回普通姿势后会重新获得可发射状态，随后才进入 Charging Bullet/装填。原因不是偏移再次错误，而是写入时机和权威层级错误：V3 在通用每帧更新中越过原生射击事务，持续改写本应由普通射击、蹲射和姿势恢复共同维护的缓存。因此“字段生命周期地址齐全”不能推出“任意时机持续写该字段安全”，V3 维持失败记录，不得发布。
+
+对固定 RPX 全 `.text` 扫描证明仅有四条“当前弹仓减 1 后写回 `+0x45A`”路径：`0x02857700→0x0285770C`、`0x0285893C→0x02858944`、`0x02876248→0x0287624C`、`0x02878B5C→0x02878B60`。其中 `0x0285893C` 所在流程原生已经在真实弹药消耗后由 `0x0285899C..0x028589B8` 回填，不需要再补。V4 删除所有重弩每帧写入：普通射击改在真实弹药已扣除、原生 `0x02857788` 分弹种缓存快照之前的 `0x02857768`，仅对重弩 type 5 设置 `min(+0x45B 容量, +0x462 剩余量)`；另外两条特殊/蹲射减弹路径在 `0x02876248` 与 `0x02878B5C` 采用同一 type-5 钳制。HUD、姿势恢复、切弹和装填判定继续由原生代码维护。铳枪 type 9 与轻弩 type 6 保留已通过的每帧回填，旧版模糊的 `type 3..7` 条件同时收紧。
+
+V2 assumed that synchronizing HBG type 5 field `+0x46C` was sufficient. Cross-reference evidence disproved that field. V3 then identified the real indexed cache but wrote both common and indexed HBG counts continuously from a generic per-frame hook. Despite passing eleven pinned field anchors and the assembler gate, **the 2026-08-21 gameplay retest falsified V3**: the HUD count was abnormal, leaving siege stance restored another shootable state, and reload/Charging Bullet occurred only afterwards. The addresses were real, but the write timing and authority were wrong; a closed field map does not prove that continuous out-of-transaction writes are safe.
+
+A full `.text` scan finds exactly four decrement-to-`+0x45A` writers: `0x02857700→0x0285770C`, `0x0285893C→0x02858944`, `0x02876248→0x0287624C`, and `0x02878B5C→0x02878B60`. The `0x0285893C` flow already refills natively after consumption. V4 performs no per-frame HBG writes. Normal fire refills at `0x02857768`, after real ammo consumption and immediately before the native `0x02857788` indexed snapshot, using `min(+0x45B capacity, +0x462 remaining)` only for HBG type 5. The other two special/siege decrement paths receive the same type-5 clamp. Native code remains authoritative for HUD, stance restoration, ammo switching, and reload decisions. Gameplay-passed Gunlance type 9 and LBG type 6 per-frame logic is retained and the former broad `type 3..7` condition is narrowed.
+
+V4 交付目录为 `.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V4-Native-Writers-20260821/`，ZIP 为 `MH3G-007-自动补弹-V4-原生射击写点-20260821.zip`（SHA-256 `36606fb21b5f7a46298b636863dbee41618076206223785e85c86eeaae7fc25a`）。固定 RPX 前像 4/4 匹配；真实 Cemu PPCAssembler 接受 66 条指令及 27 个 relocation，零错误；与当前 47 个已启用条目的固定地址审计无冲突。V4 已替换本机标准 Cemu 中的 V3 激活项，速度 ZL/ZR V3 保持启用，未启动 Cemu。重弩玩法复测前，V4 仍为 **Runtime Experimental**，不得写成通过。
+
+The V4 handoff is `.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V4-Native-Writers-20260821/`; archive `MH3G-007-自动补弹-V4-原生射击写点-20260821.zip` has SHA-256 `36606fb21b5f7a46298b636863dbee41618076206223785e85c86eeaae7fc25a`. All four pinned preimages match; the real Cemu PPCAssembler accepts 66 instructions and 27 relocations with zero errors; no fixed-address conflict exists against the 47 currently enabled entries. V4 replaced the active V3 entry in the standard local Cemu profile while Speed ZL/ZR V3 remained enabled, and Cemu was not launched. V4 remains **Runtime Experimental** until HBG gameplay retest.
+
+2026-08-21 的本机玩法随后同样否定了 V4：真实弹药库存仍有剩余时，重弩弹仓继续下降，自动补弹没有恢复当前弹仓。这里存在一个可以从原生生命周期直接证明的遗漏，而不是再次猜偏移：普通射击 hook 后会继续执行原生 `0x02857788`，把新值写进 `+0x480 + 弹种×2`；但 V4 在 `0x02876248` 和 `0x02878B5C` 的两条特殊/蹲射事务只改 `+0x45A`，没有同步重弩姿势恢复在 `0x02891B20/0x028947AC` 读取的分弹种缓存。旧缓存因此可以覆盖刚回填的通用弹仓。V4 状态改为 **gameplay failed**，不得发布。
+
+V5 保留 V4 的原生事务时机，并且只在上述两条特殊/蹲射减弹事务中，为重弩 type 5 同步一次 `+0x480 + 弹种×2`；弹种索引必须无符号小于 `0x24`。它不会恢复 V3 的每帧 HBG `+0x45A/+0x480` 写入。V5 固定前像 4/4、真实 Cemu PPCAssembler 78/78、29 个分支范围、2/2 特殊事务缓存同步和 6/6 语义边界模型均通过；交付目录为 `.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V5-Special-Cache-Snapshot-20260821/`，ZIP SHA-256 为 `d0b7d551533b9bc16ec96a1cc6875653f64cc24f815f57384531754fe0456aad`。这些仍只是静态门禁；取得普通射击、蹲射、切姿势、切弹与最后一发回执前，V5 仍为 **Runtime Experimental**。
+
+Local gameplay later falsified V4 as well: the HBG magazine continued to decrease while real ammo remained. The omission is provable from the native lifecycle. Normal fire reaches native `0x02857788`, which snapshots the refill to `+0x480+ammoSubtype*2`; V4's two special/siege transactions at `0x02876248` and `0x02878B5C` changed only `+0x45A`, leaving the indexed cache consumed by `0x02891B20/0x028947AC` stale. A later stance restore could therefore overwrite the refill. V4 is **gameplay failed**. V5 snapshots the current-ammo cache once inside those two native decrement transactions for HBG type 5, guarded by unsigned `ammoSubtype < 0x24`, while retaining the ban on per-frame HBG writes. Its static gates pass (4/4 preimages, 78/78 real assembler inputs, 29/29 branch ranges, 2/2 transaction snapshots, and 6/6 boundary cases), but it remains **Runtime Experimental** pending gameplay evidence.
+
+## Superseding V7/V8 selector evidence and V9 candidate / 覆盖 V7/V8 的 selector 运行态证据与 V9 候选（2026-08-22）
+
+上述历史段落把 `+0x0002 == 5` 称为固定“重弩类型”，该归类已被运行态证据覆盖。V8 日志首先证明精确 Pack 已加载；随后对同一进程的只读 LLDB 检查定位到 guest `0x2FF7D610` 的玩家/武器状态对象，其 `+0x0608` 为大端 `0x3F800000` (1.0)，与既有玩家速度字段证据一致。在画面正处于重弩蹲射时，该对象 `+0x0002` 实际值为 **4**，不是 5。因此 `+0x0002` 在本文后续统一称为运行态 selector，不再冒充固定武器枚举。
+
+This supersedes the historical classification of `+0x0002 == 5` as a fixed HBG type. The exact V8 pack was proven loaded by its Cemu log. A read-only LLDB inspection then identified the player/weapon state at guest `0x2FF7D610`; big-endian `+0x0608 = 0x3F800000` (1.0) matches the already-known player-speed field. While visible gameplay was actively in HBG siege stance, `+0x0002` was **4**, not 5. This field is therefore documented as a runtime selector rather than a fixed weapon enumeration.
+
+V7 在两条蹲射事务和四个 `+0x0008/+0x063C` writer 内都守卫 selector 5；V8 两个最终开火门禁也守卫 5。所以两版修复分支在实机 selector-4 蹲射现场中都从未执行。这同时更正 V7 RCA：V7 玩法确实失败，但失败不能证明“writer 回填本身使结束门禁不可达”，因为那些 writer hook 当时根本未命中。V8 也已被两张实机截图否定：弹仓为空且备弹仍为 10 时没有回填，左上计数变成 `-27`；弹仓与备弹同时为 0 后，保持蹲射仍能继续开火。零库存内存快照为 `+0x45A=0, +0x462=0, +0x0008=1, +0x062C=0, +0x063C=0`，恰好说明为什么未命中的原生门禁仍看到 `+0x0008 != 0`。
+
+V7 guarded selector 5 at both siege transactions and all four `+0x0008/+0x063C` writers; V8 guarded selector 5 at both final fire gates. Neither implementation therefore ran in the live selector-4 HBG siege state. This also corrects the V7 RCA: the gameplay failure is real, but it does not prove writer refill itself made completion unreachable because those hooks never matched. V8 is likewise gameplay-failed: screenshots show no refill with reserve 10 and a `-27` counter, then continued fire with both common magazine and reserve at zero. The zero-stock snapshot (`+0x45A=0, +0x462=0, +0x0008=1, +0x062C=0, +0x063C=0`) explains why the untouched native gate still considered work active.
+
+V9 的固定 hook 集为 `0x0289248C`、两条蹲射事务 `0x02876248/0x02878B5C`、四个计数 writer `0x02876550/0x028765B8/0x02878E04/0x02878E6C` 和两个最终开火门禁 `0x028764A4/0x02878D58`。只在 selector 4 中，正库存写 `min(+0x45B capacity, signed +0x462 reserve)`，精确零写 0 并交还原生“`+8 == 0` 且 `+63C <= 0`”结束分支，负数哨兵保留原版逻辑。V9 不写 `+0x480/+0x481`，因而不再污染旧版误归类的 selector-5 缓存路径。静态门禁已通过：9/9 hook 前像、18/18 原生事务/writer/门禁上下文、174/174 真实 Cemu PPCAssembler、72/72 分支范围、13/13 结构契约、11/11 语义边界、8/8 Manifest 契约和 0 个活动固定地址冲突。它已原子替换 V8 并在本机标准 Cemu 配置启用，但仍是 **Runtime Experimental / Gameplay Pending**；必须冷启动验证普通射击、蹲射计数不为负、备弹 `3→2→1→0` 后下一发被拒绝、切姿态/切弹，以及铳枪/轻弩回归。
+
+V9 hooks the common update, both siege transactions, all four native counter writers, and both final fire gates. Selector 4 positive stock writes `min(capacity, reserve)`; exact zero clears the common and siege counters and returns to native completion; negative sentinels remain vanilla. It performs no `+0x480/+0x481` writes. Static gates pass (9/9 preimages, 18/18 native context words, 174/174 assembler inputs, 72/72 branch ranges, 13/13 structural contracts, 11/11 semantic cases, 8/8 manifest checks, zero active fixed-address conflicts). V9 atomically replaced V8 in the standard local Cemu profile but remains **Runtime Experimental / Gameplay Pending** until cold-start gameplay covers normal fire, non-negative siege count, reserve `3→2→1→0` plus rejection of the next trigger, stance/ammo switching, and Gunlance/LBG regression.
+
+### V9 gameplay failure and V10 all-ammo entry gate / V9 玩法失败与 V10 跨弹种入口门禁（2026-08-23）
+
+V9 的精确 Pack 已由 Cemu 日志证明加载，但实机用火炎弹保持蹲姿时，公共弹仓和真实备弹都归零后仍能继续生成弹丸；同时 LLDB 零库存快照为 `+0x45A=0, +0x45B=0, +0x462=0, +0x0008=1, +0x062C=0, +0x063C=0`。因此 V9 由 pending 改为 **gameplay failed**，不能发布。固定 RPX 反汇编将失败收敛到控制流：`0x02876498: cmpwi r26,2` 支配旧 A 门禁 `0x028764A4`，`0x02878D4C: cmpwi r25,2` 支配旧 B 门禁 `0x02878D58`；ammo index 7..9 映射到 class 1，index 10 才映射到 class 2。V9 的所谓“最终门禁”因此只覆盖 index 10，火炎弹等 index 7..9 必然绕过。
+
+V10 在两条蹲射发射函数入口 `0x02875DEC` 和 `0x02878738` 增加跨弹种门禁，均位于 ammo-index 映射和弹种分流之前。两处原始前像都是 `0x7C0802A6` (`mflr r0`)；非零/负数哨兵路径先重放该指令再进入原函数，selector 4 且 signed `+0x462 == 0` 时清空 `+0x45A/+0x0008/+0x062C/+0x063C` 并直接返回，避免进入任何弹丸生成路径。静态门禁通过：11/11 hook 前像、22/22 原生事务/writer/门禁/class 上下文、206/206 真实 Cemu PPCAssembler、80 个 relocation、80/80 分支范围、16/16 结构契约、14/14 语义边界、10/10 Manifest 契约和 0 个活动固定地址冲突。V10 已在 2026-08-23 21:48:01 +08:00 原子替换本机 V9，速度 V3 保留，未自动启动 Cemu。它仍是 **Runtime Experimental / Gameplay Pending**；关键验收为火炎弹保持蹲姿耗尽到零后，不切姿势的下一次射击不得生成弹丸且计数不得为负，再回归其他弹种、普通射击、切姿态/切弹、铳枪和轻弩。
+
+The exact V9 pack was proven loaded, yet held Flaming-S siege continued generating projectiles after both common magazine and real reserve reached zero. V9 is therefore **gameplay failed**. Exact-RPX control flow proves why: its A/B gates are dominated by ammo class 2, which covers index 10 only; indices 7..9 map to class 1 and bypass both gates. V10 hooks both siege-fire function entries before ammo mapping/dispatch. Exact-zero selector-4 reserve clears all common/siege snapshots and returns before projectile generation; positive stock and negative sentinels replay the original entry. Static validation passes (11/11 preimages, 22/22 native context words, 206/206 assembler inputs, 80 relocations, 80/80 branch ranges, 16/16 structural checks, 14/14 semantic cases, 10/10 manifest checks, zero active conflicts). V10 is installed locally but remains **Runtime Experimental / Gameplay Pending** until the held-Flaming-S zero-reserve test and all regressions pass.
+
+## ZL/ZR (physical L2/R2) speed-hotkey V3 gameplay result / ZL/ZR（实体 L2/R2）速度热键 V3 玩法回执
+
+V2 实际使用的是 Wii U **L/R**，不是实体手柄常说的 L2/R2。根据本次固定 JP-v96 RPX 反汇编，输入归一化函数在 `0x02BCB7C8` 测试原始 ZR 位并于 `0x02BCB7D0` 写入内部掩码 `0x0800`，在 `0x02BCB7D4` 测试原始 ZL 位并于 `0x02BCB7DC` 写入内部掩码 `0x0400`。因此 V3 保留玩法已通过的倍率状态写回，只改为：**ZL（常见实体 L2）启用所选 2x/3x，ZR（常见实体 R2）恢复 1x；同时按下时恢复优先。**
+
+The V2 pack actually uses Wii U **L/R**, not the controls commonly labelled L2/R2 on a physical controller. Exact JP-v96 disassembly shows raw ZR normalized to `0x0800` at `0x02BCB7C8`/`0x02BCB7D0`, and raw ZL normalized to `0x0400` at `0x02BCB7D4`/`0x02BCB7DC`. The V3 candidate therefore retains the gameplay-passed multiplier writeback and changes only the hotkeys: ZL (typically physical L2) selects 2x/3x, while ZR (typically physical R2) restores 1x, with restore priority when both are held.
+
+V3 的两个新 `andi.` 立即数已由真实 Cemu `PPCAssembler` 编码为 `0x73AB0800` 与 `0x73AB0400`；固定 RPX 的两个 Hook 前像以及四个 ZL/ZR 映射证据字均逐字匹配。候选随后安装并与自动补弹 V3 联测；2026-08-21 用户明确确认速度倍率与 ZL/ZR 切换正常，因此该映射获得用户玩法通过回执。独立 #006、#31、#57 仍会同时改写 `0x02BCB9CC`；换成 ZL/ZR 只解决按键占用，不解决 Patch 地址冲突，正式同时启用前必须合并为共享输入分派器。
+
+The real Cemu `PPCAssembler` encodes the two changed `andi.` immediates as `0x73AB0800` and `0x73AB0400`; both hook preimages and all four ZL/ZR mapping evidence words match the pinned RPX. The candidate was later installed and jointly tested with Auto Refill V3. On 2026-08-21 the user explicitly confirmed that the multiplier and ZL/ZR switching behave correctly, providing a user gameplay pass for this mapping. Standalone #006, #31, and #57 still all overwrite `0x02BCB9CC`; moving to ZL/ZR removes button overlap but not the patch-address conflict, so a shared input dispatcher is required before simultaneous use can be supported.
+
 # Per-pack description quality gate / 单包说明质量门禁（2026-08-12）
 
 - All 56 `rules.txt` files now provide effect-first bilingual descriptions with explicit Effect, Scope, Verify, and Source/status sections. The 43 static ARM conversions already met this standard and were audited; the remaining 13 frame-rate, item-box, Felyne food, equipment, and task-box packs were expanded from short labels or research notes into complete user-facing descriptions. / 全部 56 个 `rules.txt` 现都提供以实际效果开头的中英双语说明，并明确分为“效果、边界、验证、来源/状态”四部分。43 个静态 ARM 转换包原本已达到该标准并完成复核；其余 13 个帧率、道具箱、猫饭、装备及任务箱包则从短标签或研究备注扩展为完整的用户说明。
@@ -209,6 +289,28 @@ These gates establish static correctness and installation integrity only. They d
 
 以上门槛只证明静态正确性与安装完整性；没有游戏内证据时，不得把包升级为 `Runtime Verified`。
 
+## #24/#30 Weapon Auto Refill V10 freeze / 武器自动补弹 V10 冻结结论（2026-08-24）
+
+V10 已从外部 handoff 纳入正式目录
+`packs/wiiu/mh3g-hd/jp-v96/dynamic-24-30-weapon-auto-refill/`，作为默认关闭、必须显式选择的
+`Runtime Experimental` Pack。固定 JP-v96 RPX 上的 11/11 hook 前像、真实 Cemu
+PPCAssembler、分支范围、结构与语义模型均已通过；这些仍只证明补丁身份与静态闭环。
+
+本机用户决定停止继续修改当前候选，并接受重弩在普通/蹲射姿态切换前后可能出现约
+1～2 发的状态或 HUD 同步延迟作为本轮复测的已知边界。用户推测它可能与原版 MH3G
+的姿态状态机有关，但目前没有关闭 Pack 的同场景对照或原生 writer trace，因此仓库只记录
+“原版来源未证实”，不把推测写成事实。该边界也不覆盖真实备弹归零后无限生成弹丸、持续
+负数计数、输入卡死或崩溃；这些现象若在皮皮鸟独立复测中出现，仍直接判失败。
+
+V10 is now a default-off, explicitly selected `Runtime Experimental` pack in the repository.
+Its pinned hook preimages, real Cemu PPCAssembler, branch ranges, and structural/semantic models
+pass, which proves patch identity and static closure only. The local user froze the candidate and
+accepts a possible one-to-two-shot state or HUD synchronization delay around HBG normal/siege
+stance transitions for this retest. A vanilla-game origin is only a hypothesis because no disabled-pack
+control or native-writer trace proves it. Indefinite zero-reserve firing, persistent negative counts,
+stuck input, or crashes remain failures. Independent PipiNiao feedback is pending, so V10 is not
+promoted to `Runtime Verified`.
+
 ## Runtime evidence / 运行时证据
 
 - **Lobby / 大厅：** The one-word `0x02799678 = li r5, 0` pack was tested by the user. The full menu appears, and equipment change, equipment sets, and talisman operations work. It remains opt-in `Runtime Verified`.
@@ -264,6 +366,38 @@ patch_custom_felyne_food_skills.asm   499ba021caf506aceacf71b0855f5f21bd5fcdf6b8
 ```
 
 No Cemu process was launched, and no WUA, RPX, Cemu binary, MLC, or save file was modified.
+
+## External MH3G-007 HBG V8 gate candidate / 外部重弩 V8 开火门禁候选（2026-08-22）
+
+The V7 siege-counter refill strategy is formally gameplay-rejected. User testing showed that after
+real HBG siege reserve reached zero, firing continued indefinitely until stance transition and the
+upper-left counter could become negative. Full JP-v96 PPC control flow proves that `+0x0008` and
+`+0x063C` are finite action countdowns: path A exits through
+`0x028764A4..0x028764B8`, and path B through `0x02878D58..0x02878D6C`, only
+after both values expire. Refilling the four decrement writers made those native completion gates
+unreachable.
+
+V8 removes both V7 siege-transaction hooks and all four countdown-writer hooks. It preserves V6's
+gameplay-proven common-magazine refill and two stance-restore hooks, then adds only the native A/B
+siege fire-gate hooks at `0x028764A4` and `0x02878D58`. For HBG type 5 with exact signed
+`+0x462 == 0`, the gate clears `+0x45A/+0x0008/+0x062C/+0x063C` and returns to
+the immediately following vanilla completion checks. Positive reserve and negative sentinels replay
+the original load and never refill an action countdown.
+
+V8 static gates pass: hook preimages **5/5**, native gate/writer context **18/18**, real Cemu
+PPCAssembler **81/81** with 31 relocations, branch ranges **31/31**, structural contract
+**17/17**, semantic model **6/6**, and active fixed-address conflicts **0**. This proves target and
+control-flow integrity only. Rejection of the next zero-stock projectile and visible native
+reload/forced-exit behavior remain **Runtime Experimental / Gameplay Pending**.
+
+V7 蹲射计数回填策略已被实机正式否定：真实备弹归零后，不切姿势仍可无限射击，
+左上计数还能变成负数。完整 JP v96 PPC 控制流证明 `+0x0008/+0x063C` 是一次动作的
+有限倒计时，V7 在四个递减 writer 内持续回填，直接令原生结束门禁不可达。
+
+V8 撤销两条蹲射事务和四个倒计时 writer hook，仅保留 V6 已通过的公共弹仓/姿势恢复，
+并在 `0x028764A4/0x02878D58` 两个原生开火门禁检查 type 5 的真实备弹。
+精确归零时清空本次事务并交还原生结束判断；正数和负数哨兵完全重放原版。静态门禁全部
+通过，但“归零后下一发被拒绝以及可见装填/强退蹲射”仍需实机，故不得标为 Runtime Verified。
 
 ## Distribution / 分发
 

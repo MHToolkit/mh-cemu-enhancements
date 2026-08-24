@@ -109,8 +109,11 @@ DISTRIBUTION_CATEGORY_PACKS = {
         ),
     },
     "combat-weapons": {
-        static_pack_id(index, STATIC_ARM_PACKS[index])
-        for index in (5, 6, 29, 49, 50, 52, 72)
+        "mh3g-hd-jp-v96-dynamic-24-30-weapon-auto-refill",
+        *(
+            static_pack_id(index, STATIC_ARM_PACKS[index])
+            for index in (5, 6, 29, 49, 50, 52, 72)
+        ),
     },
     "balance-breaking": {
         *EXTERNAL_EQUIPMENT_PACKS,
@@ -189,6 +192,7 @@ class CatalogTests(unittest.TestCase):
                 "mh3g-hd-jp-v96-fps-lock-44",
                 "mh3g-hd-jp-v96-lobby-full-item-box",
                 "mh3g-hd-jp-v96-custom-felyne-food-skills",
+                "mh3g-hd-jp-v96-dynamic-24-30-weapon-auto-refill",
                 "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
                 "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
                 "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
@@ -327,7 +331,7 @@ class CatalogTests(unittest.TestCase):
     def test_every_pack_has_effect_first_bilingual_description_and_summary(self):
         result = self.tool.validate_repository(REPO)
         self.assertEqual([], result.errors, "\n".join(result.errors))
-        self.assertEqual(56, len(result.packs))
+        self.assertEqual(57, len(result.packs))
 
         for pack in result.packs:
             rules_path = REPO / pack["pack_dir"] / pack["rules"]
@@ -714,6 +718,39 @@ class CatalogTests(unittest.TestCase):
                 },
             )
         self.assertTrue(all(len(Path(pack["pack_dir"]).parts) == 5 for pack in result.packs))
+
+    def test_dynamic_weapon_auto_refill_v10_is_explicit_experimental_with_frozen_boundary(self):
+        result = self.tool.validate_repository(REPO)
+        self.assertEqual([], result.errors, "\n".join(result.errors))
+        pack = next(
+            item
+            for item in result.packs
+            if item["id"] == "mh3g-hd-jp-v96-dynamic-24-30-weapon-auto-refill"
+        )
+        self.assertEqual("Runtime Experimental", pack["status"])
+        self.assertFalse(pack["default_install"])
+        self.assertFalse(pack["auto_experimental_install"])
+        self.assertEqual([24, 30], pack["source_cheat_entries"])
+        self.assertEqual(
+            {
+                0x02875DEC,
+                0x02878738,
+                0x0289248C,
+                0x02876248,
+                0x02878B5C,
+                0x02876550,
+                0x028765B8,
+                0x02878E04,
+                0x02878E6C,
+                0x028764A4,
+                0x02878D58,
+            },
+            {int(item["address"], 0) for item in pack["preimages"]},
+        )
+        risks = "\n".join(pack["known_risks"])
+        self.assertIn("1～2 发", risks)
+        self.assertIn("unproven", risks)
+        self.assertIn("Indefinite projectile generation", risks)
 
     def test_manifest_schema_is_json_and_exposes_required_statuses_and_categories(self):
         schema = json.loads((REPO / "schemas" / "pack-manifest.schema.json").read_text())
@@ -1647,10 +1684,10 @@ class CatalogTests(unittest.TestCase):
             extracted_root = Path(tmp) / "extracted" / "mh-cemu-enhancements"
             extracted_result = self.tool.validate_repository(extracted_root)
             self.assertEqual([], extracted_result.errors, "\n".join(extracted_result.errors))
-            self.assertEqual(56, distribution_index["pack_count"])
-            self.assertEqual(53, distribution_index["available_pack_count"])
+            self.assertEqual(57, distribution_index["pack_count"])
+            self.assertEqual(54, distribution_index["available_pack_count"])
             self.assertEqual(3, distribution_index["runtime_blocked_pack_count"])
-            self.assertEqual(56, len(distribution_index["packs"]))
+            self.assertEqual(57, len(distribution_index["packs"]))
             for indexed_pack in distribution_index["packs"]:
                 self.assertTrue(indexed_pack["summary"].startswith("中文："))
                 self.assertTrue(

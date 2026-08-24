@@ -42,35 +42,61 @@
     {
       "id": "direct-native-hooks",
       "priority": 1,
-      "source_indices": [8, 12, 19, 20, 62],
+      "source_indices": [
+        8,
+        12,
+        19,
+        20,
+        62
+      ],
       "goal_zh": "先在 JP v96 PPC 中定位与五个 ARM hook 等价的原生函数、寄存器语义和写回点；这是最可能不依赖长期对象指针即可转换的一批。",
       "goal_en": "Locate the JP-v96 PPC native functions, register semantics, and writeback sites equivalent to the five ARM hooks. This batch is the most likely to convert without persistent object pointers."
     },
     {
       "id": "player-inventory-roots",
       "priority": 2,
-      "source_indices": [4, 9, 10, 23, 32, 58],
+      "source_indices": [
+        4,
+        9,
+        10,
+        23,
+        32,
+        58
+      ],
       "goal_zh": "用大厅、任务与装备切换前后快照确认玩家、背包、道具箱、斩味和放置物计数在 Wii U 对象中的真实归属与生命周期。",
       "goal_en": "Use lobby, quest, and equipment-change snapshots to prove the Wii U ownership and lifetime of player, pouch, item-box, sharpness, drink-timer, and placement-count state."
     },
     {
       "id": "weapon-runtime-state",
       "priority": 3,
-      "source_indices": [24, 25, 28, 30],
+      "source_indices": [
+        24,
+        25,
+        28,
+        30
+      ],
       "goal_zh": "分别用铳枪、弩和斩斧触发弹药、装填与能量变化，捕获对应 PPC 写入函数；不得把 3DS 偏移直接套到 Wii U。",
       "goal_en": "Trigger ammunition, reload, and gauge changes with Gunlance, Bowgun, and Switch Axe to capture the responsible PPC writers; 3DS offsets must never be reused on Wii U."
     },
     {
       "id": "controller-action-hooks",
       "priority": 4,
-      "source_indices": [1, 2, 3, 31, 57],
+      "source_indices": [
+        1,
+        2,
+        3,
+        31,
+        57
+      ],
       "goal_zh": "先证明 Wii U 控制器位掩码和每帧输入读取路径，再把速度、回血和放置物比较切换实现为同一套可审计 PPC 输入门。",
       "goal_en": "First prove the Wii U controller mask and per-frame input path, then implement speed, healing, and placed-object comparison toggles through one auditable PPC input gate."
     },
     {
       "id": "monster-runtime-state",
       "priority": 5,
-      "source_indices": [66],
+      "source_indices": [
+        66
+      ],
       "goal_zh": "在小怪、大怪、可捕获与不可捕获状态下对比当前区域怪物对象，定位真实生命/捕获状态写入；该项最后处理以避免污染任务结算。",
       "goal_en": "Compare current-area monster objects across small, large, capturable, and non-capturable states to locate the real health/capture writer. Handle this last to avoid corrupting quest resolution."
     }
@@ -81,7 +107,11 @@
       "name_zh": "速度变更L键3倍",
       "name_en": "L held: game speed ×3",
       "source_mechanism": "arm-hotkey-routine",
-      "source_sites": ["0x008cc418", "0x00af49b0", "0x00af49c0"],
+      "source_sites": [
+        "0x008cc418",
+        "0x00af49b0",
+        "0x00af49c0"
+      ],
       "source_semantics_zh": "3DS L 掩码 0x0200 按住时，把 0x008CC418 改为调用临时 ARM 例程；该例程把 3.0 写入玩家内层状态 +0x600，并立即从同一字段回读，而非修改全局帧率。",
       "source_semantics_en": "While the 3DS L mask 0x0200 is held, redirect 0x008CC418 to a scratch ARM routine that writes 3.0 to inner-player state +0x600 and immediately reloads it; this is not a global frame-rate write.",
       "probe_batch": "controller-action-hooks",
@@ -89,7 +119,11 @@
       "target_strategy_en": "Static matching found per-frame player updater 0x02892294 and the +0x608 multiplier load at 0x028924AC. Runtime evidence hit that consumer during village movement and confirmed the current-frame Wii U L mask as 0x0100 at 0x02BCB9CC. The next step is an input-to-multiplier bridge with proven lifetime, release restoration, and no native-state collision.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["speed-consumer-village-move", "normalized-input-code-window", "input-l-persistent"],
+      "runtime_evidence_refs": [
+        "speed-consumer-village-move",
+        "normalized-input-code-window",
+        "input-l-persistent"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -123,7 +157,11 @@
       "name_zh": "速度变更L键2倍",
       "name_en": "L held: game speed ×2",
       "source_mechanism": "arm-hotkey-routine",
-      "source_sites": ["0x008cc418", "0x00af49b0", "0x00af49c0"],
+      "source_sites": [
+        "0x008cc418",
+        "0x00af49b0",
+        "0x00af49c0"
+      ],
       "source_semantics_zh": "与 #1 同一路径，3DS L 按住时把玩家内层状态 +0x600 写为并回读 2.0 浮点倍率；它不是 FPS 锁定值。",
       "source_semantics_en": "Uses the same path as #1, writing and reloading a 2.0 float multiplier at inner-player state +0x600 while 3DS L is held; it is not an FPS cap value.",
       "probe_batch": "controller-action-hooks",
@@ -131,7 +169,11 @@
       "target_strategy_en": "Reuse #1's runtime-observed 0x028924AC multiplier consumer and 0x02BCB9CC L=0x0100 input evidence. Next capture a controlled +0x608 transition from 1.0 to 2.0 and back to 1.0, then share one PPC state machine with #1/#3.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["speed-consumer-village-move", "normalized-input-code-window", "input-l-persistent"],
+      "runtime_evidence_refs": [
+        "speed-consumer-village-move",
+        "normalized-input-code-window",
+        "input-l-persistent"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -165,7 +207,11 @@
       "name_zh": "速度变更R键1倍",
       "name_en": "R held: restore game speed ×1",
       "source_mechanism": "arm-hotkey-routine",
-      "source_sites": ["0x008cc418", "0x00af49b0", "0x00af49c0"],
+      "source_sites": [
+        "0x008cc418",
+        "0x00af49b0",
+        "0x00af49c0"
+      ],
       "source_semantics_zh": "3DS R 掩码 0x0100 按住时，把同一玩家内层状态 +0x600 写为并回读 1.0，用于恢复该更新倍率的正常值。",
       "source_semantics_en": "While the 3DS R mask 0x0100 is held, write and reload 1.0 at the same inner-player +0x600 field to restore that update multiplier's normal value.",
       "probe_batch": "controller-action-hooks",
@@ -173,7 +219,11 @@
       "target_strategy_en": "Reuse the #1/#2 multiplier consumer and runtime-observed input normalizer, using the current-frame Wii U R mask 0x0200 as the restore branch. Next prove that it restores the same +0x608 state to 1.0 rather than creating a duplicate code cave.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["speed-consumer-village-move", "normalized-input-code-window", "input-r-persistent"],
+      "runtime_evidence_refs": [
+        "speed-consumer-village-move",
+        "normalized-input-code-window",
+        "input-r-persistent"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -207,7 +257,10 @@
       "name_zh": "斩味常紫",
       "name_en": "Sharpness always purple",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x08115eb0", "0x008cc074"],
+      "source_sites": [
+        "0x08115eb0",
+        "0x008cc074"
+      ],
       "source_semantics_zh": "沿 3DS 运行时根指针写入 +0x1850/+0x1854/+0x1856 的斩味相关字段，并把 0x008CC074 条件分支改为无条件跳过。",
       "source_semantics_en": "Follow a 3DS runtime root, update sharpness-related fields at +0x1850/+0x1854/+0x1856, and make the conditional branch at 0x008CC074 unconditional.",
       "probe_batch": "player-inventory-roots",
@@ -243,7 +296,10 @@
       "name_zh": "道具袋不减",
       "name_en": "Item-pouch quantities do not decrease",
       "source_mechanism": "arm-code-cave",
-      "source_sites": ["0x0098eb18", "0x00af4aa0"],
+      "source_sites": [
+        "0x0098eb18",
+        "0x00af4aa0"
+      ],
       "source_semantics_zh": "替换函数入口的 mov r4,r3；临时例程在数量参数 r2 为 -1 时改成 0，从而阻止常规消耗递减。",
       "source_semantics_en": "Replace the entry mov r4,r3; the scratch routine changes quantity delta r2 from -1 to 0, suppressing ordinary consumption decrements.",
       "probe_batch": "direct-native-hooks",
@@ -274,7 +330,10 @@
       "name_zh": "背包第一格×99",
       "name_en": "Pouch slot 1 ×99",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00c394c8", "+0x00c2"],
+      "source_sites": [
+        "0x00c394c8",
+        "+0x00c2"
+      ],
       "source_semantics_zh": "读取 3DS 背包根指针并把对象 +0xC2 的 16 位第一格数量持续写为 99。",
       "source_semantics_en": "Read the 3DS pouch root and continuously write 99 to the 16-bit first-slot quantity at object +0xC2.",
       "probe_batch": "player-inventory-roots",
@@ -282,7 +341,9 @@
       "target_strategy_en": "Static cross-architecture matching maps 3DS container selector 0x0098FACC exactly to PPC 0x0219A6E4. The primary pouch uses +0xA8 from the root's +0x38 subobject, placing its first record at +0xE0 from the object referenced by global root 0x10315C50 and its quantity at +0xE2. Native quantity writer 0x0219B6E4 stores record +2 at 0x0219B830. Prove through controlled first-slot changes 1→2→3 that r27 equals root+0xE0 before designing a narrow lifecycle-safe hook for only that slot.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["inventory-roots-village"],
+      "runtime_evidence_refs": [
+        "inventory-roots-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x0219a6e4",
@@ -316,7 +377,11 @@
       "name_zh": "任务中背包第一格",
       "name_en": "Quest pouch slot 1 ×99",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00b7b534", "+0xaa0c", "+0x2ce2"],
+      "source_sites": [
+        "0x00b7b534",
+        "+0xaa0c",
+        "+0x2ce2"
+      ],
       "source_semantics_zh": "沿 3DS 任务管理器两级指针定位任务背包，并把第一格 8 位数量写为 99。",
       "source_semantics_en": "Follow a two-level 3DS quest-manager chain to the quest pouch and write 99 to its first-slot 8-bit quantity.",
       "probe_batch": "player-inventory-roots",
@@ -346,7 +411,10 @@
       "name_zh": "携带道具上限提升至 99",
       "name_en": "Carry-item cap raised to 99",
       "source_mechanism": "arm-code-cave",
-      "source_sites": ["0x00571c44", "0x00af4c98"],
+      "source_sites": [
+        "0x00571c44",
+        "0x00af4c98"
+      ],
       "source_semantics_zh": "把原函数返回点改到临时例程；当道具记录 +3 的原携带上限非零且不超过 98 时写成 99。",
       "source_semantics_en": "Redirect the original return through a scratch routine; when item-record +3 is nonzero and at most 98, replace the carry cap with 99.",
       "probe_batch": "direct-native-hooks",
@@ -372,7 +440,10 @@
       "name_zh": "攻击倍率",
       "name_en": "Attack multiplier",
       "source_mechanism": "arm-code-cave",
-      "source_sites": ["0x008effc0", "0x00af4ad0"],
+      "source_sites": [
+        "0x008effc0",
+        "0x00af4ad0"
+      ],
       "source_semantics_zh": "替换攻击派生值的 16 位读取；临时例程读取基础值、乘 2，并写回原目标偏移。",
       "source_semantics_en": "Replace a 16-bit derived-attack load; the scratch routine reads the base value, doubles it, and writes it to the original target offset.",
       "probe_batch": "direct-native-hooks",
@@ -380,7 +451,9 @@
       "target_strategy_en": "Static cross-architecture matching found PPC attack-derivation function 0x02867648: 0x02867694 writes the 16-bit attack value to player-state +0x6E8, applies the native 700 cap, and stores the display float at +0x6EC. Capture one controlled equipment attack change at 0x0286769C to prove r9 and both fields before designing a narrow hook that starts from an unscaled input and cannot compound.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["player-state-village"],
+      "runtime_evidence_refs": [
+        "player-state-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02867648",
@@ -405,7 +478,10 @@
       "name_zh": "防御倍率",
       "name_en": "Defense multiplier",
       "source_mechanism": "arm-code-cave",
-      "source_sites": ["0x008e8e14", "0x00af4af0"],
+      "source_sites": [
+        "0x008e8e14",
+        "0x00af4af0"
+      ],
       "source_semantics_zh": "与 #19 相同算法作用于防御派生值：读取 16 位基础值、乘 2、写回原目标偏移。",
       "source_semantics_en": "Apply the same algorithm as #19 to derived defense: read the 16-bit base, double it, and write the original destination.",
       "probe_batch": "direct-native-hooks",
@@ -413,7 +489,9 @@
       "target_strategy_en": "Static cross-architecture matching found PPC defense-derivation function 0x02867CB4: 0x02867D04 writes the 16-bit defense value to player-state +0x6EA, retains the native minimum-value logic, and stores the display float at +0x6F0. Capture one controlled armor change at 0x02867D14 to prove r10 and the fields before designing a non-compounding narrow hook.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["player-state-village"],
+      "runtime_evidence_refs": [
+        "player-state-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02867cb4",
@@ -437,7 +515,10 @@
       "name_zh": "道具箱第一格×99",
       "name_en": "Item-box slot 1 ×99",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00c394c8", "+0x01a2"],
+      "source_sites": [
+        "0x00c394c8",
+        "+0x01a2"
+      ],
       "source_semantics_zh": "读取与 #9 相同的 3DS 容器根指针，把 +0x1A2 的道具箱第一格 16 位数量写为 99。",
       "source_semantics_en": "Use the same 3DS container root as #9 and write 99 to the 16-bit item-box first-slot quantity at +0x1A2.",
       "probe_batch": "player-inventory-roots",
@@ -445,7 +526,9 @@
       "target_strategy_en": "Static cross-architecture matching found PPC item-box reader 0x021F18BC: starting from the container root at *0x10315C50, it walks 101 four-byte records beginning at +0x1C0, with item ID at record +0 and signed quantity at +2. Open the full item box and capture slot one at 0x021F1900, then deposit or withdraw that slot once to prove object lifetime. The native writer and save-sync boundary must still be found separately; the reader/copy path is not a persistence hook.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["inventory-roots-village"],
+      "runtime_evidence_refs": [
+        "inventory-roots-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x021f18bc",
@@ -484,7 +567,12 @@
       "name_zh": "铳枪弹药自填",
       "name_en": "Gunlance ammunition auto-refill",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00be1818", "+0x0234", "+0x0452", "+0x0453"],
+      "source_sites": [
+        "0x00be1818",
+        "+0x0234",
+        "+0x0452",
+        "+0x0453"
+      ],
       "source_semantics_zh": "沿 3DS 武器对象链，在铳枪条件成立时把 +0x453 的 8 位最大/来源弹数复制到 +0x452 的当前弹数。",
       "source_semantics_en": "Follow the 3DS weapon-object chain and, under Gunlance conditions, copy the 8-bit maximum/source shell count at +0x453 into current shells at +0x452.",
       "probe_batch": "weapon-runtime-state",
@@ -518,7 +606,11 @@
       "name_zh": "子弹不减",
       "name_en": "Bowgun ammunition does not decrease",
       "source_mechanism": "arm-hotkey-routine",
-      "source_sites": ["0x00c9e8dc", "+0x0050", "+0x129e..+0x12ba"],
+      "source_sites": [
+        "0x00c9e8dc",
+        "+0x0050",
+        "+0x129e..+0x12ba"
+      ],
       "source_semantics_zh": "3DS A 掩码 0x0001 按住时，把玩家对象内八个间隔 4 字节的 8 位弹药槽持续写为 0x20；源代码并非拦截递减。",
       "source_semantics_en": "While the 3DS A mask 0x0001 is held, continuously write 0x20 to eight 8-bit ammo slots spaced four bytes apart in the player object; the source does not intercept decrement.",
       "probe_batch": "weapon-runtime-state",
@@ -530,8 +622,26 @@
       "static_partial": {
         "confidence": "hypothesis",
         "source_player_chain_offset": "0x0050",
-        "source_ammo_offsets": ["0x129e", "0x12a2", "0x12a6", "0x12aa", "0x12ae", "0x12b2", "0x12b6", "0x12ba"],
-        "hypothesized_target_ammo_offsets": ["0x12a6", "0x12aa", "0x12ae", "0x12b2", "0x12b6", "0x12ba", "0x12be", "0x12c2"],
+        "source_ammo_offsets": [
+          "0x129e",
+          "0x12a2",
+          "0x12a6",
+          "0x12aa",
+          "0x12ae",
+          "0x12b2",
+          "0x12b6",
+          "0x12ba"
+        ],
+        "hypothesized_target_ammo_offsets": [
+          "0x12a6",
+          "0x12aa",
+          "0x12ae",
+          "0x12b2",
+          "0x12b6",
+          "0x12ba",
+          "0x12be",
+          "0x12c2"
+        ],
         "normalized_a_mask_candidate": "0x00002000",
         "input_trace_spec": "docs/research/traces/mh3g-dynamic-controller-normalized-input.json",
         "evidence_zh": "多个已精确映射的玩家内层字段从 3DS 到 Wii U 一致后移 8 字节，因此八个弹药槽可形成 +0x12A6..+0x12C2 的候选窗口；控制器归一化路径静态显示 A 掩码为 0x2000。当前没有原生 PPC 弹药读取/递减 writer 或对象根证据，不能把窗口当成映射。",
@@ -545,7 +655,10 @@
       "name_zh": "斩斧能量槽max",
       "name_en": "Switch Axe energy gauge maximum",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x083f50c4", "+0x0064"],
+      "source_sites": [
+        "0x083f50c4",
+        "+0x0064"
+      ],
       "source_semantics_zh": "读取 3DS 斩斧运行时对象指针，把 +0x64 的 8 位能量值持续写为 100。",
       "source_semantics_en": "Read the 3DS Switch Axe runtime-object pointer and continuously write 100 to its 8-bit energy value at +0x64.",
       "probe_batch": "weapon-runtime-state",
@@ -571,12 +684,17 @@
       "name_zh": "MH3G_v1.0弩系自动装填",
       "name_en": "Bowgun auto reload",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00be1818", "+0x0234", "+0x0452", "+0x0453"],
+      "source_sites": [
+        "0x00be1818",
+        "+0x0234",
+        "+0x0452",
+        "+0x0453"
+      ],
       "source_semantics_zh": "沿与 #24 相同的 3DS 武器链，在弩类型/状态条件成立时把 +0x453 的来源弹数复制到 +0x452 当前装填数。",
       "source_semantics_en": "Follow the same 3DS weapon chain as #24 and, under Bowgun type/state conditions, copy the source count at +0x453 into current loaded rounds at +0x452.",
       "probe_batch": "weapon-runtime-state",
-      "target_strategy_zh": "静态交叉比对确认该项与 #24 共用 PPC 0x02856C0C 和 +0x45A/+0x45B 字段；备用类型/状态分支在 0x02856D7C 再次读取来源弹数，并于 0x02856D90 写当前装填数。分别用轻弩/重弩和不同装填数触发换弹，在 0x02856D7C 证明武器类型、弹种与状态条件后再实现自动装填。",
-      "target_strategy_en": "Static matching confirms that this entry shares PPC 0x02856C0C and fields +0x45A/+0x45B with #24. The alternate type/state branch reloads the source count at 0x02856D7C and writes current rounds at 0x02856D90. Trigger reloads with Light and Heavy Bowguns of different capacities and prove weapon type, ammo subtype, and state conditions at 0x02856D7C before implementation.",
+      "target_strategy_zh": "V9 已被 2026-08-23 实机复测否定：火炎弹保持蹲姿时，公共弹仓与真实备弹均为零后仍能生成弹丸。固定 RPX 反汇编给出唯一直接根因：V9 的 0x028764A4/0x02878D58 均被 ammo class == 2 支配，只覆盖 index 10；火炎弹等 index 7..9 映射到 class 1 并绕过门禁。V10 因而在两条蹲射发射函数入口 0x02875DEC/0x02878738、任何弹种分流之前检查实机已证明的 selector 4 与 signed +0x0462。精确零时清空 +0x45A/+0x0008/+0x062C/+0x063C 并直接返回，正库存和负数哨兵完整执行原函数。",
+      "target_strategy_en": "V9 was falsified by gameplay on 2026-08-23: held Flaming-S siege continued generating projectiles after both the common magazine and real reserve reached zero. Exact-RPX disassembly gives a direct root cause: V9 gates 0x028764A4/0x02878D58 are dominated by ammo class == 2 and therefore cover index 10 only; indices 7..9 such as Flaming S map to class 1 and bypass them. V10 gates both siege-fire function entries 0x02875DEC/0x02878738 before every ammo-type dispatch, checking live-proven selector 4 and signed +0x0462. Exact zero clears +0x45A/+0x0008/+0x062C/+0x063C and returns; positive stock and negative sentinels execute the original function.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "not-traced",
       "pack_state": "not-created",
@@ -588,16 +706,213 @@
         "current_count_write": "0x02856d90",
         "current_count_write_preimage": "0x9927045a",
         "player_state_register": "r7",
-        "weapon_type_offset": "0x0002",
+        "runtime_selector_offset": "0x0002",
         "current_count_offset": "0x045a",
         "source_count_offset": "0x045b",
         "ammo_subtype_offset": "0x045d",
         "native_limit_halfword_offset": "0x0462",
+        "indexed_magazine_halfword_offset": "0x0480 + ammoSubtype*2",
+        "hbg_indexed_magazine_low_byte_offset": "0x0481 + ammoSubtype*2",
+        "native_indexed_magazine_write": "0x02856db8",
+        "bowgun_fire_decrement_write": "0x0285770c",
+        "bowgun_fire_indexed_snapshot": "0x02857788",
+        "native_ammo_slot_upper_bound": "0x24 slots at 0x02859800",
+        "hbg_restore_type_check_a": "0x02891b08",
+        "hbg_restore_load_a": "0x02891b20",
+        "hbg_restore_type_check_b": "0x02894794",
+        "hbg_restore_load_b": "0x028947ac",
         "trace_spec": "docs/research/traces/mh3g-dynamic-30-bowgun-counts.json",
-        "patch_constraint_zh": "不得把共享函数改成全武器补满，也不得删除原版对不支持弹种、武器状态和 +0x462 上限的判断；轻弩与重弩至少各需一次受控 trace。",
-        "patch_constraint_en": "Do not turn the shared function into an all-weapon refill or remove native unsupported-ammo, weapon-state, and +0x462 capacity checks. At least one controlled trace is required for both Light and Heavy Bowgun.",
-        "static_evidence_zh": "3DS 与 Wii U 函数均在武器类型分派后执行第二组来源弹数读取、当前弹数写入、半字上限比较和弹种索引同步；该结构证明字段映射，但尚未证明轻弩/重弩的运行时类型值。",
-        "static_evidence_en": "Both 3DS and Wii U functions perform the second source-count load, current-count write, halfword capacity comparison, and ammo-subtype indexed synchronization after weapon-type dispatch. This proves the field mapping, but not yet the runtime type values for Light and Heavy Bowgun."
+        "patch_constraint_zh": "保留铳枪/轻弩已通过逻辑；重弩蹲射只允许在实机已证明的 selector 4 路径中执行。零备弹阻断必须位于 0x02875DEC/0x02878738 的弹种分流之前；不得写 +0x46C、+0x480 或 +0x481，不得与 #25/#52 或 Auto Refill V1-V9 共测。",
+        "patch_constraint_en": "Preserve gameplay-passed Gunlance/LBG behavior. HBG siege changes may execute only on live-proven selector 4. Zero-reserve rejection must occur before ammo dispatch at 0x02875DEC/0x02878738. Do not write +0x46C, +0x480, or +0x481, and do not co-test with #25/#52 or Auto Refill V1-V9.",
+        "static_evidence_zh": "V9 的运行态对象快照已证明 selector 4 且 +0x45A/+0x462/+0x62C/+0x63C 为零时 +0x0008 仍为 1。进一步反汇编证明旧 A/B 门禁分别受 0x02876498 的 cmpwi r26,2 与 0x02878D4C 的 cmpwi r25,2 支配；index 7..9 在入口映射为 class 1，必然绕过。V10 的两个入口 hook 位于该映射和所有弹种分流之前。",
+        "static_evidence_en": "The V9 live object snapshot proves selector 4 and +0x0008 still 1 while +0x45A/+0x462/+0x62C/+0x63C are zero. Disassembly further proves the old A/B gates are dominated by cmpwi r26,2 at 0x02876498 and cmpwi r25,2 at 0x02878D4C. Indices 7..9 map to class 1 at function entry and necessarily bypass them. V10 hooks both entries before that mapping and every ammo dispatch."
+      },
+      "post_baseline_update_20260821": {
+        "mapping_state": "ppc-native-writer-timing-candidate",
+        "runtime_state": "v3-gameplay-failed-v4-gameplay-failed-v5-gameplay-pending",
+        "pack_state": "external-runtime-experimental-v5-copied-activation-waits-for-cemu-exit",
+        "ledger": "docs/research/mh3g-dynamic-gameplay-feedback-20260818.json",
+        "reason": "V3 gameplay falsified continuous cache writes. V4 removed per-frame HBG writes but gameplay showed no refill because special/siege transactions left the indexed stance cache stale. V5 adds transaction-local indexed snapshots only."
+      },
+      "v3_gameplay_failure_20260821": {
+        "runtime_state": "failed",
+        "observed_zh": [
+          "左上武器弹数显示异常",
+          "重弩由蹲姿切回普通姿势后重新获得可发射状态",
+          "随后才进入 Charging Bullet/装填流程"
+        ],
+        "observed_en": [
+          "abnormal weapon-ammo HUD count",
+          "leaving siege stance restores another shootable state",
+          "Charging Bullet/reload occurs only afterwards"
+        ],
+        "root_cause_zh": "V3 命中了真实 +0x480 索引缓存，但从通用每帧 hook 持续写 +0x45A 与姿势恢复缓存，越过了原生射击事务和普通/蹲射状态机。字段地址正确不等于任意时机持续写安全。",
+        "root_cause_en": "V3 targeted the real indexed cache but continuously wrote +0x45A and the stance-restore cache from a generic per-frame hook, bypassing the native firing transaction and normal/siege state machine. Correct field addresses do not make arbitrary continuous writes safe."
+      },
+      "v4_candidate_20260821": {
+        "mapping_state": "ppc-native-writer-timing-candidate",
+        "runtime_state": "gameplay-failed",
+        "pack_state": "external-runtime-experimental-v4-installed-local",
+        "hbg_per_frame_writes": false,
+        "normal_post_consumption_hook": "0x02857768",
+        "normal_native_snapshot": "0x02857788",
+        "special_or_siege_hooks": [
+          "0x02876248",
+          "0x02878b5c"
+        ],
+        "hbg_guard": "weapon type 5",
+        "refill_formula": "min(+0x45B capacity, +0x462 post-consumption remaining)",
+        "native_refill_flow_excluded": "0x0285893C path already refills at 0x0285899C..0x028589B8",
+        "preserved_gameplay_passed_types": {
+          "gunlance": 9,
+          "light_bowgun": 6
+        },
+        "preimages": "4/4 PASS",
+        "full_text_writer_scan": "exactly 4 decrement-to-+0x45A writers",
+        "cemu_ppcassembler": "66 instructions accepted; 27 relocations; 0 errors",
+        "active_pack_fixed_address_conflict": "none across 47 enabled entries",
+        "artifact": ".codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V4-Native-Writers-20260821/",
+        "zip_sha256": "36606fb21b5f7a46298b636863dbee41618076206223785e85c86eeaae7fc25a",
+        "gameplay_failure": {
+          "observed_zh": [
+            "真实库存仍有弹时，重弩弹仓继续下降",
+            "自动装填/补弹不生效"
+          ],
+          "root_cause_zh": "两条特殊/蹲射 hook 只写 +0x45A，未同步重弩姿势恢复读取的 +0x480+弹种×2 缓存。",
+          "root_cause_en": "The two special/siege hooks wrote only +0x45A and left the +0x480+ammoSubtype*2 cache used by HBG stance restoration stale."
+        }
+      },
+      "v5_candidate_20260821": {
+        "mapping_state": "ppc-native-transaction-cache-candidate",
+        "runtime_state": "gameplay-pending",
+        "pack_state": "external-runtime-experimental-v5-copied-activation-waits-for-cemu-exit",
+        "hbg_per_frame_writes": false,
+        "normal_post_consumption_hook": "0x02857768 followed by native 0x02857788 indexed snapshot",
+        "special_or_siege_transaction_hooks": [
+          "0x02876248",
+          "0x02878b5c"
+        ],
+        "special_indexed_snapshot": "+0x480 + ammoSubtype*2 halfword",
+        "guards": [
+          "weapon type == 5",
+          "unsigned ammoSubtype < 0x24"
+        ],
+        "refill_formula": "min(+0x45B capacity, +0x462 post-consumption remaining)",
+        "preimages": "4/4 PASS",
+        "cemu_ppcassembler": "78/78 accepted; 29 relocations",
+        "branch_ranges": "29/29 PASS",
+        "semantic_boundary_model": "6/6 PASS",
+        "artifact": ".codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V5-Special-Cache-Snapshot-20260821/",
+        "zip_sha256": "d0b7d551533b9bc16ec96a1cc6875653f64cc24f815f57384531754fe0456aad"
+      },
+      "post_v7_failure_update_20260822": {
+        "v6_gameplay": {
+          "verdict": "partial",
+          "passed": "normal HBG shot refills one common-magazine round",
+          "failed": [
+            "siege HUD/action counter drains",
+            "zero reserve still permits firing until stance switch"
+          ]
+        },
+        "v7_gameplay": {
+          "verdict": "failed",
+          "observed": [
+            "siege reserve reaches zero but firing continues without stance switch",
+            "upper-left siege count becomes negative",
+            "stance switch triggers delayed inventory reevaluation"
+          ],
+          "withdrawn_root_cause": "The earlier claim that writer refill itself made the completion gate unreachable is withdrawn: all V7 transaction/writer hooks guarded +0x0002 == 5, while live HBG siege used selector 4, so those hooks never executed.",
+          "corrected_root_cause": "V7's HBG-specific transaction and writer logic never matched the live selector-4 HBG siege state because every guard compared selector 5."
+        },
+        "v8_candidate": {
+          "hook_set": [
+            "0x0289248C",
+            "0x028764A4",
+            "0x02878D58",
+            "0x02891B20",
+            "0x028947AC"
+          ],
+          "removed_v7_hooks": [
+            "0x02876248",
+            "0x02878B5C",
+            "0x02876550",
+            "0x028765B8",
+            "0x02878E04",
+            "0x02878E6C"
+          ],
+          "zero_contract": "selector 5 and signed +0x462 == 0 clears +0x45A/+0x0008/+0x062C/+0x063C, then native A/B two-counter gate decides completion",
+          "positive_or_negative_contract": "replay original gate load without changing any siege countdown",
+          "static_verification": "hook preimages 5/5; native gate/writer context 18/18; PPCAssembler 81/81; branch ranges 31/31; structural 17/17; semantic 6/6",
+          "gameplay": "failed: negative siege count, no positive-stock refill, and firing after both common magazine and real reserve reached zero",
+          "corrected_root_cause": "both final fire gates guarded selector 5, but live HBG siege used selector 4; the V8 branches never executed",
+          "artifact": ".codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V8-Siege-Fire-Gate-20260822/"
+        },
+        "v9_candidate": {
+          "mapping_state": "ppc-runtime-selector4-native-writer-candidate",
+          "runtime_state": "gameplay-failed-2026-08-23",
+          "pack_state": "external-runtime-experimental-v9-superseded-by-v10",
+          "live_evidence": {
+            "guest_state": "0x2FF7D610",
+            "host_mapping_base": "0x300000000",
+            "selector_offset": "+0x0002",
+            "selector_value_during_visible_hbg_siege": 4,
+            "zero_stock_snapshot": "+0x45A=0, +0x462=0, +0x0008=1, +0x062C=0, +0x063C=0"
+          },
+          "hook_set": [
+            "0x0289248C",
+            "0x02876248",
+            "0x02878B5C",
+            "0x02876550",
+            "0x028765B8",
+            "0x02878E04",
+            "0x02878E6C",
+            "0x028764A4",
+            "0x02878D58"
+          ],
+          "selector_contract": "all HBG-specific transaction, writer, and gate logic is guarded by live-proven selector 4; +0x0002 is not documented as a fixed weapon type",
+          "positive_stock_contract": "transaction and native counter writers use min(+0x45B capacity, signed +0x462 reserve)",
+          "zero_contract": "clear +0x45A/+0x0008/+0x062C/+0x063C and return to the adjacent native two-counter completion gate",
+          "negative_sentinel_contract": "preserve native decrement or gate behavior",
+          "indexed_cache_contract": "no +0x480/+0x481 writes; selector-5 cache modifications removed",
+          "static_verification": "hook preimages 9/9; native transaction/writer/gate context 18/18; PPCAssembler 174/174; branch ranges 72/72; structural 13/13; semantic 11/11; manifest 8/8; active conflicts 0",
+          "gameplay": "failed: Flaming S held siege continued firing after magazine and real reserve reached zero",
+          "artifact": ".codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V9-Selector4-Native-Writers-20260822/",
+          "corrected_root_cause": "0x028764A4/0x02878D58 are dominated by ammo class == 2 (index 10); ammo indices 7..9 map to class 1 and bypass both gates."
+        },
+        "v10_candidate": {
+          "mapping_state": "ppc-all-ammo-siege-entry-gate-candidate",
+          "runtime_state": "gameplay-pending",
+          "pack_state": "external-runtime-experimental-v10-installed-local",
+          "supersedes": "v9 gameplay failure",
+          "entry_hooks": [
+            "0x02875DEC",
+            "0x02878738"
+          ],
+          "entry_preimage": "0x7C0802A6 (mflr r0) at both entries",
+          "all_ammo_proof": {
+            "path_a": "0x02876498 cmpwi r26,2 dominates legacy gate 0x028764A4",
+            "path_b": "0x02878D4C cmpwi r25,2 dominates legacy gate 0x02878D58",
+            "mapping": "indices 7..9 -> class 1; index 10 -> class 2"
+          },
+          "zero_contract": "selector 4 and signed +0x462 == 0 clears +0x45A/+0x0008/+0x062C/+0x063C and returns from the fire function before ammo dispatch/projectile generation",
+          "positive_or_negative_contract": "replay mflr r0 and execute the complete original function",
+          "hook_set": [
+            "0x02875DEC",
+            "0x02878738",
+            "0x0289248C",
+            "0x02876248",
+            "0x02878B5C",
+            "0x02876550",
+            "0x028765B8",
+            "0x02878E04",
+            "0x02878E6C",
+            "0x028764A4",
+            "0x02878D58"
+          ],
+          "static_verification": "hook preimages 11/11; native transaction/writer/gate/class context 22/22; PPCAssembler 206/206; relocations 80; branch ranges 80/80; structural 16/16; semantic 14/14; manifest 10/10; active conflicts 0",
+          "gameplay": "pending: held Flaming-S siege must reject the next trigger after reserve zero without stance switching; then other ammo, normal fire, stance/ammo switching, GL/LBG regression",
+          "artifact": ".codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V10-All-Ammo-Siege-Entry-Gate-20260823/"
+        }
       }
     },
     {
@@ -605,7 +920,11 @@
       "name_zh": "按a回血",
       "name_en": "Press A to heal",
       "source_mechanism": "arm-hotkey-routine",
-      "source_sites": ["0x00c9e8dc", "+0x0050", "+0x1398"],
+      "source_sites": [
+        "0x00c9e8dc",
+        "+0x0050",
+        "+0x1398"
+      ],
       "source_semantics_zh": "当当前 HP 低于 150 且 3DS A 按住时，每个金手指执行周期把 16 位 HP 加 1。",
       "source_semantics_en": "When current HP is below 150 and 3DS A is held, add one to the 16-bit HP value on every cheat-engine execution tick.",
       "probe_batch": "controller-action-hooks",
@@ -613,7 +932,11 @@
       "target_strategy_en": "Static matching found HP-change function 0x02865D08: 0x02865FEC loads current HP at player-state +0x640, +0x642 is maximum HP, and r31 holds the signed delta. Runtime evidence confirms current-frame Wii U A mask 0x2000 and a live 100/100 HP field pair. Next capture the damage/healing writer while injured before designing a cross-function bridge clamped to the real maximum.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["normalized-input-code-window", "input-a-persistent", "player-state-village"],
+      "runtime_evidence_refs": [
+        "normalized-input-code-window",
+        "input-a-persistent",
+        "player-state-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02865d08",
@@ -655,7 +978,11 @@
       "name_zh": "冷热饮效果",
       "name_en": "Hot and cold drink effect",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00c9e8dc", "+0x0050", "+0x16cc/+0x16d0/+0x16d8/+0x16dc"],
+      "source_sites": [
+        "0x00c9e8dc",
+        "+0x0050",
+        "+0x16cc/+0x16d0/+0x16d8/+0x16dc"
+      ],
       "source_semantics_zh": "把玩家对象四个 32 位浮点冷热饮计时字段持续写为 0x468CA000（18000.0）。",
       "source_semantics_en": "Continuously write float 0x468CA000 (18000.0) to four hot/cold-drink timer fields in the player object.",
       "probe_batch": "player-inventory-roots",
@@ -663,7 +990,10 @@
       "target_strategy_en": "Static matching found PPC per-frame state updater 0x02892294: player-state +0x974/+0x978 and +0x980/+0x984 are two current/previous float-timer pairs, updated by 0x02893150..0x02893238 and 0x028932B0..0x02893394. Drink the matching beverage in hot and cold quests and capture both pairs to identify which pair represents each effect before selecting a writer that maintains only a positive timer without overwriting environment state.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["player-state-village", "drink-timers-village-baseline"],
+      "runtime_evidence_refs": [
+        "player-state-village",
+        "drink-timers-village-baseline"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02892294",
@@ -681,7 +1011,12 @@
         "second_previous_write": "0x02893334",
         "second_previous_write_preimage": "0xd1470984",
         "player_state_register": "r7",
-        "timer_pair_offsets": ["0x0974", "0x0978", "0x0980", "0x0984"],
+        "timer_pair_offsets": [
+          "0x0974",
+          "0x0978",
+          "0x0980",
+          "0x0984"
+        ],
         "trace_spec": "docs/research/traces/mh3g-dynamic-32-drink-timers.json",
         "patch_constraint_zh": "静态证据尚不能区分哪一组是热饮或冷饮；不得把四个字段永久写死为 18000.0，也不得覆盖 0、环境切换或任务初始化。必须先完成高温和低温各一次受控 trace。",
         "patch_constraint_en": "Static evidence does not yet identify which pair is hot-drink versus cold-drink state. Do not force all four fields permanently to 18000.0 or overwrite zero, environment transitions, or quest initialization. Complete one controlled hot-area and one cold-area trace first.",
@@ -694,7 +1029,9 @@
       "name_zh": "L+←破坏所有设置物/R+←恢复正常",
       "name_en": "L+Left destroys placed objects; R+Left restores them",
       "source_mechanism": "arm-hotkey-routine",
-      "source_sites": ["0x00635378"],
+      "source_sites": [
+        "0x00635378"
+      ],
       "source_semantics_zh": "L+左把 ARM `cmp r2,r0` 改为 `cmp r0,r0`，R+左恢复原指令；它切换放置物匹配判定，并非直接遍历删除对象。",
       "source_semantics_en": "L+Left changes ARM `cmp r2,r0` to `cmp r0,r0`, while R+Left restores it; this toggles placed-object matching rather than directly iterating and deleting objects.",
       "probe_batch": "controller-action-hooks",
@@ -702,7 +1039,12 @@
       "target_strategy_en": "Static matching found the PPC 64-slot placed-object lookup at 0x02189FF4, threshold comparator at 0x0218A38C, and combined entry at 0x0218A3A0. Records are 12 bytes with ID at +0 and state/threshold byte at +7; runtime evidence confirms current-frame L/R/Left masks 0x0100/0x0200/0x0080. Next trace real placement, repeated placement, and removal at the comparator plus durable toggle state before designing the reversible input gate.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["normalized-input-code-window", "input-l-persistent", "input-r-persistent", "input-left-persistent"],
+      "runtime_evidence_refs": [
+        "normalized-input-code-window",
+        "input-l-persistent",
+        "input-r-persistent",
+        "input-left-persistent"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x0218a3a0",
@@ -739,7 +1081,10 @@
       "name_zh": "可以设置多个炸弹、陷阱和肉",
       "name_en": "Allow multiple bombs, traps, and meat",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x08115eb0", "+0x12ca/+0x12cb/+0x12cc"],
+      "source_sites": [
+        "0x08115eb0",
+        "+0x12ca/+0x12cb/+0x12cc"
+      ],
       "source_semantics_zh": "沿 3DS 玩家根指针把炸弹、陷阱和肉的三个 8 位已放置计数持续清零。",
       "source_semantics_en": "Follow the 3DS player root and continuously zero three 8-bit placed counts for bombs, traps, and meat.",
       "probe_batch": "player-inventory-roots",
@@ -747,7 +1092,9 @@
       "target_strategy_en": "Static matching maps the three 3DS counters exactly to Wii U player-state +0x572/+0x573/+0x574 and finds three native admission helpers: 0x0289A014 tests whether +0x572 is zero, 0x0289A608 tests +0x573 below three, and 0x0289A728 tests +0x574 below two. Repeatedly place bombs, traps, and meat while recording the helper hit, counter transition, and rejection point; after runtime identifies each item-to-field relationship, prefer relaxing the admission checks.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["player-state-village"],
+      "runtime_evidence_refs": [
+        "player-state-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x0289a014",
@@ -762,7 +1109,11 @@
         "two_limit_function_preimage": "0x7c0802a6",
         "two_limit_check": "0x0289a738",
         "two_limit_check_preimage": "0x88080574",
-        "placed_count_offsets": ["0x0572", "0x0573", "0x0574"],
+        "placed_count_offsets": [
+          "0x0572",
+          "0x0573",
+          "0x0574"
+        ],
         "trace_specs": [
           "docs/research/traces/mh3g-dynamic-58-placed-count-zero-limit.json",
           "docs/research/traces/mh3g-dynamic-58-placed-count-three-limit.json",
@@ -779,7 +1130,11 @@
       "name_zh": "氧气无限",
       "name_en": "Infinite oxygen",
       "source_mechanism": "arm-code-cave",
-      "source_sites": ["0x008e6990", "0x0033c148", "0x00af49e8"],
+      "source_sites": [
+        "0x008e6990",
+        "0x0033c148",
+        "0x00af49e8"
+      ],
       "source_semantics_zh": "一处把氧气相关 +0x54 的读取改为写回，另一处调用临时例程把 +0x56 写为 150；两条原生更新路径都被覆盖。",
       "source_semantics_en": "Change one oxygen-related +0x54 load into a write and redirect another path through a scratch routine that writes 150 to +0x56, covering both native update paths.",
       "probe_batch": "direct-native-hooks",
@@ -787,7 +1142,9 @@
       "target_strategy_en": "Static cross-architecture matching found PPC oxygen-delta function 0x02863EEC: r4 is the signed delta, r10+0x65C is current oxygen, r10+0x65E is the cap, and 0x02863F20 writes current oxygen; the HUD reads the same cap at 0x02601DA8. After entering water, capture a real negative delta at 0x02863F0C to prove the object and call semantics, then suppress only oxygen consumption while preserving refill, initialization, water exit, and HUD updates.",
       "mapping_state": "ppc-candidate",
       "runtime_state": "partial-runtime-evidence",
-      "runtime_evidence_refs": ["player-state-village"],
+      "runtime_evidence_refs": [
+        "player-state-village"
+      ],
       "pack_state": "not-created",
       "ppc_candidate": {
         "function_entry": "0x02863eec",
@@ -814,7 +1171,12 @@
       "name_zh": "当前区域怪物一击必杀 大怪可直接捕获",
       "name_en": "One-hit KO for current-area monsters; large monsters immediately capturable",
       "source_mechanism": "arm-runtime-pointer",
-      "source_sites": ["0x00b89c0c", "+0x48a8", "+0x0438", "+0x1558"],
+      "source_sites": [
+        "0x00b89c0c",
+        "+0x48a8",
+        "+0x0438",
+        "+0x1558"
+      ],
       "source_semantics_zh": "沿 3DS 当前区域管理器多级指针，把怪物对象 +0x1558 的 32 位状态字段写为 0x18。",
       "source_semantics_en": "Follow a multi-level 3DS current-area manager chain and write 0x18 to a 32-bit monster-object state field at +0x1558.",
       "probe_batch": "monster-runtime-state",

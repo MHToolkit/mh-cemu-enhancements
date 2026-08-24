@@ -1,0 +1,149 @@
+{
+  "id": "mh3g-hd-jp-v96-dynamic-24-30-weapon-auto-refill",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Experimental",
+  "distribution_category": "combat-weapons",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "source_cheat_entries": [
+    24,
+    30
+  ],
+  "name_bilingual": "铳枪/轻弩/重弩自动补弹 V10 / Weapon Auto Refill V10",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/dynamic-24-30-weapon-auto-refill",
+  "install_folder": "MH3G HD JP v96 - Dynamic 24-30 - Weapon Auto Refill V10",
+  "rules": "rules.txt",
+  "patch": "patch_dynamic_24_30_weapon_auto_refill_v10.asm",
+  "preimages": [
+    {
+      "address": "0x02875DEC",
+      "word": "0x7C0802A6",
+      "meaning": "siege-fire function A entry; original mflr r0"
+    },
+    {
+      "address": "0x02878738",
+      "word": "0x7C0802A6",
+      "meaning": "siege-fire function B entry; original mflr r0"
+    },
+    {
+      "address": "0x0289248C",
+      "word": "0xC1A70440",
+      "meaning": "generic player update; common-magazine refill"
+    },
+    {
+      "address": "0x02876248",
+      "word": "0x396BFFFF",
+      "meaning": "siege transaction A common-magazine decrement"
+    },
+    {
+      "address": "0x02878B5C",
+      "word": "0x396BFFFF",
+      "meaning": "siege transaction B common-magazine decrement"
+    },
+    {
+      "address": "0x02876550",
+      "word": "0x38E7FFFF",
+      "meaning": "active siege path A +0x0008 decrement"
+    },
+    {
+      "address": "0x028765B8",
+      "word": "0x38E7FFFF",
+      "meaning": "active siege path A +0x063C decrement"
+    },
+    {
+      "address": "0x02878E04",
+      "word": "0x38E7FFFF",
+      "meaning": "active siege path B +0x0008 decrement"
+    },
+    {
+      "address": "0x02878E6C",
+      "word": "0x3929FFFF",
+      "meaning": "active siege path B +0x063C decrement"
+    },
+    {
+      "address": "0x028764A4",
+      "word": "0x894C0008",
+      "meaning": "path A legacy final-fire gate load; only ammo-index-10 branch"
+    },
+    {
+      "address": "0x02878D58",
+      "word": "0x88FB0008",
+      "meaning": "path B legacy final-fire gate load; only ammo-index-10 branch"
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x02876498",
+      "word": "0x2C1A0002",
+      "meaning": "中文：旧路径 A 门禁只位于 ammo class 2 分支，不能代表全弹种入口。 / English: The legacy path-A gate is class-2-only and is not an all-ammo entry gate."
+    },
+    {
+      "address": "0x0287649C",
+      "word": "0x40820148",
+      "meaning": "中文：非 class 2 弹种会绕过旧 A 门禁。 / English: Non-class-2 ammunition bypasses the legacy A gate."
+    },
+    {
+      "address": "0x02878D4C",
+      "word": "0x2C190002",
+      "meaning": "中文：旧路径 B 门禁同样只位于 ammo class 2 分支。 / English: The legacy path-B gate is likewise class-2-only."
+    },
+    {
+      "address": "0x02878D50",
+      "word": "0x40820148",
+      "meaning": "中文：非 class 2 弹种会绕过旧 B 门禁。 / English: Non-class-2 ammunition bypasses the legacy B gate."
+    }
+  ],
+  "known_risks": [
+    "中文：用户接受当前候选在重弩普通/蹲射姿态切换前后可能出现约 1～2 发状态或 HUD 同步延迟；是否属于原版 MH3G 行为尚未证实，皮皮鸟独立复测仍待回执。 / English: The user accepts a possible one-to-two-shot state or HUD synchronization delay around HBG normal/siege stance changes for this candidate; a vanilla MH3G origin is unproven and independent PipiNiao retest feedback is pending.",
+    "中文：一旦真实备弹归零后仍可无限生成弹丸、左上计数持续为负、输入卡死或崩溃，必须判失败，不能归入上述 1～2 发延迟。 / English: Indefinite projectile generation after zero real reserve, a persistently negative HUD counter, stuck input, or a crash is a failure and is not covered by the accepted one-to-two-shot delay.",
+    "中文：不得与 #25、#52、旧 V1～V9 或任何其他修改弹药状态的 Pack 同时启用。 / English: Do not combine with #25, #52, V1-V9, or any other pack that modifies ammunition state."
+  ],
+  "runtime_evidence": {
+    "date": "2026-08-23",
+    "cemu_build": "Nemessix Cemu 2.6 RelWithDebInfo / GDBStub Persistent build 1dcbefc",
+    "loaded_pack": "V9 confirmed active in Cemu log at 2026-08-23 20:40:43",
+    "guest_state_address": "0x2FF7D610",
+    "host_mapping_base": "0x300000000",
+    "selector_offset": "+0x0002",
+    "selector_value_during_visible_hbg_siege": 4,
+    "zero_reserve_snapshot": {
+      "+0x045A": 0,
+      "+0x045B": 0,
+      "+0x0462": 0,
+      "+0x0008": 1,
+      "+0x062C": 0,
+      "+0x063C": 0
+    },
+    "gameplay_observation": "With Flaming S and held siege stance, magazine and reserve reached zero but projectile generation continued.",
+    "object_identity_check": "+0x0608 contained big-endian 0x3F800000 (1.0), matching the known player/weapon state object"
+  },
+  "v10_design": {
+    "all_ammo_entry_a": "0x02875DEC hooks before ammo-index dispatch; original entry mflr r0 is replayed on the nonzero/sentinel path",
+    "all_ammo_entry_b": "0x02878738 hooks before ammo-index dispatch; original entry mflr r0 is replayed on the nonzero/sentinel path",
+    "state_pointer": "r3 outer player object +0x0E30 -> verified weapon runtime state",
+    "selector_contract": "+0x0002 == 4 only for the live-proven active HBG siege paths",
+    "positive_stock": "execute the full original A/B function and retain V9 min(capacity, reserve) synchronization",
+    "zero_stock": "clear +0x045A/+0x0008/+0x062C/+0x063C and return before any ammo-type dispatch or projectile-generation path",
+    "negative_sentinel": "execute the full original function; no new clamp applied",
+    "legacy_index10_gates": "retained as redundant state-consistency guards, not described as cross-ammo final gates",
+    "indexed_cache": "no +0x0480/+0x0481 writes"
+  },
+  "verification": {
+    "static": "PASS: hook preimages 11/11; native transaction/writer/gate/class context 22/22; real Cemu PPCAssembler 206/206; relocations 80; branch ranges 80/80; structural contract 16/16; semantic boundary model 14/14; manifest contract 10/10; active fixed-address conflicts 0",
+    "gameplay": "USER_ACCEPTED_FOR_EXTERNAL_RETEST_WITH_KNOWN_1_TO_2_SHOT_STANCE_SYNC_DELAY; INDEPENDENT PIPINIAO VERDICT PENDING"
+  },
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：铳枪开火后自动补回炮弹；轻弩和重弩普通射击后自动回填当前弹仓，同时真实弹药仍按原版逐发消耗，回填量不超过弹仓容量与当前备弹中的较小值。 状态：Runtime Experimental，默认关闭；用户接受姿态切换附近可能约 1～2 发同步延迟作为当前已知限制，皮皮鸟独立复测待回执。 / English: Automatically refills Gunlance shells and the current LBG/HBG magazine after normal shots while real ammunition is still consumed one round at a time, clamped to the smaller of magazine capacity and current reserve. Status: Runtime Experimental; disabled by default. The user accepts a possible one-to-two-shot sync delay around stance changes as the current known limitation; independent PipiNiao retest feedback is pending."
+}

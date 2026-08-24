@@ -11,6 +11,28 @@
 After the static phase, the conversion matrix contains exactly **21** remaining entries:
 10 runtime-pointer programs, 6 hotkey routines, and 5 ARM code caves.
 
+## 2026-08-18 gameplay addendum / 2026-08-18 玩法回执补记
+
+下文“当前状态”保留的是 2026-08-08 严格 GDB 研究基线；随后制作的 9+2 个独立
+实验交付包已经收到皮皮鸟回执：按包计 10 个通过、1 个部分通过。#12 为“启用态通过，
+停用前必须先处理超原版上限堆叠”；MH3G-007 V2 中铳枪、轻弩通过而重弩仍不生效。
+2026-08-21 已针对真正的重弩分弹种弹仓生成 V3 静态闭环候选，但重弩玩法仍待复测。
+逐项机器可读回执、边界以及 ZL/ZR 速度热键 V3 候选见
+[`mh3g-dynamic-gameplay-feedback-20260818.json`](mh3g-dynamic-gameplay-feedback-20260818.json)，
+完整解释见 [`../verification.md`](../verification.md)。该补记不会把未经玩法复测的 ZL/ZR
+改键 V3 或仍失败的重弩路径误标为通过。
+
+The “Current State” section below intentionally preserves the strict 2026-08-08
+GDB research baseline. The later 9+2 experimental handoff received ten passing
+archive verdicts and one partial verdict from PipiNiao. #12 passes while enabled
+but requires over-cap stacks to be reduced before disabling; MH3G-007 passes for
+Gunlance and Light Bowgun while Heavy Bowgun fails. A 2026-08-21 V3 candidate
+now closes the real HBG per-ammo magazine lifecycle statically, but still awaits
+HBG gameplay retest. See the
+[machine-readable receipt](mh3g-dynamic-gameplay-feedback-20260818.json) and the
+[full interpretation](../verification.md). This addendum does not promote the
+untested ZL/ZR-remapped V3 candidate or HBG V3 to a gameplay pass.
+
 这些 3DS 地址和偏移只作为源语义证据，**绝不直接写入 Wii U**。每个 Cemu
 Graphic Pack 都必须先取得 JP v96 PPC hook、原指令前像和至少一次对应游戏动作的
 GDB trace；在此之前只允许推进到 `ppc-candidate / not-traced / not-created`，不得
@@ -112,7 +134,7 @@ python3 scripts/cemu-gdb-probe.py trace \
 5. **Assembler verified**：Cemu 真实 PPCAssembler 接受全部指令和 relocation。
 6. **Gameplay pending**：安装和 trace 仍不等于玩法通过；实机对照完成前不得写 `Runtime Verified`。
 
-## 当前状态 / Current State
+## 2026-08-08 研究基线 / Research Baseline
 
 - 21/21 源 Gateway 程序已解码并按真实依赖分批。
 - 17/21 已推进到静态 PPC **候选**。这表示目标原生函数、字段或输入消费点已有
@@ -140,8 +162,26 @@ python3 scripts/cemu-gdb-probe.py trace \
   - #24 铳枪弹药自填：共享武器状态函数 `0x02856C0C` 在
     `0x02856CEC/0x02856D00` 把 `+0x45B` 来源弹数复制到 `+0x45A` 当前弹数，
     并保留 `+0x462` 原生上限钳制。
-  - #30 弩系自动装填：与 #24 共用函数和字段，备用类型/状态分支在
-    `0x02856D7C/0x02856D90` 执行相同复制；轻弩与重弩仍需分别 trace。
+  - #30 弩系自动装填：与 #24 共用 `+0x45A/+0x45B`，真实备弹位于
+    signed `+0x462`。V9 已被 2026-08-23 实机复测否定：火炎弹保持蹲姿时，
+    公共弹仓与真实备弹均为零后仍可生成弹丸。固定 JP-v96 RPX 的控制流给出
+    直接根因，而不是继续猜字段：V9 的 A/B 门禁 `0x028764A4/0x02878D58`
+    分别受 `0x02876498: cmpwi r26,2` 与 `0x02878D4C: cmpwi r25,2` 支配，
+    所以只覆盖 ammo index 10；火炎弹等 index 7..9 在入口映射为 class 1，
+    会绕过两处门禁。V10 新增两条跨弹种入口 hook `0x02875DEC/0x02878738`：
+    在弹种分流前读取外层玩家对象 `+0x0E30` 的武器运行态，且仅在实机已证明
+    的 selector 4、signed `+0x462 == 0` 时清空
+    `+0x45A/+0x0008/+0x062C/+0x063C` 并直接返回，阻断本次弹丸生成；正库存和
+    负数哨兵完整重放原函数入口。旧 V9 的事务/计数 writer 仍保留作状态一致性
+    保护，但不再称其 index-10 门禁为跨弹种“最终门禁”。V10 静态通过 11/11
+    hook 前像、22/22 原生上下文、206/206 Cemu PPCAssembler、80/80 分支、
+    16/16 结构、14/14 语义和 10/10 Manifest；已安装本机。2026-08-24 用户决定
+    冻结这一候选并交给皮皮鸟独立复测，接受重弩普通/蹲射姿态切换附近可能约 1～2 发
+    状态或 HUD 同步延迟作为当前已知边界，但“源于原版 MH3G”仍只是未经证实的推测。
+    该接受不等于 `Runtime Verified`：零备弹后无限开火、持续负数、卡死或崩溃仍判失败。
+    V10 已作为显式选择的 `Runtime Experimental` Pack 纳入仓库；首要外部验收仍是火炎弹
+    保持蹲姿打到备弹 0 后不能持续生成弹丸，再回归其他弹种、普通射击、切姿势/切弹、
+    铳枪和轻弩。
   - #31 按 A 回血：HP 变更函数 `0x02865D08` 使用 `+0x640/+0x642` 作为当前/
     最大 HP，`r31` 保存有符号变化量；A 的归一化掩码为 `0x2000`，但输入轮询与
     HP writer 不在同一寄存器生命周期内。
