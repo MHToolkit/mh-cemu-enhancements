@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "item-box-interface",
   "default_install": false,
   "availability": "runtime-blocked",
   "availability_reason": "红箱与原生可交互蓝箱的运行时对照均无法在任务场景 / quest scene 中打开完整道具箱；该菜单依赖据点专属 UI 状态调度链，当前补丁不再提供安装。 / Runtime tests of both the red box and the normally interactive blue control failed to open the full item box in a quest scene; the menu depends on a hub-only UI state-dispatch chain, so this patch is no longer installable.",
@@ -219,5 +220,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "红箱与蓝箱对照均无法在任务场景启动据点完整仓库生命周期；保留为不可安装的失败证据。 / Both red and blue controls failed to start the hub full-item-box lifecycle in a quest scene; retained as non-installable negative evidence."
+  "summary": "中文：该研究候选曾把红色交纳箱提示/交互选择器改成可用状态，并尝试以完整模式调用大厅仓库初始化器，目标是只从任务红箱打开完整家中道具箱。 状态：Runtime Experimental / runtime-blocked，不可安装。 / English: This research candidate changed the red delivery-box prompt/interaction selector to a usable state and attempted a full-mode call into the lobby item-box initializer, aiming to open the complete home item box from the quest red box only. Status: Runtime Experimental / runtime-blocked; not installable."
 }

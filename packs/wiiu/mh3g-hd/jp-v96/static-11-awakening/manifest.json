@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "skills-immunities",
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
@@ -82,5 +83,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #11“里属性觉醒”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #11 \"Awakening\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：强制发动“觉醒”，解放武器原本灰显或隐藏的元素/异常属性，使该潜在属性参与面板与攻击结算。 状态：Runtime Experimental，默认关闭。 / English: Forces Awaken, releasing a weapon's grayed-out or latent element/status so it participates in the status screen and attack resolution. Status: Runtime Experimental; disabled by default."
 }

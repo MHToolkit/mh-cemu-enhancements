@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #4 sharpness-state candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "用一次普通近战命中验证 0x0285F01C 是斩味更新函数，r7 指向玩家状态，+0xAFC/+0xAFE/+0xAFB 分别是当前斩味、上限和档位缓存。只记录，不修改寄存器或内存。",
+  "purpose_en": "Use one ordinary melee hit to prove that 0x0285F01C is the sharpness updater, r7 points to player state, and +0xAFC/+0xAFE/+0xAFB are current sharpness, its cap, and the cached tier. Record only; do not alter registers or memory.",
+  "operator_steps_zh": [
+    "在任务中装备斩味已知的近战武器，关闭利刃、刚刃研磨等可能改变扣减路径的效果，并记下当前斩味颜色和可见长度。",
+    "启动 tracer 后只进行普通命中，直到一次性断点命中；不要磨刀、换区、换装或使用会恢复斩味的动作。",
+    "对照 r7+0xAFC 的 16 位值、+0xAFE 上限与 +0xAFB 档位；至少用第二次独立 trace 证明当前值随有效命中递减且上限不变，才可升级映射。"
+  ],
+  "operator_steps_en": [
+    "In a quest, equip a melee weapon with known sharpness, disable Razor Sharp, Protective Polish, and other effects that can alter the drain path, and note the visible color and length.",
+    "After starting the tracer, perform ordinary hits only until the one-shot breakpoint triggers; do not sharpen, change areas or equipment, or use a sharpness-restoring action.",
+    "Compare the halfword at r7+0xAFC, cap +0xAFE, and tier +0xAFB. Require a second independent trace showing current sharpness decrease on a valid hit while the cap stays stable before promotion."
+  ],
+  "breakpoints": [
+    {
+      "label": "ordinary_sharpness_delta",
+      "address": "0x0285f0f4",
+      "expected_word": "0xa9870afc"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_sharpness_fields",
+      "register": "r7",
+      "offset": 2800,
+      "size": 32
+    }
+  ]
+}

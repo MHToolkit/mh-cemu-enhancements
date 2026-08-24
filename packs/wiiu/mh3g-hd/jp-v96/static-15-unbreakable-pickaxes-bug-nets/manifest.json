@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "balance-breaking",
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
@@ -79,5 +80,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #15“铁镐和虫网不会损坏”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #15 \"Unbreakable Pickaxes and Bug Nets\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental."
+  "summary": "中文：把铁镐和虫网的耐久余量固定为 100，并强制相关损坏保护检查，使采矿和捕虫使用后不再随机损坏工具。 状态：Runtime Experimental，默认关闭。 / English: Fixes pickaxe and bug-net durability remainder at 100 and forces the related break-protection checks so mining and bug catching no longer randomly destroy those tools. Status: Runtime Experimental; disabled by default."
 }

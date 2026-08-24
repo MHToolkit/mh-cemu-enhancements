@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #58 placed-count +0x572 zero-limit candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证 0x0289A014 是玩家已放置物准入 helper，r12+0x572 是要求为零的 8 位计数，并通过受控放置确定它对应炸弹、陷阱还是肉。只记录，不修改。",
+  "purpose_en": "Prove that 0x0289A014 is a placed-object admission helper, r12+0x572 is an 8-bit counter required to be zero, and identify whether it belongs to bombs, traps, or meat through controlled placement. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "进入稳定任务并确保场上没有炸弹、陷阱或肉；启动 tracer 后按固定顺序各尝试一次，记录哪一个动作触发命中。",
+    "使用全新输出文件，在第一个对象仍存在时再次尝试同类放置；同时记录游戏允许或拒绝的时刻。",
+    "只有两次 trace 显示 +0x572 从 0 到非零且命中严格对应同一物品类别，回收、爆炸或销毁后又恢复，才确认字段身份。"
+  ],
+  "operator_steps_en": [
+    "Enter a stable quest with no bombs, traps, or meat currently placed. Start the tracer, try each category once in a fixed order, and record which action triggers the hit.",
+    "With a fresh output file, attempt the same category again while the first object remains and record when the game accepts or rejects it.",
+    "Confirm field identity only when two traces show +0x572 transition from zero to nonzero strictly for the same category and return after pickup, explosion, or destruction."
+  ],
+  "breakpoints": [
+    {
+      "label": "placed_count_zero_limit",
+      "address": "0x0289a018",
+      "expected_word": "0x880c0572"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_placed_counts",
+      "register": "r12",
+      "offset": 1384,
+      "size": 32
+    }
+  ]
+}

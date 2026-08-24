@@ -1,0 +1,289 @@
+{
+  "id": "mh3g-hd-jp-v96-equipment-crafting-upgrade-no-materials",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Verified",
+  "distribution_category": "balance-breaking",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "conversion_confidence": "exact-callsite-family",
+  "name_bilingual": "装备制造与强化无需材料（含生产解锁） / Craft and Upgrade Without Materials (Includes Production Unlock)",
+  "exclusive_group": "mh3g-hd-jp-v96-equipment-unlock-materials",
+  "source_cheat_name": "装备制造&强化无需材料",
+  "source_arm_patches": [
+    {
+      "address": "0x00af4aec",
+      "word": "0xe59fe010"
+    },
+    {
+      "address": "0x00af4af0",
+      "word": "0xe59d8014"
+    },
+    {
+      "address": "0x00af4af4",
+      "word": "0xe158000e"
+    },
+    {
+      "address": "0x00af4af8",
+      "word": "0x0a000000"
+    },
+    {
+      "address": "0x00af4afc",
+      "word": "0xe3a00063"
+    },
+    {
+      "address": "0x00af4b00",
+      "word": "0xe8bd81f0"
+    },
+    {
+      "address": "0x00af4b04",
+      "word": "0x005ec3a0"
+    },
+    {
+      "address": "0x00992c58",
+      "word": "0xea0587a3"
+    },
+    {
+      "address": "0x00990f9c",
+      "word": "0xe3a00001"
+    },
+    {
+      "address": "0x0042a848",
+      "word": "0xe3a00063"
+    }
+  ],
+  "source_arm_preimages": [
+    {
+      "address": "0x00af4aec",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00af4af0",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00af4af4",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00af4af8",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00af4afc",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00af4b00",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00af4b04",
+      "word": "0x00000000"
+    },
+    {
+      "address": "0x00992c58",
+      "word": "0xe8bd81f0"
+    },
+    {
+      "address": "0x00990f9c",
+      "word": "0x13a00001"
+    },
+    {
+      "address": "0x0042a848",
+      "word": "0xeb1596d9"
+    }
+  ],
+  "source_semantics": "The ARM code cave changes the combined material-count function to 99 for every caller except return address 0x005EC3A0; two direct patches also force the equipment unlock bit and an item-box-only count to 99. The PPC conversion replaces the exact twenty-five non-exempt direct callers, preserves mapped caller 0x021F74AC, covers two compiler-duplicated item-box calls, and bypasses the matching unlock-bit rejection.",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/equipment-crafting-upgrade-no-materials",
+  "install_folder": "MH3G HD JP v96 - Equipment - Craft Upgrade No Materials",
+  "rules": "rules.txt",
+  "patch": "patch_equipment_crafting_upgrade_no_materials.asm",
+  "preimages": [
+    {
+      "address": "0x02182c30",
+      "word": "0x48018935",
+      "meaning": "中文：第一条由 PPC 编译器展开出的原生仓库材料总数调用，改为返回 99。 / English: First compiler-expanded native item-box material-total call, replaced with 99."
+    },
+    {
+      "address": "0x02182c90",
+      "word": "0x480188d5",
+      "meaning": "中文：第二条由 PPC 编译器展开出的原生仓库材料总数调用，改为返回 99。 / English: Second compiler-expanded native item-box material-total call, replaced with 99."
+    },
+    {
+      "address": "0x02198fc8",
+      "word": "0x4182000c",
+      "meaning": "中文：源金手指附带的装备生产解锁位判定，改为所有有效 ID 通过。 / English: Equipment-production unlock-bit gate bundled by the source cheat, changed so every valid ID passes."
+    },
+    {
+      "address": "0x021c4014",
+      "word": "0x4bfd7611",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021c4060",
+      "word": "0x4bfd75c5",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021c40b0",
+      "word": "0x4bfd7575",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021cb7c8",
+      "word": "0x4bfcfe5d",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021d25f0",
+      "word": "0x4bfc9035",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021d48b4",
+      "word": "0x4bfc6d71",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021d4918",
+      "word": "0x4bfc6d0d",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021d49fc",
+      "word": "0x4bfc6c29",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021d4a80",
+      "word": "0x4bfc6ba5",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021d80e0",
+      "word": "0x4bfc3545",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021eca44",
+      "word": "0x4bfaebe1",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021eefec",
+      "word": "0x4bfac639",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021ef95c",
+      "word": "0x4bfabcc9",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x021f79a8",
+      "word": "0x4bfa3c7d",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x02206d6c",
+      "word": "0x4bf948b9",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0220967c",
+      "word": "0x4bf91fa9",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0221b2b4",
+      "word": "0x4bf80371",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0221bc38",
+      "word": "0x4bf7f9ed",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0221c09c",
+      "word": "0x4bf7f589",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0221c44c",
+      "word": "0x4bf7f1d9",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0221c548",
+      "word": "0x4bf7f0dd",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x02226fb0",
+      "word": "0x4bf74675",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x02228298",
+      "word": "0x4bf7338d",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x02238858",
+      "word": "0x4bf62dcd",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    },
+    {
+      "address": "0x0269504c",
+      "word": "0x4bb065d9",
+      "meaning": "中文：调用原生“背包、备用背包与仓库合计数量”函数的源等价调用点，改为直接返回 99。 / English: Source-equivalent call to the native combined pouch, alternate-pouch, and item-box count routine, replaced with a direct return value of 99."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x0219b624",
+      "word": "0x7c0802a6",
+      "meaning": "中文：Wii U 原生“背包、备用背包与仓库合计数量”函数入口。 / English: Entry of the native Wii U combined pouch, alternate-pouch, and item-box count routine."
+    },
+    {
+      "address": "0x021f74ac",
+      "word": "0x4bfa4179",
+      "meaning": "中文：与 ARM 返回地址 0x005EC3A0 精确对应的唯一豁免调用，必须保留真实数量。 / English: The unique exempt call exactly corresponding to ARM return address 0x005EC3A0; it must retain the real count."
+    },
+    {
+      "address": "0x021f74b0",
+      "word": "0x2c030000",
+      "meaning": "中文：豁免调用后继续使用真实返回数量的比较。 / English: Comparison that consumes the real result after the exempt call."
+    },
+    {
+      "address": "0x0219b564",
+      "word": "0x7c0802a6",
+      "meaning": "中文：Wii U 原生仓库材料总数函数入口；两条 PPC 展开调用被单独覆盖。 / English: Entry of the native Wii U item-box material-total routine; two compiler-expanded calls are covered separately."
+    },
+    {
+      "address": "0x02198fa8",
+      "word": "0x2805ffff",
+      "meaning": "中文：附带生产解锁补丁所属的原生有效 ID 检查入口。 / English: Native valid-ID check that owns the bundled production-unlock patch."
+    }
+  ],
+  "known_risks": [
+    "中文：3DS 原版铁匠铺会受共享 ARM 数量钩子影响而把材料显示为 99；2026-08-11 的 JP-v96 隔离实测中，Cemu 端生产与强化均能以零材料通过，但铁匠铺和其他界面保持正常数量显示、没有 99 或空白。这是跨架构调用图差异带来的更窄外部表现，不影响核心无需材料效果；后续新界面仍需留意数量显示。 / English: The original 3DS smithy shows material counts as 99 because its shared ARM count hook also reaches display callers. In the isolated JP-v96 test on 2026-08-11, Cemu production and upgrade both passed with zero materials while smithy and other UI counts remained normal, with no 99 or blank display. This narrower externally visible behavior comes from the cross-architecture call-graph difference and does not affect the core no-material requirement; newly tested screens should still be checked.",
+    "中文：2026-08-11 的更正实测确认：启用后会完整忽略材料需求，生产与强化均不扣除实际持有的材料；这不是向背包或仓库生成 99 个物品。 / English: Corrected gameplay evidence on 2026-08-11 confirms that enabling the pack fully ignores material requirements and production or upgrade does not deduct materials actually owned; it still does not create ninety-nine real items in the pouch or item box.",
+    "中文：本包已经包含“装备生产全解锁”的同一 PPC 写入，禁止与独立解锁包同时启用；金钱条件不在本包范围内。 / English: This pack already includes the same PPC write as Unlock All Equipment Production and must not be enabled with that independent pack; money requirements are outside this pack."
+  ],
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：把装备生产与强化所用的非豁免材料数量判定伪装为 99，并附带装备生产全解锁；2026-08-11 更正实测确认，零材料时也能生产和强化，实际持有的真实材料不会被扣除。 状态：Runtime Verified，默认关闭。 / English: Spoofs the non-exempt material-availability checks used by equipment production and upgrade as 99 and bundles production unlock; corrected gameplay evidence on 2026-08-11 confirmed that both actions work with zero materials and do not deduct real materials already owned. Status: Runtime Verified; disabled by default."
+}

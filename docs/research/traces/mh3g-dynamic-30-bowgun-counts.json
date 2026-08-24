@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #30 Bowgun current/source magazine candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在弩系换弹状态变化中验证备用分支 0x02856D7C 的 r7 玩家状态、+0x45A 当前装填、+0x45B 来源/上限、+2 武器类型和 +0x45D 弹种索引。只记录，不修改。",
+  "purpose_en": "During a Bowgun reload-state transition, prove r7 player state on alternate branch 0x02856D7C, current magazine +0x45A, source/capacity +0x45B, weapon type +2, and ammo subtype +0x45D. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "分别为轻弩和重弩准备一组装填数已知、可正常换弹的弹种；每次 trace 只使用其中一种武器和一种弹。",
+    "打空或消耗至少一发，启动 tracer 后只执行一次标准换弹，不切弹、不换装、不使用自动装填技能。",
+    "轻弩与重弩各完成一次独立命中；确认 r7+2 类型值、+0x45D 弹种索引、+0x45B 满装填数和 +0x45A 当前值与 HUD 一致后才可升级。"
+  ],
+  "operator_steps_en": [
+    "Prepare one normally reloadable ammo type with known capacity for both Light and Heavy Bowgun; use only one weapon and one ammo type per trace.",
+    "Spend at least one round, start the tracer, and perform exactly one standard reload without switching ammo, changing equipment, or enabling an auto-reload skill.",
+    "Obtain independent hits for Light and Heavy Bowgun. Promote only after r7+2 type, +0x45D ammo subtype, +0x45B full capacity, and +0x45A current count agree with the HUD."
+  ],
+  "breakpoints": [
+    {
+      "label": "bowgun_source_count_load",
+      "address": "0x02856d7c",
+      "expected_word": "0x8927045b"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "weapon_count_fields",
+      "register": "r7",
+      "offset": 1104,
+      "size": 32
+    }
+  ]
+}

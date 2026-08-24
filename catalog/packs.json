@@ -15,6 +15,18 @@
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/custom-felyne-food-skills/manifest.json"
     },
     {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/dynamic-24-30-weapon-auto-refill/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/equipment-production-unlock/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/equipment-crafting-upgrade-no-materials/manifest.json"
+    },
+    {
+      "manifest": "packs/wiiu/mh3g-hd/jp-v96/equipment-crafting-upgrade-no-money/manifest.json"
+    },
+    {
       "manifest": "packs/wiiu/mh3g-hd/jp-v96/quest-blue-supply-box-full-item-box-control/manifest.json"
     },
     {

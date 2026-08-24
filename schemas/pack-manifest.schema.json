@@ -4,7 +4,8 @@
   "type": "object",
   "required": [
     "id", "platform", "title", "title_id", "title_slug", "region", "update", "status",
-    "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license"
+    "distribution_category",
+    "default_install", "availability", "pack_dir", "install_folder", "rules", "source", "license", "summary"
   ],
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
@@ -15,6 +16,17 @@
     "region": { "type": "string" },
     "update": { "type": "string" },
     "status": { "enum": ["Static Verified", "Runtime Experimental", "Runtime Verified"] },
+    "distribution_category": {
+      "enum": [
+        "frame-rate",
+        "speed",
+        "skills-immunities",
+        "combat-weapons",
+        "balance-breaking",
+        "quality-of-life",
+        "item-box-interface"
+      ]
+    },
     "default_install": { "type": "boolean" },
     "auto_experimental_install": { "type": "boolean" },
     "availability": { "enum": ["available", "runtime-blocked"] },
@@ -58,7 +70,8 @@
         "module_checksum": { "type": "string", "pattern": "^0x[0-9a-fA-F]{8}$" }
       }
     },
-    "license": { "type": "string" }
+    "license": { "type": "string" },
+    "summary": { "type": "string", "minLength": 1 }
   },
   "$defs": {
     "wordAssertions": {

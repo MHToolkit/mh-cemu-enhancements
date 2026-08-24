@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #20 derived-defense candidate writeback",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在一次受控的防具防御变化中，验证 0x02867CB4 是防御派生函数、r10 指向玩家状态、+0x6EA 是 16 位防御值且 +0x6F0 是相邻显示浮点值。只记录，不修改寄存器或内存。",
+  "purpose_en": "During one controlled armor-defense change, prove that 0x02867CB4 is the defense-derivation function, r10 points to player state, +0x6EA is the 16-bit defense value, and +0x6F0 is the adjacent display float. Record only; do not alter registers or memory.",
+  "operator_steps_zh": [
+    "在稳定大厅记下当前面板防御，准备一件会让总防御明显变化的防具；不要同时更换武器、护石或猫饭。",
+    "启动 tracer 后只更换一次准备好的防具，随后打开一次状态面板，不执行其他会改变防御的动作。",
+    "只有 JSONL 命中与本次更换一致，且 r10+0x6EA 的半字与面板防御变化相符、+0x6F0 同步变化时，才把该候选升级为 ppc-mapped。"
+  ],
+  "operator_steps_en": [
+    "In a stable lobby, note the current displayed defense and prepare one armor piece that clearly changes total defense; do not also change weapons, charms, or food.",
+    "After starting the tracer, equip only that armor piece once and open the status panel once without performing another defense-changing action.",
+    "Promote the candidate to ppc-mapped only when the JSONL hit corresponds to that change, the halfword at r10+0x6EA matches the displayed defense transition, and +0x6F0 changes consistently."
+  ],
+  "breakpoints": [
+    {
+      "label": "derived_defense_writeback_state",
+      "address": "0x02867d14",
+      "expected_word": "0xa00a06ea"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_defense_fields",
+      "register": "r10",
+      "offset": 1760,
+      "size": 32
+    }
+  ]
+}

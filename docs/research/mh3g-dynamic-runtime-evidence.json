@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "captured_at": "2026-08-08",
+  "scope": "MH3G HD JP v96 dynamic 3DS-to-PPC mapping research",
+  "target": {
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "runtime": {
+    "nemessix_commit": "1dcbefc1564f5dfed55dbdbfb7903f3470f15579",
+    "nemessix_pr": "https://github.com/MHToolkit/nemessix/pull/19",
+    "source_artifact_executable_sha256": "e4c9502e4f9d052ef43c09dd4dcb3ad88f90078593053789ce8304b9eb562356",
+    "persistent_breakpoint_evidence_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/nemessix-cemu-gdbstub-persistent-1dcbefc-20260808T145426Z/evidence/persistent-breakpoint-evidence.json",
+    "persistent_breakpoint_evidence_sha256": "28a63e16ce6d9c776169909dbc4427bf8e287dc108cc4db2d43cb99c32f38e77",
+    "isolated_runtime_executable_sha256": "159c33cf5a3c3603840230c426e570444d69ae85175f6953ff653e49b97803d3",
+    "isolated_bundle_id": "info.cemu.Cemu.GDBPersistentProbe",
+    "same_process_pid": 73948,
+    "cpu_mode": "recompiler",
+    "gdb_endpoint": "127.0.0.1:1337",
+    "graphic_packs": "disabled for baseline tracing",
+    "save_and_configuration_policy": "copy-only isolated HOME, Cemu data root, MLC, controller profile, and settings"
+  },
+  "state_model": {
+    "partial-runtime-evidence": "A real runtime address, field, input mask, or candidate hook was observed, but the complete gameplay semantics and safe patch lifecycle are not yet proven.",
+    "gameplay-traced": "The requested gameplay action and all implementation-critical paths were captured under controlled conditions. No entry has this state yet."
+  },
+  "captures": [
+    {
+      "id": "speed-consumer-village-move",
+      "source_indices": [1, 2, 3],
+      "kind": "gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/speed-state-village-move-w-20260808T2235.jsonl",
+      "raw_size": 2845,
+      "raw_sha256": "ded2e12899f06b26ff201ceedd28809802a5c12e11ff249916fa707a9b8945a1",
+      "observed": {
+        "breakpoint": "0x028924ac",
+        "preimage": "0xc1070608",
+        "player_state_register": "r7",
+        "player_state": "0x2ff7d610",
+        "multiplier_address": "0x2ff7dc18",
+        "multiplier_offset": "0x0608",
+        "multiplier_u32": "0x3f800000",
+        "multiplier_float": 1.0,
+        "accumulator_offset": "0x0440",
+        "context": "Moga village while W movement input was being exercised"
+      },
+      "proves": "The JP-v96 per-frame player path really consumes a float at player-state +0x608.",
+      "does_not_prove": "No safe cross-function input-to-multiplier bridge, L/R release lifecycle, or requested 2x/3x gameplay behavior is proven."
+    },
+    {
+      "id": "normalized-input-code-window",
+      "source_indices": [1, 2, 3, 31, 57],
+      "kind": "runtime-memory-dump-plus-ppc-disassembly",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/input-normalizer-02bcb6d4-02bcba20.bin",
+      "raw_size": 844,
+      "raw_sha256": "fcd804fe3b787c29991ff584d5593c1f0d9d53590cb2aa3ed9166e4f453af55c",
+      "observed": {
+        "function_entry": "0x02bcb6d4",
+        "normalized_hold_store": "0x02bcb9cc",
+        "normalized_hold_store_preimage": "0x93bf0064",
+        "current_mask_register": "r29",
+        "previous_mask_register": "r30",
+        "input_object_register": "r31",
+        "input_object_current_offset": "0x0064",
+        "input_object_previous_offset": "0x0068"
+      },
+      "proves": "The input hook stores the current normalized mask from r29 and keeps the previous mask in r30/object +0x68.",
+      "does_not_prove": "It does not by itself associate a mask with a physical button; the controlled captures below provide that evidence."
+    },
+    {
+      "id": "input-a-persistent",
+      "source_indices": [31],
+      "kind": "conditional-persistent-gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-a-mask-persistent-20260808T2307.jsonl",
+      "raw_size": 233573,
+      "raw_sha256": "904a3c874f9cf4dc43295f015ff0573bbbc3887d16568e0949fc07784e0840bc",
+      "event_counts": {
+        "condition_miss": 833,
+        "condition_met": 1,
+        "hit": 1,
+        "complete": 1,
+        "resumed": 1
+      },
+      "observed": {
+        "button": "A",
+        "keyboard_binding": "U",
+        "breakpoint": "0x02bcb9cc",
+        "required_mask": "0x00002000",
+        "idle_value": "0x80080000",
+        "matched_value": "0x80082000",
+        "current_mask_register": "r29",
+        "previous_mask_register_value": "0x80080000"
+      },
+      "proves": "A is normalized to mask 0x2000, and the fixed Cemu stub can rearm this persistent breakpoint for at least 834 consecutive hits.",
+      "does_not_prove": "A input has not yet been bridged to the HP writer and no healing action was performed."
+    },
+    {
+      "id": "input-l-persistent",
+      "source_indices": [1, 2, 57],
+      "kind": "conditional-persistent-gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-l-mask-persistent-20260808T2308.jsonl",
+      "raw_size": 32748,
+      "raw_sha256": "cef81af67542c4b3efbf3a8462f9ca6afb257e5062da23e7cd54c11bf1b7c9e1",
+      "event_counts": {
+        "condition_miss": 108,
+        "condition_met": 1,
+        "hit": 1,
+        "complete": 1,
+        "resumed": 1
+      },
+      "observed": {
+        "button": "L",
+        "keyboard_binding": "Q",
+        "breakpoint": "0x02bcb9cc",
+        "required_mask": "0x00000100",
+        "idle_value": "0x80080000",
+        "matched_value": "0x80080100",
+        "current_mask_register": "r29"
+      },
+      "proves": "L is normalized to mask 0x0100 in the current-frame r29 value.",
+      "does_not_prove": "No shared hotkey state bridge or requested speed/placed-object action is proven."
+    },
+    {
+      "id": "input-r-persistent",
+      "source_indices": [3, 57],
+      "kind": "conditional-persistent-gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-r-mask-persistent-20260808T2309.jsonl",
+      "raw_size": 46321,
+      "raw_sha256": "bf1f517da466cd4f7274c9ca5440053252c38606e77e42373d2640f80870283f",
+      "event_counts": {
+        "condition_miss": 157,
+        "condition_met": 1,
+        "hit": 1,
+        "complete": 1,
+        "resumed": 1
+      },
+      "observed": {
+        "button": "R",
+        "keyboard_binding": "E",
+        "breakpoint": "0x02bcb9cc",
+        "required_mask": "0x00000200",
+        "idle_value": "0x80080000",
+        "matched_value": "0x80080200",
+        "current_mask_register": "r29"
+      },
+      "proves": "R is normalized to mask 0x0200 in the current-frame r29 value after a clean same-process debugger reconnect.",
+      "does_not_prove": "No restore-state bridge or requested speed/placed-object restoration action is proven."
+    },
+    {
+      "id": "input-left-persistent",
+      "source_indices": [57],
+      "kind": "conditional-persistent-gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-dpad-left-persistent-20260808T2310.jsonl",
+      "raw_size": 50264,
+      "raw_sha256": "7c1fd047ea65d415e7e7ac7a68462262afab6058d35301dee0185dc3e4542228",
+      "event_counts": {
+        "condition_miss": 170,
+        "condition_met": 1,
+        "hit": 1,
+        "complete": 1,
+        "resumed": 1
+      },
+      "observed": {
+        "button": "D-pad Left",
+        "keyboard_binding": "J",
+        "breakpoint": "0x02bcb9cc",
+        "idle_value": "0x80080000",
+        "matched_value": "0x80080080",
+        "derived_mask": "0x00000080",
+        "current_mask_register": "r29"
+      },
+      "proves": "D-pad Left is normalized to mask 0x0080 in the current-frame r29 value after another same-process debugger reconnect.",
+      "does_not_prove": "The placed-object threshold comparator has not yet been triggered by controlled placement/removal gameplay."
+    },
+    {
+      "id": "inventory-roots-village",
+      "source_indices": [9, 23],
+      "kind": "paused-rsp-memory-snapshot",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/runtime-roots-village-20260808T2252.json",
+      "raw_size": 695,
+      "raw_sha256": "a6d2748d5d3eaf2a3108a9d43b4af3d606c2f8bd06e86f72140c4efd1d168956",
+      "observed": {
+        "global_root_address": "0x10315c50",
+        "global_root_value": "0x2e622a80",
+        "pouch_first_record_address": "0x2e622b60",
+        "pouch_first_record_offset": "0x00e0",
+        "pouch_first_item_id": 2,
+        "pouch_first_quantity": 1,
+        "item_box_first_record_address": "0x2e622c40",
+        "item_box_first_record_offset": "0x01c0",
+        "item_box_first_item_id": 9,
+        "item_box_first_quantity": 99
+      },
+      "proves": "The live root and both first-record layouts agree with the static +0xE0 and +0x1C0 mappings.",
+      "does_not_prove": "No controlled 1-to-2-to-3 quantity transition or native writer hit was captured."
+    },
+    {
+      "id": "player-state-village",
+      "source_indices": [19, 20, 31, 32, 58, 62],
+      "kind": "paused-rsp-memory-snapshot",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/player-state-village-20260808T2253.json",
+      "raw_size": 1670,
+      "raw_sha256": "9a3ec218f7ae5533e6aa668aa0c370de8f9a4a2216ecd67f63e676f6dc25c9d4",
+      "observed": {
+        "player_state": "0x2ff7d610",
+        "current_hp_at_0x640": 100,
+        "maximum_hp_at_0x642": 100,
+        "current_oxygen_at_0x65c": 100,
+        "maximum_oxygen_at_0x65e": 100,
+        "derived_attack_at_0x6e8": 305,
+        "derived_defense_at_0x6ea": 633,
+        "attack_display_float_at_0x6ec": 3.05,
+        "defense_display_float_at_0x6f0": 633.0,
+        "placed_counts_at_0x572_0x573_0x574": [0, 0, 1],
+        "drink_timer_pairs_at_0x974_0x978_0x980_0x984": [0.0, 0.0, 0.0, 0.0]
+      },
+      "proves": "The candidate offsets resolve to plausible live player-state values in Moga village.",
+      "does_not_prove": "A passive snapshot cannot prove field writers, item identities, hot/cold assignment, underwater drain, or multiplier semantics."
+    },
+    {
+      "id": "drink-timers-village-baseline",
+      "source_indices": [32],
+      "kind": "multi-breakpoint-gdb-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/drink-timers-village-baseline-20260808T2236.jsonl",
+      "raw_size": 4128,
+      "raw_sha256": "a844967e8eadecac497fe44a701363c61ba54b57a8c894f2de403db5cf429b36",
+      "observed": {
+        "first_breakpoint": "0x02893154",
+        "second_breakpoint": "0x028932b4",
+        "player_state_register": "r7",
+        "player_state": "0x2ff7d610",
+        "timer_values": {
+          "0x0974": 0.0,
+          "0x0978": 0.0,
+          "0x0980": 0.0,
+          "0x0984": 0.0
+        },
+        "context": "Moga village baseline without an active hot/cold drink effect"
+      },
+      "proves": "Both candidate timer paths execute against the same live player object and are zero in this baseline context.",
+      "does_not_prove": "The hot and cold pair identities remain unresolved until controlled hot-area and cold-area drink traces are captured."
+    }
+  ],
+  "entry_runtime_state": {
+    "1": "partial-runtime-evidence",
+    "2": "partial-runtime-evidence",
+    "3": "partial-runtime-evidence",
+    "9": "partial-runtime-evidence",
+    "19": "partial-runtime-evidence",
+    "20": "partial-runtime-evidence",
+    "23": "partial-runtime-evidence",
+    "31": "partial-runtime-evidence",
+    "32": "partial-runtime-evidence",
+    "57": "partial-runtime-evidence",
+    "58": "partial-runtime-evidence",
+    "62": "partial-runtime-evidence"
+  },
+  "summary": {
+    "entry_count": 21,
+    "partial_runtime_evidence": 12,
+    "not_traced": 9,
+    "gameplay_traced": 0,
+    "ppc_mapped": 0,
+    "installable_dynamic_packs": 0,
+    "persistent_breakpoint_gate": "passed",
+    "same_process_independent_attach_count": 4
+  }
+}

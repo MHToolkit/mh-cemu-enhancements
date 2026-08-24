@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "speed",
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
@@ -223,5 +224,5 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #13 转换为 JP v96 PPC；根据三轮 2026-08-07 负向实测，除 0xC7 与动作倍率外，现对普通游泳状态 9 的两条最终积分增加窄范围 0.5→1.0 实际位移适配，并补齐该状态漏掉的 1.10→2.0 动作标量；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #13 to JP-v96 PPC. Following three negative gameplay comparisons on 2026-08-07, it supplements the 0xC7/action-rate mapping with a narrow 0.5-to-1.0 physical-travel adaptation at both final integrations of ordinary-swim state 9 and adds that state's missed 1.10-to-2.0 action scalar; disabled by default and classified Runtime Experimental."
+  "summary": "中文：把水下普通游泳及已覆盖动作状态的动作速率和最终坐标位移提高到约 2 倍；0.1.22 已补齐普通游泳状态 9 的两条最终积分，2026-08-07 本机实测已确认不再只是动画变快，实际移动距离也明显翻倍。 状态：Runtime Experimental，默认关闭。 / English: Raises action rate and final coordinate travel for ordinary swimming and the covered underwater action states to about 2x; 0.1.22 added both state-9 final integrations, and local gameplay on 2026-08-07 confirmed clearly doubled physical travel rather than animation-only speedup. Status: Runtime Experimental; disabled by default."
 }

@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #1/#2/#3 player-speed-state candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证 0x028924AC 在玩家每帧更新中从 r7+0x608 读取动作/时间倍率，并记录 r7+0x440 累加器；只采样，不写寄存器或内存，也不把它误报为全局帧率。",
+  "purpose_en": "Prove that 0x028924AC loads an action/time multiplier from r7+0x608 during the per-frame player update and record the r7+0x440 accumulator. Sample only; do not modify registers or memory or misreport this as global frame rate.",
+  "operator_steps_zh": [
+    "进入可自由操控猎人的任务，关闭所有动态金手指，先以站立或普通移动触发一次基线断点。",
+    "另取独立 trace，在行走、游泳或执行动作时触发，并对照 r7+0x608 的浮点值和 r7+0x440 累加器是否随帧更新。",
+    "该 trace 只能证明倍率消费路径；必须再完成归一化输入 spec 对 L/R 的 trace，且找到安全跨钩子桥接后才能创建 pack。"
+  ],
+  "operator_steps_en": [
+    "Enter a quest where the hunter is freely controllable, disable all dynamic cheats, and take one baseline hit while standing or moving normally.",
+    "Take an independent trace while walking, swimming, or performing an action, then compare the float at r7+0x608 and the r7+0x440 accumulator across frames.",
+    "This trace proves only the multiplier consumer. The normalized-input spec must separately prove L/R, and no pack may be created until a safe cross-hook bridge is found."
+  ],
+  "breakpoints": [
+    {
+      "label": "player_multiplier_load",
+      "address": "0x028924ac",
+      "expected_word": "0xc1070608"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_multiplier_window",
+      "register": "r7",
+      "offset": 1536,
+      "size": 32
+    },
+    {
+      "label": "player_accumulator_window",
+      "register": "r7",
+      "offset": 1080,
+      "size": 32
+    }
+  ]
+}

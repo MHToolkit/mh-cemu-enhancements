@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "item-box-interface",
   "default_install": false,
   "availability": "runtime-blocked",
   "availability_reason": "无条件调度桥在任务中热加载后仍未打开完整仓库，并使任务看板对话框变空白；该候选只保留为失败证据。 / The unconditional dispatch bridge still failed to open the full item box after hot-loading in a quest and blanked the quest board dialogue; this candidate is retained only as failure evidence.",
@@ -219,5 +220,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "无条件移除任务场景提前退出会破坏任务看板且仍不能打开完整仓库；保留为不可安装的失败证据。 / Unconditionally removing the quest-scene early exit corrupts the quest board and still does not open the full item box; retained as non-installable failure evidence."
+  "summary": "中文：该研究对照曾尝试移除任务场景的提前退出，并让原生蓝色补给箱以完整模式调用大厅仓库初始化与分发链，目标是从任务蓝箱打开完整家中道具箱。 状态：Runtime Experimental / runtime-blocked，不可安装。 / English: This research control attempted to remove the quest-scene early exit and make the native blue supply box invoke the lobby item-box initializer and dispatcher in full mode, aiming to open the complete home item box from a quest blue box. Status: Runtime Experimental / runtime-blocked; not installable."
 }

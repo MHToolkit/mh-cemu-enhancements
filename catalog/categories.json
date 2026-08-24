@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "categories": [
+    {
+      "id": "frame-rate",
+      "folder": "01-frame-rate",
+      "order": 1,
+      "label_en": "Frame Rate",
+      "label_zh_cn": "帧率相关",
+      "description_en": "Frame-rate locks and fixes for behavior that changes at non-native frame rates.",
+      "description_zh_cn": "帧率锁定，以及非原生帧率下出现的行为差异修复。"
+    },
+    {
+      "id": "speed",
+      "folder": "02-speed-and-actions",
+      "order": 2,
+      "label_en": "Speed and Actions",
+      "label_zh_cn": "加速与动作",
+      "description_en": "Movement, gathering, placement, eating, and other action-speed changes.",
+      "description_zh_cn": "移动、采集、设置、进食及其他动作速度调整。"
+    },
+    {
+      "id": "skills-immunities",
+      "folder": "03-skills-and-immunities",
+      "order": 3,
+      "label_en": "Skills and Immunities",
+      "label_zh_cn": "技能与免疫",
+      "description_en": "Hunter or meal skills, resistances, and status immunities.",
+      "description_zh_cn": "猎人或猫饭技能、抗性以及异常状态免疫。"
+    },
+    {
+      "id": "combat-weapons",
+      "folder": "04-combat-and-weapons",
+      "order": 4,
+      "label_en": "Combat and Weapons",
+      "label_zh_cn": "战斗与武器",
+      "description_en": "Focused changes to weapon mechanics, ammunition, sharpness, recoil, and affinity.",
+      "description_zh_cn": "针对武器机制、弹药、锋利度、后坐力及会心的专项调整。"
+    },
+    {
+      "id": "balance-breaking",
+      "folder": "05-balance-breaking",
+      "order": 5,
+      "label_en": "Balance Breaking",
+      "label_zh_cn": "破坏平衡",
+      "description_en": "Resource, economy, survival, or broad combat overrides that materially bypass normal progression.",
+      "description_zh_cn": "显著绕过正常成长的资源、经济、生存或广域战斗覆盖。"
+    },
+    {
+      "id": "quality-of-life",
+      "folder": "06-quality-of-life",
+      "order": 6,
+      "label_en": "Quality of Life",
+      "label_zh_cn": "便利功能",
+      "description_en": "Information and navigation conveniences that do not primarily alter combat rules.",
+      "description_zh_cn": "不以改变战斗规则为主的信息显示与导航便利功能。"
+    },
+    {
+      "id": "item-box-interface",
+      "folder": "07-item-box-and-interface",
+      "order": 7,
+      "label_en": "Item Box and Interface",
+      "label_zh_cn": "道具箱与界面",
+      "description_en": "Item-box interfaces plus retained runtime-blocked task-box research packs.",
+      "description_zh_cn": "道具箱界面，以及作为失败证据保留的任务箱运行时阻塞包。"
+    }
+  ]
+}

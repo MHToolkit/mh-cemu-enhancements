@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #9 primary-pouch slot-one candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证原生数量写回 0x0219B830 命中第一格时，r27 等于 `*0x10315C50+0xE0`，记录 +0/+2 分别为道具 ID 和 16 位数量。只记录，不修改。",
+  "purpose_en": "Prove that when native quantity writeback 0x0219B830 handles the first slot, r27 equals *0x10315C50+0xE0 and record +0/+2 are item ID and 16-bit quantity. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "把主背包第一格放入已知道具并记录 ID/数量；在大厅或任务中以原生操作让数量按 1→2→3 或 3→2→1 变化，每次使用全新输出文件。",
+    "断点命中时把固定内存 0x10315C50 的大端指针解引用，并确认 GPR r27 精确等于该根对象 +0xE0；同时比较 r27 快照中 +0 的 ID、+2 的旧数量和 GPR r12 的新数量。",
+    "再对第二格执行一次同类变化，确认其 r27=首记录+4 而不会被误认成第一格；只有主/备用背包切换也符合选择器语义时才确认映射。"
+  ],
+  "operator_steps_en": [
+    "Place a known item in primary-pouch slot one and record its ID/count. Use native actions in the lobby or quest to change the count 1→2→3 or 3→2→1, with a fresh output file for each run.",
+    "At the hit, decode and dereference the big-endian pointer at fixed memory 0x10315C50 and require GPR r27 to equal that root object +0xE0. Compare ID at r27+0, old count at r27+2, and new count in GPR r12.",
+    "Repeat once on slot two and confirm r27 equals first-record+4 rather than being mistaken for slot one. Confirm the mapping only if primary/alternate pouch switching also follows the selector semantics."
+  ],
+  "breakpoints": [
+    {
+      "label": "pouch_quantity_write",
+      "address": "0x0219b830",
+      "expected_word": "0xb19b0002"
+    }
+  ],
+  "fixed_memory": [
+    {
+      "label": "pouch_root_pointer",
+      "address": "0x10315c50",
+      "size": 4
+    }
+  ],
+  "register_memory": [
+    {
+      "label": "pouch_record_before_write",
+      "register": "r27",
+      "offset": 0,
+      "size": 4
+    }
+  ]
+}

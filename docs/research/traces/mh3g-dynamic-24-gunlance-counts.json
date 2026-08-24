@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #24 Gunlance current/source shell candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在铳枪装填状态变化中验证 0x02856CEC 的 r7 玩家状态、+0x45A 当前弹数、+0x45B 来源/上限弹数、+2 武器类型和 +0x45D 弹种索引。只记录，不修改。",
+  "purpose_en": "During a Gunlance load-state transition, prove r7 player state at 0x02856CEC, current shells +0x45A, source/capacity +0x45B, weapon type +2, and ammo-subtype index +0x45D. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "在任务中装备已知装填数的铳枪，记下满弹数；不要同时更换武器、技能或装备。",
+    "先打空至少一发，再启动 tracer，只执行一次标准装填或一次会刷新装填状态的收刀/拔刀流程。",
+    "只有命中时 r7+2 的类型在铳枪流程中稳定、+0x45B 等于已知满弹数，且后续 +0x45A 从当前值恢复并受 +0x462 原生上限约束时，才可升级映射。"
+  ],
+  "operator_steps_en": [
+    "In a quest, equip a Gunlance with known shell capacity and record the full count; do not change weapon, skills, or equipment simultaneously.",
+    "Spend at least one shell, start the tracer, and perform exactly one standard reload or one sheathe/draw flow known to refresh load state.",
+    "Promote only when r7+2 is stable for the Gunlance flow, +0x45B equals the known full capacity, and the following +0x45A update restores current shells while respecting native +0x462 capacity."
+  ],
+  "breakpoints": [
+    {
+      "label": "gunlance_source_count_load",
+      "address": "0x02856cec",
+      "expected_word": "0x8927045b"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "weapon_count_fields",
+      "register": "r7",
+      "offset": 1104,
+      "size": 32
+    }
+  ]
+}

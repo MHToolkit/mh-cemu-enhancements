@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G normalized controller-input candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在 0x02BCB9CC 写入归一化按住位之前记录 r29 和输入对象，验证 MH3G 内部 A/L/R 掩码分别为 0x2000/0x0100/0x0200。只观察，不修改控制器状态。",
+  "purpose_en": "Record r29 and the input object immediately before 0x02BCB9CC stores normalized held buttons, proving MH3G internal A/L/R masks 0x2000/0x0100/0x0200. Observe only; do not modify controller state.",
+  "operator_steps_zh": [
+    "进入可以自由操控猎人的任务；每次 tracer 只设一个一次性断点，分别在不按键、只按 A、只按 L、只按 R 时各采集一份 JSONL。",
+    "断点命中时以 GPR r29 为本帧归一化 hold mask；r31+0x64 在该指令执行前仍可能是上一帧值，不能拿旧内存代替 r29。",
+    "要求四次 trace 的差分分别证明 A=0x2000、L=0x0100、R=0x0200，并确认没有其他按键噪声，才可升级输入映射。"
+  ],
+  "operator_steps_en": [
+    "Enter a quest with free hunter control. Use the one-shot tracer separately while holding no button, A only, L only, and R only, producing one JSONL per condition.",
+    "At the breakpoint, GPR r29 is the current normalized hold mask. Because the store has not executed yet, r31+0x64 may still contain the prior frame and must not replace r29 as evidence.",
+    "Require the four trace differences to prove A=0x2000, L=0x0100, and R=0x0200 without unrelated button noise before promoting the input mapping."
+  ],
+  "breakpoints": [
+    {
+      "label": "normalized_hold_before_store",
+      "address": "0x02bcb9cc",
+      "expected_word": "0x93bf0064"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "normalized_input_object_window",
+      "register": "r31",
+      "offset": 96,
+      "size": 32
+    }
+  ]
+}

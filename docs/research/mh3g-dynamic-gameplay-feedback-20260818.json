@@ -1,0 +1,447 @@
+{
+  "schema_version": 1,
+  "received_at": "2026-08-18",
+  "tester": "PipiNiao / 皮皮鸟",
+  "scope": "The 9+2 MH3G HD JP v96 dynamic-pack handoff sent on 2026-08-12; #28 and #66 were explicitly excluded.",
+  "summary": {
+    "archive_count": 11,
+    "archive_passed": 10,
+    "archive_partial": 1,
+    "fully_passed_source_entries": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      9,
+      10,
+      12,
+      20,
+      23,
+      24,
+      25,
+      31,
+      57
+    ],
+    "partial_source_entries": [
+      30
+    ]
+  },
+  "results": [
+    {
+      "pack": "04",
+      "source_entries": [
+        4
+      ],
+      "name_zh": "斩味常紫",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "08",
+      "source_entries": [
+        8
+      ],
+      "name_zh": "道具袋不减",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "09-10",
+      "source_entries": [
+        9,
+        10
+      ],
+      "name_zh": "大厅与任务背包第一格 99",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "12",
+      "source_entries": [
+        12
+      ],
+      "name_zh": "携带道具上限 99",
+      "verdict": "pass-with-disable-safety-condition",
+      "tester_note": "每次使用必须打勾启用；否则进任务使用道具后，多余物品消失。",
+      "interpretation_zh": "启用态核心效果通过。若背包存在超过原版上限的同格堆叠，停用或未启用后，原版数量归一化会在下一次物品操作时截断超出部分。保持启用，或在停用前把每格整理到原版上限以内。若 Cemu 本身不保存勾选状态，则另记配置持久化故障。",
+      "interpretation_en": "The enabled behavior passes. If an over-cap stack exists when the title is reloaded without the pack, vanilla normalization can discard the excess on the next item operation. Keep the pack enabled or reduce every stack to its vanilla cap before disabling. A checkbox that is literally not persisted by Cemu is a separate configuration issue."
+    },
+    {
+      "pack": "20",
+      "source_entries": [
+        20
+      ],
+      "name_zh": "防御倍率 2 倍",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "23",
+      "source_entries": [
+        23
+      ],
+      "name_zh": "道具箱第一格 99",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "25",
+      "source_entries": [
+        25
+      ],
+      "name_zh": "子弹不减",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "31",
+      "source_entries": [
+        31
+      ],
+      "name_zh": "A 键回血",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "57",
+      "source_entries": [
+        57
+      ],
+      "name_zh": "设置物破坏/恢复热键",
+      "verdict": "pass",
+      "tester_note": ""
+    },
+    {
+      "pack": "MH3G-006 V2",
+      "source_entries": [
+        1,
+        2,
+        3
+      ],
+      "name_zh": "玩家动作/时间倍率 L/R 热键 V2",
+      "verdict": "pass",
+      "tester_note": "",
+      "boundary_zh": "该回执证明 V2 的 +0x608 写回与 L/R 热键玩法，不证明后续 ZL/ZR 改键 V3。",
+      "boundary_en": "This receipt proves the V2 +0x608 writeback and L/R controls, not the later ZL/ZR-remapped V3 candidate."
+    },
+    {
+      "pack": "MH3G-007 V2",
+      "source_entries": [
+        24,
+        30
+      ],
+      "name_zh": "铳枪/轻弩/重弩自动装填 V2",
+      "verdict": "partial",
+      "tester_note": "铳枪、轻弩生效；重弩不生效。",
+      "subresults": {
+        "gunlance_source_24": "pass",
+        "light_bowgun_source_30": "pass",
+        "heavy_bowgun_source_30": "fail"
+      },
+      "disproven_assumption": "Synchronizing HBG type 5 common +0x45A and internal +0x46C from the generic per-frame hook is sufficient.",
+      "next_evidence_required": [
+        "Trace normal HBG fire around 0x02858934..0x02858950.",
+        "Trace siege/crouching fire separately.",
+        "Establish the order of decrement, empty check, and reload-state transition before changing another field or hook."
+      ],
+      "static_rca_20260821": {
+        "v2_field_disproven": "+0x46C has no HBG type-5 lifecycle evidence and belongs to a separate special-item/coating flow.",
+        "authoritative_hbg_magazine": "+0x480 + ammoSubtype*2 halfword; HBG restores its low byte at +0x481 + ammoSubtype*2.",
+        "native_reload_writer": "0x02856DB8",
+        "fire_decrement_and_snapshot": [
+          "0x0285770C",
+          "0x02857788"
+        ],
+        "hbg_restore_paths": [
+          "0x02891B08/0x02891B20",
+          "0x02894794/0x028947AC"
+        ],
+        "v3_change": "For type 5 only, synchronize the clamped count to the indexed +0x480 halfword, reject nonpositive totals and ammoSubtype >= 0x24, and remove the +0x46C write.",
+        "status": "static-lifecycle-closed-gameplay-pending"
+      }
+    }
+  ],
+  "speed_v3_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-Speed-ZL-ZR-V3-20260818/MH3G-006-速度倍率-ZL-ZR-V3-20260818.zip",
+    "sha256": "4261f10a794ca3a20ec73078287cba0de5732a982d7a9fb40238e418cbc55b61",
+    "behavior": "ZL (typically physical L2) selects the configured 2x/3x multiplier; ZR (typically physical R2) restores 1x; ZR has priority if both are held.",
+    "normalized_masks": {
+      "ZL": "0x00000400",
+      "ZR": "0x00000800"
+    },
+    "static_mapping_words": [
+      {
+        "address": "0x02bcb7c8",
+        "word": "0x54eb0673"
+      },
+      {
+        "address": "0x02bcb7d0",
+        "word": "0x63bd0800"
+      },
+      {
+        "address": "0x02bcb7d4",
+        "word": "0x54ec0631"
+      },
+      {
+        "address": "0x02bcb7dc",
+        "word": "0x63bd0400"
+      }
+    ],
+    "assembler_words": [
+      {
+        "instruction": "andi. r11, r29, 0x0800",
+        "word": "0x73ab0800"
+      },
+      {
+        "instruction": "andi. r11, r29, 0x0400",
+        "word": "0x73ab0400"
+      }
+    ],
+    "gameplay": "user-pass-2026-08-21-zl-zr-and-multiplier",
+    "installation": "installed-standard-cemu-and-preserved-active-during-v4-install",
+    "cemu_launched": false,
+    "conflict": "Standalone #006, #31, and #57 all overwrite 0x02BCB9CC. The ZL/ZR remap removes button overlap but not the patch-address conflict; simultaneous support requires a shared input dispatcher."
+  },
+  "auto_refill_v3_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V3-Speed-Joint-Test-20260821/MH3G-007-自动装填-V3-20260821.zip",
+    "sha256": "ae3d1cd0f697d994b338fb3c5147e7be02f49338ce8387c213218d1c4c9d4bc4",
+    "joint_artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V3-Speed-Joint-Test-20260821/MH3G-006+007-速度快捷键与自动装填-联测V3-20260821.zip",
+    "joint_sha256": "770ee560d01cd4ea2958487534c8a54928e2a7b7d142dc8723537eee5c6830e6",
+    "static_verification": {
+      "pinned_ppc_words": "11/11 PASS",
+      "cemu_ppcassembler": "35 instructions/data directives accepted; 13 expected branch relocations",
+      "branch_ranges": "13/13 PASS",
+      "safety_guards": "available total > 0 and ammo subtype < 0x24",
+      "speed_fixed_address_conflict": "none"
+    },
+    "gameplay": "failed-2026-08-21-hbg-hud-stance-restore-and-delayed-reload",
+    "installation": {
+      "root": "/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks",
+      "auto_refill_dir": "MH3G-HD-JP-v96-Dynamic-24-30-Weapon-Auto-Refill-v3",
+      "speed_dir": "MH3G-HD-JP-v96-Dynamic-01-03-Speed-Hotkeys-v3",
+      "tree_hashes_match": true,
+      "cemu_launched": false
+    },
+    "runtime_feedback": {
+      "received_at": "2026-08-21",
+      "verdict": "fail",
+      "speed_v3_joint_test": "pass",
+      "symptoms_zh": [
+        "左上弹数异常",
+        "蹲姿切回普通姿势后重新可射击",
+        "随后才 Charging Bullet/装填"
+      ],
+      "conclusion": "V3 must remain rejected; static field-lifecycle evidence did not validate per-frame write timing."
+    }
+  },
+  "auto_refill_v4_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V4-Native-Writers-20260821/MH3G-007-自动补弹-V4-原生射击写点-20260821.zip",
+    "sha256": "36606fb21b5f7a46298b636863dbee41618076206223785e85c86eeaae7fc25a",
+    "behavior": "No HBG per-frame writes. Refill after real ammo consumption and before native indexed snapshot; type-5-only special/siege writer guards.",
+    "static_verification": {
+      "pinned_preimages": "4/4 PASS",
+      "full_text_current_magazine_writer_scan": "4 writers",
+      "cemu_ppcassembler": "66 accepted, 27 relocations, 0 errors",
+      "active_fixed_address_conflict": "none across 47 enabled entries"
+    },
+    "installation": {
+      "root": "/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks",
+      "auto_refill_dir": "MH3G-HD-JP-v96-Dynamic-24-30-Weapon-Auto-Refill-v4",
+      "v3_active_entry_replaced": true,
+      "speed_v3_preserved_active": true,
+      "cemu_launched": false
+    },
+    "gameplay": "failed-2026-08-21-hbg-magazine-kept-decreasing-with-real-inventory-remaining",
+    "runtime_feedback": {
+      "received_at": "2026-08-21",
+      "verdict": "fail",
+      "symptoms_zh": [
+        "真实弹药库存仍有剩余",
+        "重弩弹仓继续下降",
+        "自动装填/补弹没有恢复当前弹仓"
+      ],
+      "static_rca": "Normal path has native 0x02857788 indexed snapshot, but V4 special/siege hooks only write +0x45A and leave the HBG +0x480+ammoSubtype*2 stance cache stale."
+    }
+  },
+  "auto_refill_v5_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V5-Special-Cache-Snapshot-20260821/MH3G-007-自动补弹-V5-特殊蹲射缓存同步-20260821.zip",
+    "sha256": "d0b7d551533b9bc16ec96a1cc6875653f64cc24f815f57384531754fe0456aad",
+    "behavior": "Keep V4 native transaction timing; additionally snapshot +0x480+ammoSubtype*2 inside each type-5 special/siege decrement transaction, with unsigned subtype < 0x24.",
+    "static_verification": {
+      "pinned_preimages": "4/4 PASS",
+      "cemu_ppcassembler": "78/78 accepted, 29 relocations",
+      "branch_ranges": "29/29 PASS",
+      "special_transaction_cache_sync": "2/2 PASS",
+      "semantic_boundary_model": "6/6 PASS"
+    },
+    "installation": {
+      "root": "/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks",
+      "auto_refill_dir": "MH3G-HD-JP-v96-Dynamic-24-30-Weapon-Auto-Refill-v5",
+      "pack_tree_copied": true,
+      "activation": "waiter will replace V4 entry only after current Cemu PID 48715 exits",
+      "current_game_not_killed": true
+    },
+    "gameplay": "pending-hbg-normal-siege-stance-transition-ammo-switch-final-round-and-gl-lbg-regression"
+  },
+  "auto_refill_v6_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V6-PerFrame-Refill-Stance-Restore-20260822/",
+    "gameplay": "partial-2026-08-22",
+    "passed": [
+      "normal HBG fires one shot and immediately refills one common-magazine round"
+    ],
+    "failed": [
+      "siege transient/HUD count drains",
+      "after finite reserve reaches zero, firing continues until stance switch"
+    ]
+  },
+  "auto_refill_v7_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V7-Siege-Transaction-Zero-Clamp-20260822/",
+    "gameplay": "failed-2026-08-22",
+    "observed_zh": [
+      "蹲射备弹归零后不切姿势仍可持续射击",
+      "左上计数扣成负数",
+      "切姿势后才重新判断库存"
+    ],
+    "withdrawn_static_rca": "The earlier claim that writer refill itself prevented the native completion gate is withdrawn because all V7 transaction/writer hooks guarded selector 5 and never executed in the live selector-4 HBG siege state.",
+    "corrected_runtime_rca": "Live LLDB evidence proves +0x0002 == 4 during visible HBG siege; V7 guarded 5 at both transactions and all four counter writers.",
+    "hooks_that_never_matched_live_selector4": [
+      "0x02876550",
+      "0x028765B8",
+      "0x02878E04",
+      "0x02878E6C"
+    ],
+    "superseded_by": "auto_refill_v9_candidate; V8 also gameplay-failed"
+  },
+  "auto_refill_v8_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V8-Siege-Fire-Gate-20260822/",
+    "behavior": "Preserve V6 common refill and stance restore; remove V7 siege transactions/countdown writers; exact-zero reserve check at native A/B siege fire gates.",
+    "hook_set": [
+      "0x0289248C",
+      "0x028764A4",
+      "0x02878D58",
+      "0x02891B20",
+      "0x028947AC"
+    ],
+    "static_verification": {
+      "hook_preimages": "5/5 PASS",
+      "native_gate_writer_context": "18/18 PASS",
+      "cemu_ppcassembler": "81/81 accepted, 31 relocations",
+      "branch_ranges": "31/31 PASS",
+      "structural_contract": "17/17 PASS",
+      "semantic_model": "6/6 PASS",
+      "active_fixed_address_conflict": "none"
+    },
+    "gameplay": "failed-2026-08-22-negative-count-no-positive-stock-refill-and-zero-stock-still-fires-while-holding-siege",
+    "runtime_feedback": {
+      "received_at": "2026-08-22",
+      "observed_zh": [
+        "弹仓为空而备弹仍有 10 发时未自动回填",
+        "左上蹲射计数显示 -27",
+        "弹仓和备弹都为 0 后，保持蹲射仍可继续开火"
+      ],
+      "exact_pack_loaded": true,
+      "live_selector_offset": "+0x0002",
+      "live_selector_value": 4,
+      "v8_guard_value": 5,
+      "zero_stock_snapshot": "+0x45A=0, +0x462=0, +0x0008=1, +0x062C=0, +0x063C=0",
+      "conclusion": "V8 final-fire gates never executed because selector 5 did not match the live selector-4 HBG siege state."
+    },
+    "installation": "superseded-and-backed-up-by-v9-install",
+    "cemu_launched": false
+  },
+  "auto_refill_v9_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V9-Selector4-Native-Writers-20260822/",
+    "behavior": "Preserve common refill; for live-proven selector 4 synchronize both siege transactions, four native +0x0008/+0x063C writers, and both final fire gates. Positive reserve uses min(capacity,reserve), exact zero clears all common/siege counters, negative sentinels retain vanilla behavior.",
+    "hook_set": [
+      "0x0289248C",
+      "0x02876248",
+      "0x02878B5C",
+      "0x02876550",
+      "0x028765B8",
+      "0x02878E04",
+      "0x02878E6C",
+      "0x028764A4",
+      "0x02878D58"
+    ],
+    "safety_boundary": {
+      "runtime_selector": "+0x0002 == 4 only",
+      "no_indexed_cache_writes": "+0x480/+0x481 untouched",
+      "zero_gate": "returns to adjacent native +8==0 and +63C<=0 completion logic",
+      "conflicts": "do not enable #25, #52, or Auto Refill V1-V8"
+    },
+    "static_verification": {
+      "hook_preimages": "9/9 PASS",
+      "native_transaction_writer_gate_context": "18/18 PASS",
+      "cemu_ppcassembler": "174/174 accepted, 72 relocations",
+      "branch_ranges": "72/72 PASS",
+      "structural_contract": "13/13 PASS",
+      "semantic_model": "11/11 PASS",
+      "manifest_contract": "8/8 PASS",
+      "active_fixed_address_conflict": "none"
+    },
+    "installation": {
+      "status": "SUPERSEDED_AND_BACKED_UP_BY_V10_INSTALL",
+      "installed_at": "2026-08-22T18:30:47.467436+08:00",
+      "target": "/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/MH3G-HD-JP-v96-Dynamic-24-30-Weapon-Auto-Refill-v9",
+      "v8_moved_to_transaction_backup": true,
+      "speed_v3_preserved": true,
+      "pack_tree_match": true,
+      "cemu_launched": false
+    },
+    "gameplay": "failed-2026-08-23-flaming-s-held-siege-fires-after-common-magazine-and-real-reserve-reach-zero",
+    "runtime_feedback": {
+      "received_at": "2026-08-23",
+      "exact_pack_loaded": true,
+      "observed_zh": [
+        "火炎弹保持蹲姿时，公共弹仓与真实备弹均已归零",
+        "不切换姿态仍可继续生成弹丸"
+      ],
+      "live_zero_snapshot": "+0x45A=0, +0x45B=0, +0x462=0, +0x0008=1, +0x062C=0, +0x063C=0",
+      "corrected_root_cause": "V9 gates at 0x028764A4/0x02878D58 are reachable only for ammo class 2 (index 10); Flaming S index 7..9 maps to class 1 and bypasses them."
+    }
+  },
+  "auto_refill_v10_candidate": {
+    "artifact": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-HBG-Auto-Refill-V10-All-Ammo-Siege-Entry-Gate-20260823/",
+    "behavior": "Gate both siege-fire function entries before ammo-type dispatch. Exact-zero selector-4 reserve clears common/siege snapshots and returns before projectile generation; positive stock and negative sentinels execute original code.",
+    "entry_hooks": [
+      "0x02875DEC",
+      "0x02878738"
+    ],
+    "legacy_hooks": [
+      "0x0289248C",
+      "0x02876248",
+      "0x02878B5C",
+      "0x02876550",
+      "0x028765B8",
+      "0x02878E04",
+      "0x02878E6C",
+      "0x028764A4",
+      "0x02878D58"
+    ],
+    "static_verification": {
+      "hook_preimages": "11/11 PASS",
+      "native_transaction_writer_gate_class_context": "22/22 PASS",
+      "cemu_ppcassembler": "206/206 accepted, 80 relocations",
+      "branch_ranges": "80/80 PASS",
+      "structural_contract": "16/16 PASS",
+      "semantic_model": "14/14 PASS",
+      "manifest_contract": "10/10 PASS",
+      "active_fixed_address_conflict": "none"
+    },
+    "installation": {
+      "status": "INSTALLED_ACTIVE",
+      "installed_at": "2026-08-23T21:48:01.885524+08:00",
+      "target": "/Users/vincentadamnemessis/Library/Application Support/Cemu/graphicPacks/MH3G-HD-JP-v96-Dynamic-24-30-Weapon-Auto-Refill-v10",
+      "v9_moved_to_transaction_backup": true,
+      "speed_v3_preserved": true,
+      "pack_tree_match": true,
+      "cemu_launched": false
+    },
+    "gameplay": "user-accepted-2026-08-24-for-independent-retest-with-known-1-to-2-shot-stance-sync-delay",
+    "repository_pack": "packs/wiiu/mh3g-hd/jp-v96/dynamic-24-30-weapon-auto-refill",
+    "independent_retest": "pending-pipiniao",
+    "known_limitation_zh": "重弩普通/蹲射姿态切换前后可能出现约 1～2 发状态或 HUD 同步延迟；用户接受其作为当前候选边界，但是否为原版 MH3G 行为尚未证实。零备弹后无限开火、持续负数、卡死或崩溃仍应判失败。",
+    "known_limitation_en": "A one-to-two-shot state or HUD synchronization delay may occur around HBG normal/siege stance changes. The user accepts it as the current candidate boundary, but a vanilla MH3G origin is unproven. Indefinite zero-reserve fire, persistent negative counts, hangs, or crashes remain failures."
+  }
+}

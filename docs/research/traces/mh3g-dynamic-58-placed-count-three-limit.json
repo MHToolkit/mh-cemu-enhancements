@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #58 placed-count +0x573 three-limit candidate",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "验证 0x0289A608 是玩家已放置物准入 helper，r12+0x573 是与 3 比较的 8 位计数，并通过受控放置确定物品类别。只记录，不修改。",
+  "purpose_en": "Prove that 0x0289A608 is a placed-object admission helper, r12+0x573 is an 8-bit counter compared with three, and identify its item category through controlled placement. Record only; do not modify state.",
+  "operator_steps_zh": [
+    "在无放置物的稳定任务启动 tracer，按固定顺序尝试炸弹、陷阱、肉，记录触发命中的具体动作。",
+    "为同一类别的后续每次放置使用新输出文件，保持先前对象存在，直到游戏拒绝或达到可携带数量。",
+    "确认 +0x573 随同一类别计数变化且拒绝边界与原生 `<3` 判断一致，并验证对象消失后回落，才确认字段身份。"
+  ],
+  "operator_steps_en": [
+    "Start the tracer in a stable quest with no placed objects, then try bombs, traps, and meat in a fixed order and record the exact action that triggers the hit.",
+    "Use a fresh output file for every later placement of that category while previous objects remain, until the game rejects placement or carried stock is exhausted.",
+    "Confirm identity only when +0x573 follows the same category, its rejection boundary agrees with the native less-than-three test, and the counter falls after object removal."
+  ],
+  "breakpoints": [
+    {
+      "label": "placed_count_three_limit",
+      "address": "0x0289a618",
+      "expected_word": "0x880c0573"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_placed_counts",
+      "register": "r12",
+      "offset": 1384,
+      "size": 32
+    }
+  ]
+}

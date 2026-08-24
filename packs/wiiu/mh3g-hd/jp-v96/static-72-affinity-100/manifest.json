@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "combat-weapons",
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
@@ -94,6 +95,6 @@
     "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "中文：把 3DS 静态 ARM 金手指 #72“会心率 100%”转换为 JP v96 Wii U PPC 固定地址补丁；默认关闭，状态为 Runtime Experimental。 / English: Converts 3DS static ARM cheat #72 \"Affinity 100%\" into fixed-address JP-v96 Wii U PPC patches; disabled by default and classified Runtime Experimental.",
+  "summary": "中文：强制两条会心技能检查并把会心加成从 30 改为 100，目标是让武器达到或接近 100% 会心率，连续攻击几乎每次触发正会心。 状态：Runtime Experimental，默认关闭。 / English: Forces both affinity-skill checks and changes the affinity addition from 30 to 100, aiming for 100% or near-100% affinity so almost every repeated hit becomes a positive critical. Status: Runtime Experimental; disabled by default.",
   "exclusive_group": "mh3g-hd-jp-v96-affinity-override"
 }

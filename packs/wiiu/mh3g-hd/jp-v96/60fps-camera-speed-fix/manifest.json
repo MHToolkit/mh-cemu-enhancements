@@ -7,6 +7,7 @@
   "region": "JP",
   "update": "v96",
   "status": "Runtime Experimental",
+  "distribution_category": "frame-rate",
   "default_install": false,
   "auto_experimental_install": false,
   "availability": "available",
@@ -44,5 +45,5 @@
     "cemu_rpx_hash": "8cb62099"
   },
   "license": "MIT for repository-authored metadata and patch source; no game assets included.",
-  "summary": "在60帧下自定义视角速度，支持多级预设。 / Custom camera speed at 60 FPS with multiple preset levels."
+  "summary": "中文：仅应在 60 FPS 运行时启用；按所选预设把普通视角基值 `0x40B` 和瞄准视角基值 `0x34B` 统一缩放到 40%..120%，默认预设为 70%，用来校正 60 FPS 下过快或不合手感的镜头转速。 状态：Runtime Experimental，默认关闭。 / English: Enable only while running at 60 FPS; the selected preset uniformly scales normal-camera base `0x40B` and aiming-camera base `0x34B` across 40%..120%, defaulting to 70% to correct camera rotation that feels too fast or unsuitable at 60 FPS. Status: Runtime Experimental; disabled by default."
 }
