@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "name": "MH3G #28 Switch Axe player-state snapshot",
+  "target": {
+    "title": "Monster Hunter 3G HD JP v96",
+    "title_id": "0005000010104D00",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0"
+  },
+  "purpose_zh": "在通用玩家每帧路径 0x0289248C 捕获 r7 玩家状态前 0x800 字节，用五个同生命周期快照筛选斩斧 0..100 能量字段。该断点只证明对象快照，不证明能量 writer，也不修改内存。",
+  "purpose_en": "Capture the first 0x800 bytes of r7 player state at generic per-frame path 0x0289248C and use five same-lifecycle snapshots to isolate the 0..100 Switch Axe energy field. This breakpoint proves only the object snapshot, not the energy writer, and never modifies memory.",
+  "operator_steps_zh": [
+    "关闭所有 Graphic Pack，尤其是 #007、#25 和任何武器/速度修改；冷启动同一 JP v96 游戏进程，装备斩斧并进入不会换区的安全任务区域。",
+    "能量完全充满且保持稳定时运行一次 tracer，保存为 full.jsonl。断点每次只取一个快照并自动恢复游戏。",
+    "保持同一 Cemu 进程、任务、区域、装备和角色生命周期；进入剑模式，制造两个清晰递减的能量状态，各暂停操作后立即独立运行 tracer，保存 consume-1.jsonl 与 consume-2.jsonl。",
+    "切回斧模式等待自然回充，在两个严格递增且尚未换区的时点分别运行 tracer，保存 recharge-1.jsonl 与 recharge-2.jsonl。",
+    "用 analyze-switch-axe-snapshots.py 同时分析五个文件。只有同一 r7 基址、0..100 标度和完整 100>消耗1>消耗2<回充1<回充2 序列才进入 writer 定位；否则重新采样，不生成 Pack。"
+  ],
+  "operator_steps_en": [
+    "Disable every Graphic Pack, especially #007, #25, and all weapon or speed modifiers. Cold-start the same JP-v96 process, equip a Switch Axe, and enter a safe quest area without changing zones.",
+    "Run one tracer at a stable full gauge and save full.jsonl. Each run takes one snapshot and resumes the title automatically.",
+    "Keep the same Cemu process, quest, area, equipment, and player lifecycle. Enter sword mode, produce two clearly decreasing gauge states, and immediately run independent traces saved as consume-1.jsonl and consume-2.jsonl.",
+    "Return to axe mode for natural recharge and capture two strictly increasing points without changing areas, saved as recharge-1.jsonl and recharge-2.jsonl.",
+    "Analyze all five files with analyze-switch-axe-snapshots.py. Proceed to writer tracing only when the r7 base is identical, the scale is 0..100, and the full 100 > consume1 > consume2 < recharge1 < recharge2 sequence holds; otherwise recapture and do not create a Pack."
+  ],
+  "breakpoints": [
+    {
+      "label": "generic_player_update",
+      "address": "0x0289248c",
+      "expected_word": "0xc1a70440"
+    }
+  ],
+  "fixed_memory": [],
+  "register_memory": [
+    {
+      "label": "player_state",
+      "register": "r7",
+      "offset": 0,
+      "size": 2048
+    }
+  ]
+}

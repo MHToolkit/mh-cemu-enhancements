@@ -662,21 +662,49 @@
       "source_semantics_zh": "读取 3DS 斩斧运行时对象指针，把 +0x64 的 8 位能量值持续写为 100。",
       "source_semantics_en": "Read the 3DS Switch Axe runtime-object pointer and continuously write 100 to its 8-bit energy value at +0x64.",
       "probe_batch": "weapon-runtime-state",
-      "target_strategy_zh": "通过斧/剑切换和自然回充捕获 PPC 能量写入；确认 0..100 标度后在 writer 末端钳制为最大值。",
-      "target_strategy_en": "Capture PPC energy writes during axe/sword switching and natural recharge; after proving the 0..100 scale, clamp the writer result to maximum.",
+      "target_strategy_zh": "先在通用玩家每帧路径 0x0289248C 对 r7 前 0x800 字节做五个同生命周期快照，以满能量、两次剑模式耗能和两次斧模式自然回充筛选严格 0..100 字段；再对命中偏移的原生 byte store 逐个设置执行断点，闭环耗能、回充、斩斧身份和生命周期后，才在唯一 writer 末端钳制为最大值。",
+      "target_strategy_en": "First snapshot the first 0x800 bytes of r7 at generic per-frame player path 0x0289248C five times in one lifecycle, using full energy, two sword-mode consumptions, and two axe-mode recharge points to isolate a strict 0..100 field. Then execution-breakpoint each native byte store to the winning offset and prove consumption, recharge, Switch Axe identity, and lifecycle before clamping the unique writer result to maximum.",
       "mapping_state": "source-decoded",
       "runtime_state": "not-traced",
       "pack_state": "not-created",
       "static_partial": {
-        "confidence": "source-only",
+        "confidence": "layout-hypothesis",
         "source_runtime_pointer": "0x083f50c4",
         "source_energy_offset": "0x0064",
         "source_width_bits": 8,
         "source_maximum": 100,
-        "evidence_zh": "源地址 0x083F50C4 是 Citra 运行时堆指针而非可跨架构匹配的静态全局。对 PPC +0x64 字节访问的扫描会命中大量无关对象，尚无斩斧专属控制流、0..100 标度或 writer 可建立目标候选。",
-        "evidence_en": "Source address 0x083F50C4 is a Citra runtime heap pointer rather than a static global that can be matched across architectures. Scanning PPC byte accesses at +0x64 produces many unrelated objects, with no Switch-Axe-specific control flow, 0..100 scale, or writer establishing a target candidate.",
-        "unresolved_zh": "需要以斧/剑切换、自然回充和耗能三种动作做变化 trace，反向锁定 PPC writer 和对象生命周期。",
-        "unresolved_en": "Use axe/sword switching, natural recharge, and gauge consumption as three change traces to identify the PPC writer and object lifetime."
+        "known_inner_player_layout_shift": 8,
+        "hypothesized_target_energy_offset": "0x006c",
+        "snapshot_hook": "0x0289248c",
+        "snapshot_hook_preimage": "0xc1a70440",
+        "snapshot_register": "r7",
+        "snapshot_size": 2048,
+        "snapshot_trace_spec": "docs/research/traces/mh3g-dynamic-28-switch-axe-player-snapshot.json",
+        "snapshot_analyzer": "scripts/analyze-switch-axe-snapshots.py",
+        "ppc_offset_scanner": "scripts/scan-ppc-dform-offsets.py",
+        "runbook": "docs/research/mh3g-switch-axe-energy-trace.md",
+        "static_access_counts": {
+          "source_offset_0x64_nonstack_byte_or_halfword": 260,
+          "hypothesis_offset_0x6c_nonstack_byte_or_halfword": 181,
+          "source_offset_0x64_nonstack_byte": 84,
+          "hypothesis_offset_0x6c_nonstack_byte": 149
+        },
+        "near_player_weapon_range_0x02800000_0x02900000": {
+          "source_offset_0x64_byte_accesses": 0,
+          "hypothesis_offset_0x6c_byte_accesses": [
+            "0x02860690",
+            "0x028606a4",
+            "0x02860b98"
+          ],
+          "evidence_limit_zh": "三处均落在 0x02860558 的复杂动作/效果函数内，当前没有斩斧身份或 0..100 标度，不能当作 writer。",
+          "evidence_limit_en": "All three accesses are inside complex action/effect function 0x02860558 and currently lack Switch Axe identity or a 0..100 scale, so none is a writer mapping."
+        },
+        "apple_silicon_watchpoint_limit_zh": "当前 Cemu GDB stub 的 read/write breakpoint 底层只在 x86-64 Windows/Linux 实现；Apple Silicon 必须用快照差分缩小字段后，再对静态 store 候选逐个设置执行断点。",
+        "apple_silicon_watchpoint_limit_en": "Cemu's current GDB-stub read/write breakpoint backend is implemented only for x86-64 Windows/Linux. On Apple Silicon, narrow the field by snapshot differencing, then execution-breakpoint the statically enumerated store candidates.",
+        "evidence_zh": "源地址 0x083F50C4 是 Citra 运行时堆指针而非可跨架构匹配的静态全局。#24/#30 等已精确映射的同类玩家内层字段在 Wii U 一致后移 8 字节，因此 +0x6C 是有依据但未验证的布局假设；静态访问计数与 0x02860558 内的三处直接 byte 访问仍不能证明斩斧身份、0..100 标度或 writer。",
+        "evidence_en": "Source address 0x083F50C4 is a Citra runtime heap pointer rather than a cross-architecture static global. Exactly mapped related inner-player fields such as #24/#30 consistently shift by eight bytes on Wii U, making +0x6C an evidence-based but unverified layout hypothesis. Static access counts and the three direct byte accesses inside 0x02860558 still prove neither Switch Axe identity, a 0..100 scale, nor a writer.",
+        "unresolved_zh": "必须先完成同一 r7 基址的五快照严格序列，再在真实耗能与自然回充中命中唯一 PPC writer，并验证换区、猫车、任务结束和回大厅的对象生命周期。",
+        "unresolved_en": "First complete the strict five-snapshot sequence on one r7 base, then hit the unique PPC writer during real consumption and natural recharge and validate object lifetime across area change, cart, quest end, and lobby return."
       }
     },
     {

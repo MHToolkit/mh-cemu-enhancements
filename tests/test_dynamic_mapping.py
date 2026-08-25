@@ -321,7 +321,23 @@ class DynamicMappingTests(unittest.TestCase):
         self.assertEqual("0x1030be28", rows[10]["static_partial"]["target_global_root"])
         self.assertEqual("hypothesis", rows[25]["static_partial"]["confidence"])
         self.assertEqual(8, len(rows[25]["static_partial"]["hypothesized_target_ammo_offsets"]))
-        self.assertEqual("source-only", rows[28]["static_partial"]["confidence"])
+        switch_axe = rows[28]["static_partial"]
+        self.assertEqual("layout-hypothesis", switch_axe["confidence"])
+        self.assertEqual(8, switch_axe["known_inner_player_layout_shift"])
+        self.assertEqual("0x006c", switch_axe["hypothesized_target_energy_offset"])
+        self.assertEqual("0x0289248c", switch_axe["snapshot_hook"])
+        self.assertEqual("0xc1a70440", switch_axe["snapshot_hook_preimage"])
+        self.assertEqual(2048, switch_axe["snapshot_size"])
+        self.assertTrue((REPO / switch_axe["snapshot_trace_spec"]).is_file())
+        self.assertTrue((REPO / switch_axe["snapshot_analyzer"]).is_file())
+        self.assertTrue((REPO / switch_axe["ppc_offset_scanner"]).is_file())
+        self.assertTrue((REPO / switch_axe["runbook"]).is_file())
+        self.assertEqual(
+            ["0x02860690", "0x028606a4", "0x02860b98"],
+            switch_axe["near_player_weapon_range_0x02800000_0x02900000"][
+                "hypothesis_offset_0x6c_byte_accesses"
+            ],
+        )
         self.assertEqual("source-only", rows[66]["static_partial"]["confidence"])
         for source_index, row in rows.items():
             with self.subTest(source_index=source_index):
