@@ -21,11 +21,12 @@ class DynamicMappingTests(unittest.TestCase):
         self.dynamic = json.loads(DYNAMIC.read_text(encoding="utf-8"))
         self.runtime_evidence = json.loads(RUNTIME_EVIDENCE.read_text(encoding="utf-8"))
 
-    def test_all_and_only_requires_ppc_entries_have_a_dynamic_ledger_row(self):
+    def test_all_dynamic_research_entries_have_a_ledger_row(self):
         expected = {
             entry["source_index"]: entry
             for entry in self.conversion["entries"]
-            if entry["disposition"] == "requires-ppc-mapping"
+            if entry["disposition"]
+            in {"requires-ppc-mapping", "implemented-dynamic-runtime-verified"}
         }
         actual = {entry["source_index"]: entry for entry in self.dynamic["entries"]}
 
@@ -50,11 +51,11 @@ class DynamicMappingTests(unittest.TestCase):
             dict(Counter(row["source_mechanism"] for row in rows)),
         )
         self.assertEqual(
-            {"source-decoded": 4, "ppc-candidate": 17, "ppc-mapped": 0},
+            {"source-decoded": 3, "ppc-candidate": 17, "ppc-mapped": 1},
             self.dynamic["summary"]["mapping_counts"],
         )
         self.assertEqual(
-            {"source-decoded": 4, "ppc-candidate": 17},
+            {"source-decoded": 3, "ppc-candidate": 17, "ppc-mapped": 1},
             dict(Counter(row["mapping_state"] for row in rows)),
         )
         batches = {batch["id"]: batch for batch in self.dynamic["probe_batches"]}
@@ -76,16 +77,28 @@ class DynamicMappingTests(unittest.TestCase):
             self.assertIn(row["probe_batch"], batches)
             self.assertIn(row["source_index"], batches[row["probe_batch"]]["source_indices"])
 
-    def test_no_dynamic_pack_exists_before_complete_ppc_and_runtime_evidence(self):
+    def test_dynamic_pack_creation_requires_complete_ppc_and_runtime_evidence(self):
         for row in self.dynamic["entries"]:
             with self.subTest(source_index=row["source_index"]):
-                self.assertIn(row["mapping_state"], {"source-decoded", "ppc-candidate"})
-                self.assertIn(
-                    row["runtime_state"],
-                    {"not-traced", "partial-runtime-evidence"},
-                )
-                self.assertEqual("not-created", row["pack_state"])
-                self.assertNotIn("pack_id", row)
+                if row["source_index"] == 28:
+                    self.assertEqual("ppc-mapped", row["mapping_state"])
+                    self.assertEqual("gameplay-traced", row["runtime_state"])
+                    self.assertEqual("runtime-verified-created", row["pack_state"])
+                    self.assertEqual(
+                        "mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max",
+                        row["pack_id"],
+                    )
+                    self.assertIn("runtime_mapping", row)
+                else:
+                    self.assertIn(
+                        row["mapping_state"], {"source-decoded", "ppc-candidate"}
+                    )
+                    self.assertIn(
+                        row["runtime_state"],
+                        {"not-traced", "partial-runtime-evidence"},
+                    )
+                    self.assertEqual("not-created", row["pack_state"])
+                    self.assertNotIn("pack_id", row)
                 self.assertTrue(row["source_sites"])
                 self.assertGreaterEqual(len(row["source_semantics_zh"]), 25)
                 self.assertGreaterEqual(len(row["source_semantics_en"]), 25)
@@ -102,9 +115,9 @@ class DynamicMappingTests(unittest.TestCase):
         self.assertEqual(expected_partial, actual_partial)
         self.assertEqual(
             {
-                "not-traced": 9,
+                "not-traced": 8,
                 "partial-runtime-evidence": 12,
-                "gameplay-traced": 0,
+                "gameplay-traced": 1,
             },
             self.dynamic["summary"]["runtime_counts"],
         )
@@ -149,7 +162,10 @@ class DynamicMappingTests(unittest.TestCase):
         for row in self.dynamic["entries"]:
             refs = row.get("runtime_evidence_refs", [])
             with self.subTest(source_index=row["source_index"]):
-                if row["runtime_state"] == "partial-runtime-evidence":
+                if row["runtime_state"] in {
+                    "partial-runtime-evidence",
+                    "gameplay-traced",
+                }:
                     self.assertGreaterEqual(len(refs), 1)
                     for ref in refs:
                         self.assertIn(ref, captures_by_id)
@@ -161,15 +177,17 @@ class DynamicMappingTests(unittest.TestCase):
             int(source_index): state
             for source_index, state in self.runtime_evidence["entry_runtime_state"].items()
         }
-        self.assertEqual(
-            {source_index: "partial-runtime-evidence" for source_index in expected_partial},
-            evidence_state,
-        )
+        expected_evidence_state = {
+            source_index: "partial-runtime-evidence"
+            for source_index in expected_partial
+        }
+        expected_evidence_state[28] = "gameplay-traced"
+        self.assertEqual(expected_evidence_state, evidence_state)
         summary = self.runtime_evidence["summary"]
         self.assertEqual(12, summary["partial_runtime_evidence"])
-        self.assertEqual(0, summary["gameplay_traced"])
-        self.assertEqual(0, summary["ppc_mapped"])
-        self.assertEqual(0, summary["installable_dynamic_packs"])
+        self.assertEqual(1, summary["gameplay_traced"])
+        self.assertEqual(1, summary["ppc_mapped"])
+        self.assertEqual(1, summary["installable_dynamic_packs"])
         self.assertEqual("passed", summary["persistent_breakpoint_gate"])
         self.assertGreaterEqual(summary["same_process_independent_attach_count"], 4)
 
@@ -316,28 +334,11 @@ class DynamicMappingTests(unittest.TestCase):
             for row in self.dynamic["entries"]
             if row["mapping_state"] == "source-decoded"
         }
-        self.assertEqual({10, 25, 28, 66}, set(rows))
+        self.assertEqual({10, 25, 66}, set(rows))
         self.assertEqual("0x0270e63c", rows[10]["static_partial"]["target_manager_accessor"])
         self.assertEqual("0x1030be28", rows[10]["static_partial"]["target_global_root"])
         self.assertEqual("hypothesis", rows[25]["static_partial"]["confidence"])
         self.assertEqual(8, len(rows[25]["static_partial"]["hypothesized_target_ammo_offsets"]))
-        switch_axe = rows[28]["static_partial"]
-        self.assertEqual("layout-hypothesis", switch_axe["confidence"])
-        self.assertEqual(8, switch_axe["known_inner_player_layout_shift"])
-        self.assertEqual("0x006c", switch_axe["hypothesized_target_energy_offset"])
-        self.assertEqual("0x0289248c", switch_axe["snapshot_hook"])
-        self.assertEqual("0xc1a70440", switch_axe["snapshot_hook_preimage"])
-        self.assertEqual(2048, switch_axe["snapshot_size"])
-        self.assertTrue((REPO / switch_axe["snapshot_trace_spec"]).is_file())
-        self.assertTrue((REPO / switch_axe["snapshot_analyzer"]).is_file())
-        self.assertTrue((REPO / switch_axe["ppc_offset_scanner"]).is_file())
-        self.assertTrue((REPO / switch_axe["runbook"]).is_file())
-        self.assertEqual(
-            ["0x02860690", "0x028606a4", "0x02860b98"],
-            switch_axe["near_player_weapon_range_0x02800000_0x02900000"][
-                "hypothesis_offset_0x6c_byte_accesses"
-            ],
-        )
         self.assertEqual("source-only", rows[66]["static_partial"]["confidence"])
         for source_index, row in rows.items():
             with self.subTest(source_index=source_index):
@@ -354,6 +355,27 @@ class DynamicMappingTests(unittest.TestCase):
                 self.assertGreaterEqual(len(partial["evidence_en"]), 40)
                 self.assertGreaterEqual(len(partial["unresolved_zh"]), 20)
                 self.assertGreaterEqual(len(partial["unresolved_en"]), 20)
+
+    def test_switch_axe_mapping_is_live_and_runtime_verified(self):
+        row = next(
+            row for row in self.dynamic["entries"] if row["source_index"] == 28
+        )
+        self.assertEqual("ppc-mapped", row["mapping_state"])
+        self.assertEqual("gameplay-traced", row["runtime_state"])
+        self.assertEqual("runtime-verified-created", row["pack_state"])
+        mapping = row["runtime_mapping"]
+        self.assertEqual("0x062C", mapping["target_energy_offset"])
+        self.assertEqual(16, mapping["target_width_bits"])
+        self.assertEqual("big-endian", mapping["target_byte_order"])
+        self.assertEqual("0x0285DE70", mapping["native_delta_writer"])
+        self.assertEqual(-4, mapping["drain_delta"])
+        self.assertEqual(5, mapping["recharge_delta"])
+        self.assertEqual(
+            ["0x0285DEFC", "0x0285DF48"], mapping["patch_sites"]
+        )
+        self.assertEqual("0x7D4A0214", mapping["patch_preimage"])
+        self.assertEqual("0x39400064", mapping["patch_replacement"])
+        self.assertEqual("pass", mapping["gameplay_result"])
 
     def test_dynamic_target_is_the_same_fail_closed_jp_v96_identity(self):
         target = self.dynamic["target"]

@@ -2,14 +2,32 @@
 
 ## 结论 / Verdict
 
-静态转换结束后，剩余的不是模糊的“二三十项”，而是矩阵中精确的 **21 项**：
+静态转换结束后需要动态研究的矩阵共有精确的 **21 项**；截至 2026-08-25，#28 已完成
+PPC writer 映射、Pack 生成和本机玩法验收，**20 项仍待继续研究**。原始机制分布为：
 
 - 10 项 `arm-runtime-pointer`
 - 6 项 `arm-hotkey-routine`
 - 5 项 `arm-code-cave`
 
-After the static phase, the conversion matrix contains exactly **21** remaining entries:
-10 runtime-pointer programs, 6 hotkey routines, and 5 ARM code caves.
+After the static phase, the dynamic-research matrix contained exactly **21** entries.
+As of 2026-08-25, #28 has completed PPC-writer mapping, pack generation, and
+local gameplay acceptance; **20 entries remain pending**. The original mechanism
+mix is 10 runtime-pointer programs, 6 hotkey routines, and 5 ARM code caves.
+
+## 2026-08-25 #28 closure / 2026-08-25 #28 闭环
+
+#28 斩斧能量槽最大已从 `source-decoded / not-traced / not-created` 升级为
+`ppc-mapped / gameplay-traced / runtime-verified-created`。五快照唯一严格字段为斩斧
+运行时对象的大端 16 位 `+0x62C`；原生 `0x0285DE70` writer 分别捕获剑模式
+`r4=-4` 与斧模式 `r4=+5`。Pack 只把两条原生结果计算改成 `li r10,100`，保留
+原生写回和钳制。2026-08-25 本机隔离冷启动、只启用本包的玩法验收通过。
+
+#28 is now `ppc-mapped / gameplay-traced / runtime-verified-created`. The unique
+five-snapshot field is the big-endian 16-bit `+0x62C` gauge on the Switch Axe
+runtime object. Native writer `0x0285DE70` captured sword drain `r4=-4` and axe
+recharge `r4=+5`; the pack changes only two result calculations to `li r10,100`.
+Local isolated cold-start gameplay with only this pack enabled passed on
+2026-08-25.
 
 ## 2026-08-18 gameplay addendum / 2026-08-18 玩法回执补记
 
@@ -56,7 +74,7 @@ as `partial-runtime-evidence`; it does not relax the pack promotion gates.
 | ---: | --- | --- | --- |
 | 1 | `direct-native-hooks` | #8、#12、#19、#20、#62 | 先找等价 PPC 原生函数、参数和写回；最有机会转为窄范围静态 PPC hook。 |
 | 2 | `player-inventory-roots` | #4、#9、#10、#23、#32、#58 | 用大厅/任务/装备切换快照确定对象归属和生命周期。 |
-| 3 | `weapon-runtime-state` | #24、#25、#28、#30 | 用铳枪、轻/重弩、斩斧的受控动作定位弹药、装填与能量 writer。 |
+| 3 | `weapon-runtime-state` | #24、#25、#30；#28 已完成 | 用铳枪、轻/重弩的受控动作继续定位弹药与装填 writer；#28 能量 writer 已闭环。 |
 | 4 | `controller-action-hooks` | #1、#2、#3、#31、#57 | 先证明 Wii U 输入位，再建立共用 PPC 输入门。 |
 | 5 | `monster-runtime-state` | #66 | 最后定位怪物生命/捕获字段，避免污染任务结算。 |
 
@@ -201,19 +219,14 @@ python3 scripts/cemu-gdb-probe.py trace \
     `+0xAA0C/+0x2CE2` 背包镜像和 8 位数量 writer。
   - #25 子弹不减：依据已证实的 `+8` 布局偏移，仅得到八个缓存槽
     `+0x12A6..+0x12C2` 的假设窗口；尚无 PPC 弹药递减 writer 或对象根证据。
-  - #28 斩斧能量槽最大：源 `0x083F50C4` 是 Citra 运行时堆指针。#24/#30 等
-    已精确映射的同类玩家内层字段在 Wii U 一致后移 8 字节，因此 `+0x6C` 已升级为
-    有依据但未验证的布局假设；它不是映射。新增 `0x0289248C`/`r7` 前 `0x800`
-    字节五快照 trace、严格 0..100 序列分析器和 PPC D-form 偏移扫描器。Apple
-    Silicon 上 Cemu 的 read/write watchpoint 后端未实现，所以流程先用满能量、两次耗能、
-    两次回充的同生命周期快照锁字段，再对缩小后的 store 候选逐个设置执行断点。
-    静态扫描在常见玩家/武器区间只留下 `0x02860690/0x028606A4/0x02860B98`
-    三处 `+0x6C` byte 访问，但均缺斩斧身份、0..100 标度与 writer 证据，仍不生成 Pack。
-    完整步骤见 [`mh3g-switch-axe-energy-trace.md`](mh3g-switch-axe-energy-trace.md)。
+  - #28 斩斧能量槽最大：已完成。五快照唯一严格序列锁定大端 16 位 `+0x62C`；
+    `0x0285DE70` 原生 writer 的剑模式 `r4=-4` 和斧模式 `r4=+5` 均由执行断点证明，
+    两个原生结果写回点被窄范围钳制为 100。2026-08-25 本机隔离玩法验收通过。
+    完整证据见 [`mh3g-switch-axe-energy-trace.md`](mh3g-switch-axe-energy-trace.md)。
   - #66 当前区域怪物一击必杀/直接捕获：源管理器链和 `+0x1558 = 0x18`
     已解码，但常量与字段语义都不唯一，必须排除怪物生命周期和任务结算状态。
-- 0/21 已完成 PPC 映射；当前没有为动态项创建任何可安装 pack。
-- 12/21 已取得 `partial-runtime-evidence`，9/21 仍为 `not-traced`；0/21 达到
+- 1/21 已完成 PPC 映射并创建 Runtime Verified Pack（#28）。
+- 12/21 为 `partial-runtime-evidence`，8/21 为 `not-traced`，1/21 达到
   `gameplay-traced`。逐项原始路径、SHA-256、观测值和限制见
   [`mh3g-dynamic-runtime-evidence.json`](mh3g-dynamic-runtime-evidence.json) 与
   [`mh3g-dynamic-runtime-evidence-20260808.md`](mh3g-dynamic-runtime-evidence-20260808.md)。

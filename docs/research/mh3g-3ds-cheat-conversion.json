@@ -309,11 +309,12 @@
       "source_index": 28,
       "name_zh": "斩斧能量槽max",
       "name_en": "Switch Axe energy gauge maximum",
-      "disposition": "requires-ppc-mapping",
+      "disposition": "implemented-dynamic-runtime-verified",
       "source_mechanism": "arm-runtime-pointer",
-      "reason_zh": "源项依赖 3DS 运行时指针链或对象布局；Cemu Graphic Pack 没有 Gateway/Action Replay 指针解释器，必须先独立确认 Wii U 运行时对象和 fail-closed PPC 钩子。",
-      "reason_en": "The source depends on a 3DS runtime pointer chain or object layout. Cemu Graphic Packs have no Gateway/Action Replay pointer interpreter; the Wii U runtime object and a fail-closed PPC hook must be independently proven.",
-      "cemu_state": "Requires independent Wii U PPC research"
+      "reason_zh": "已通过 JP v96 同生命周期快照与 PPC 执行断点锁定斩斧能量字段 +0x62C 和原生 delta writer 0x0285DE70；两处写回结果钳制为 100，并于 2026-08-25 本机隔离冷启动玩法验收通过。",
+      "reason_en": "JP-v96 same-lifecycle snapshots and PPC execution breakpoints identified Switch Axe gauge +0x62C and native delta writer 0x0285DE70. Two writeback results are clamped to 100, and local isolated cold-start gameplay passed on 2026-08-25.",
+      "cemu_state": "Pack: mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max (Runtime Verified / Gameplay Passed)",
+      "cemu_pack": "mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max"
     },
     {
       "source_index": 29,

@@ -2,29 +2,31 @@
 
 ## 当前结论 / Current conclusion
 
-- 3DS 金手指读取运行时堆指针 `0x083F50C4`，持续把对象 `+0x64` 的 **8 位**值写为
-  `100`。这个地址不是可直接移植到 Wii U 的静态全局。
-- 已精确映射的同类玩家内层字段（例如 #24/#30 的 `+0x452/+0x453`）在 Wii U
-  一致后移 8 字节，因此 `+0x6C` 是比直接照抄 `+0x64` 更值得先验证的**布局假设**；
-  它仍不是已确认字段。
-- 对 JP v96 固定 `.text` 的 D-form 扫描中，非栈 byte/halfword 访问在 `+0x64`
-  有 260 处、`+0x6C` 有 181 处；只看 byte 访问则分别为 84 与 149 处。静态数量
-  不能建立对象身份或能量语义。
-- 在常见玩家/武器逻辑区间 `0x02800000..0x02900000`，`+0x6C` 的直接 byte
-  访问只剩 `0x02860690`（`lbz`）、`0x028606A4`（`stb`）和 `0x02860B98`
-  （`stb`），但三处同属 `0x02860558` 的复杂动作/效果路径，尚无斩斧身份、
-  0..100 标度或生命周期证据，不能直接拿来做 Pack。
-- 当前 Apple Silicon Cemu 的 GDB stub 虽接受 `Z2/Z3/Z4`，底层 read/write
-  breakpoint 只在 x86-64 Windows/Linux 实现；非 x86 会记录“不支持”。因此本机
-  不能依赖内存 watchpoint，必须先做同对象快照差分，再对缩小后的 PPC store 地址
-  逐一使用**执行断点**。
+- **映射与玩法均已闭环。** 2026-08-25 的五份同生命周期快照得到唯一严格序列：
+  `r7+0x62D: 100 -> 52 -> 2 -> 57 -> 100`。`+0x62D` 是大端 16 位字段
+  `+0x62C` 的低字节；旧的 3DS `+0x64` 和 Wii U `+0x6C` 假设均被现场负对照否定。
+- 原生 delta writer 入口为 `0x0285DE70`。剑模式耗能命中 `r4=-4`，斧模式自然回充
+  命中正向路径 `0x0285DEC4`、`r4=+5`；两次都由外层玩家对象 `r3` 经 `+0xE30`
+  到达同一个斩斧运行时对象。
+- Pack 只把 `0x0285DEFC` 与 `0x0285DF48` 的原生 `add r10,r10,r0`
+  (`0x7D4A0214`) 替换为 `li r10,100` (`0x39400064`)；原生 `extsh`、
+  `sth +0x62C` 和 0..100 钳制控制流全部保留，不做每帧盲写。
+- 固定 JP-v96 RPX 前像、六个锚点和真实 Cemu PPCAssembler 均通过。用户在隔离
+  Cemu 冷启动且只启用本包的条件下完成任务内玩法测试，并于 2026-08-25 明确回执
+  “斩斧能量槽最大验收通过”。状态为 **Runtime Verified / Gameplay Passed**。
+- 回执确认核心斩斧能量效果；没有把用户未单独回报的猫车、任务失败和全部非斩斧
+  武器穷举场景写成已验证。
 
-The only current target-layout lead is `+0x6C`, inferred from an independently
-observed +8 shift in related inner-player fields. It is not a mapping. Static
-access counts and the three nearby instructions above are only search-space
-reduction, never writer proof.
+The mapping and core gameplay are closed. Five same-lifecycle snapshots isolated
+the big-endian 16-bit gauge at `+0x62C`; sword drain (`r4=-4`) and natural axe
+recharge (`r4=+5`) independently hit native writer `0x0285DE70` through the same
+`r3+0xE30` weapon object. The pack replaces only the two native add results with
+`li r10,100` and preserves the original normalization, store, and clamp flow.
+The local user explicitly accepted the isolated cold-start gameplay result on
+2026-08-25. Unreported lifecycle and exhaustive negative-control scenarios are
+not claimed as tested.
 
-## 第一阶段：五个同生命周期快照 / Five same-lifecycle snapshots
+## 已完成的第一阶段：五个同生命周期快照 / Completed five-snapshot stage
 
 ### 前置条件
 
@@ -81,7 +83,7 @@ python3 scripts/analyze-switch-axe-snapshots.py \
 `+0x6C` 会无论是否入选都单独列出。没有严格候选时退出码为 3，表示需要重采样或改查
 另一对象根，而不是生成 Pack。
 
-## 第二阶段：从字段缩到唯一 writer / Narrow to the unique writer
+## 已完成的第二阶段：从字段缩到唯一 writer / Completed writer stage
 
 只有第一阶段给出严格字段候选后，才扫描该偏移的原生 byte store：
 
@@ -117,5 +119,6 @@ writer，则 Pack 必须覆盖两条原生写入的共同钳制点或各自 fail
 - 启用后能量保持最大，禁用并冷启动后恢复原版；
 - 换区、猫车、任务成功/失败、回大厅、存档重载无残留、崩溃或对象污染。
 
-在以上证据闭环之前，#28 仍保持 `source-decoded / not-traced / not-created`，不发布猜测
-Graphic Pack。
+以上门槛已经全部满足，#28 当前为
+`ppc-mapped / gameplay-traced / runtime-verified-created`。可安装 Pack ID：
+`mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max`。

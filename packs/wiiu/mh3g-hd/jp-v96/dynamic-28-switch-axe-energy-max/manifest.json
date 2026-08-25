@@ -1,0 +1,112 @@
+{
+  "id": "mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max",
+  "platform": "wiiu",
+  "title": "Monster Hunter 3G HD Ver.",
+  "title_id": "0005000010104D00",
+  "title_slug": "mh3g-hd",
+  "region": "JP",
+  "update": "v96",
+  "status": "Runtime Verified",
+  "distribution_category": "combat-weapons",
+  "default_install": false,
+  "auto_experimental_install": false,
+  "availability": "available",
+  "source_cheat_entries": [
+    28
+  ],
+  "name_bilingual": "斩斧能量槽最大 / Switch Axe Energy Max",
+  "pack_dir": "packs/wiiu/mh3g-hd/jp-v96/dynamic-28-switch-axe-energy-max",
+  "install_folder": "MH3G HD JP v96 - Dynamic 28 - Switch Axe Energy Max",
+  "rules": "rules.txt",
+  "patch": "patch_dynamic_28_switch_axe_energy_max.asm",
+  "preimages": [
+    {
+      "address": "0x0285defc",
+      "word": "0x7d4a0214",
+      "meaning": "中文：正增量分支把当前能量与本次整数增量相加；替换为 100 后继续执行原生 extsh/sth/上界钳制。 / English: Positive-delta branch adds the integer delta to current energy; replacement 100 still flows through native extsh/sth/upper-bound clamping."
+    },
+    {
+      "address": "0x0285df48",
+      "word": "0x7d4a0214",
+      "meaning": "中文：零/负增量分支执行同一加法；剑模式 r4=-4 的实机消耗断点命中该事务。 / English: Zero/negative-delta branch performs the same addition; the live sword-drain trace hit this transaction with r4=-4."
+    }
+  ],
+  "anchors": [
+    {
+      "address": "0x0285de70",
+      "word": "0x7c0802a6",
+      "meaning": "中文：原生斩斧能量 delta writer 入口；实机分别捕获 r4=-4 消耗与 r4=+5 回充。 / English: Native Switch Axe gauge-delta writer entry; live traces captured r4=-4 drain and r4=+5 recharge."
+    },
+    {
+      "address": "0x0285df00",
+      "word": "0x7d4a0735",
+      "meaning": "中文：正增量结果按 16 位有符号数规格化并设置条件码，保持不变。 / English: Native signed-16 normalization and condition-code update for the positive result, left intact."
+    },
+    {
+      "address": "0x0285df04",
+      "word": "0xb14b062c",
+      "meaning": "中文：正增量结果写入运行时对象 +0x62C 的 16 位字段，保持不变。 / English: Native positive-result halfword store to runtime object +0x62C, left intact."
+    },
+    {
+      "address": "0x0285df4c",
+      "word": "0x7d4a0735",
+      "meaning": "中文：零/负增量结果按 16 位有符号数规格化并设置条件码，保持不变。 / English: Native signed-16 normalization and condition-code update for the zero/negative result, left intact."
+    },
+    {
+      "address": "0x0285df50",
+      "word": "0xb14b062c",
+      "meaning": "中文：零/负增量结果写入运行时对象 +0x62C 的 16 位字段，保持不变。 / English: Native zero/negative-result halfword store to runtime object +0x62C, left intact."
+    },
+    {
+      "address": "0x0285df64",
+      "word": "0x2c0a0064",
+      "meaning": "中文：原生上界仍比较 100，保持不变。 / English: Native upper bound remains 100 and is left intact."
+    }
+  ],
+  "known_risks": [
+    "中文：补丁依赖斩斧原生能量更新事务；刚进入任务、换装或对象重建后，第一次事务发生前 HUD 可能短暂保留初始化值。 / English: The patch intentionally relies on the native Switch Axe gauge transaction; after quest entry, equipment change, or object reconstruction, the HUD may briefly retain its initialized value until the first transaction.",
+    "中文：不得与其他修改 0x0285DEFC、0x0285DF48 或斩斧能量 writer 的 Pack 同时启用。 / English: Do not combine with another pack modifying 0x0285DEFC, 0x0285DF48, or the Switch Axe gauge writer."
+  ],
+  "runtime_evidence": {
+    "date": "2026-08-25",
+    "cemu_build": "Nemessix Cemu 2.6 RelWithDebInfo / GDBStub Persistent build 1dcbefc",
+    "same_lifecycle_byte_sequence": "r7+0x62D: 100 -> 52 -> 2 -> 57 -> 100",
+    "field_contract": "r3 outer player +0x0E30 -> weapon runtime object; signed 16-bit gauge at +0x062C, whose big-endian low byte is +0x062D",
+    "drain_trace": {
+      "pc": "0x0285DE70",
+      "r3": "0x2FD035D0",
+      "r4_signed": -4,
+      "inner_pointer_at_r3_plus_0xe30": "0x2FD04410"
+    },
+    "recharge_trace": {
+      "pc": "0x0285DEC4",
+      "r3": "0x2FD035D0",
+      "r4_signed": 5,
+      "inner_pointer_at_r3_plus_0xe30": "0x2FD04410"
+    },
+    "native_range": "0..100 enforced by 0x0285DF00..0x0285DF70",
+    "negative_control": "The previous +0x64 3DS offset and +0x6C Wii U layout hypothesis remained zero and were rejected on this object."
+  },
+  "verification": {
+    "runtime_mapping": "PASS: one same-lifecycle strict field; identical outer/inner object chain; native negative drain and positive recharge execution paths both hit",
+    "static": "PASS: exact JP-v96 preimages 2/2; replacement words 0x39400064 at both sites; real Cemu PPCAssembler 2/2 with zero relocations",
+    "gameplay": "PASS: on 2026-08-25 the local user cold-started the isolated exact-JP-v96 Cemu environment, tested the Switch Axe in quest, and explicitly accepted the maximum-energy behavior."
+  },
+  "source": {
+    "rpx_sha256": "7c78aad3810aa76a04e9d0fa2032718f71a21e3763f5394e627aa1cbdfe857a0",
+    "module_checksum": "0x348600a0",
+    "cemu_rpx_hash": "8cb62099",
+    "3ds_code_sha256": "3354687a7831b61dab19dd07619303de5c969523d4f35134aac38bcfb1759b77"
+  },
+  "license": "MIT for repository-authored metadata and patch source; no game assets included.",
+  "summary": "中文：斩斧能量发生原生回充或消耗事务时，将实际写回值固定为 100，使剑模式攻击不再降低能量，并在任务内首次能量更新后保持满槽。状态：Runtime Verified / Gameplay Passed；字段、正/负 writer 与两处补丁均由同生命周期快照、PPC 执行断点和 2026-08-25 本机隔离冷启动玩法验收闭环；默认关闭。 / English: Whenever the native Switch Axe gauge recharge/drain transaction runs, force its writeback to 100 so sword attacks no longer reduce energy and the gauge stays full after the first in-quest energy update. Status: Runtime Verified / Gameplay Passed. The field, positive/negative writer paths, and both patch sites are closed by same-lifecycle snapshots, PPC execution breakpoints, and local isolated cold-start gameplay acceptance on 2026-08-25; disabled by default.",
+  "gameplay_evidence": {
+    "date": "2026-08-25",
+    "reported_by": "local user",
+    "result": "pass",
+    "scope_zh": "隔离 Cemu 冷启动、只启用本包后，用户在任务内验证“斩斧能量槽最大”效果并明确回执验收通过。",
+    "scope_en": "After a cold start of the isolated Cemu configuration with only this pack enabled, the local user verified the in-quest Switch Axe maximum-energy effect and explicitly accepted it.",
+    "evidence_limit_zh": "用户回执确认核心玩法效果；未把未单独回报的猫车、任务失败或所有非斩斧武器穷举场景写成已验证。",
+    "evidence_limit_en": "The receipt confirms the core gameplay effect; carting, quest-failure, and exhaustive non-Switch-Axe scenarios were not separately reported and are not claimed as verified."
+  }
+}

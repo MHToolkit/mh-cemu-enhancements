@@ -1,3 +1,18 @@
+# #28 Switch Axe energy gameplay pass / #28 斩斧能量槽玩法通过（2026-08-25）
+
+用户使用锁定的 JP v96 Cemu/RPX、原有 MLC 和存档，在隔离 Cemu 配置中冷启动并只启用
+`mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max`，完成任务内斩斧能量槽最大效果验收，
+明确回执“斩斧能量槽最大已经验收通过”。这将 #28 升级为 **Runtime Verified /
+Gameplay Passed**。回执确认核心能量最大效果；未单独回报的猫车、任务失败及全部非斩斧
+武器穷举场景不冒充已验证。
+
+The local user cold-started the locked JP-v96 Cemu/RPX environment with the
+original MLC/save and only `mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max`
+enabled, then explicitly accepted the in-quest maximum-energy behavior. #28 is
+therefore **Runtime Verified / Gameplay Passed**. The receipt covers the core
+effect and does not claim unreported carting, quest-failure, or exhaustive
+non-Switch-Axe scenarios.
+
 # Dynamic 9+2 gameplay feedback / 动态 9+2 实测回执（2026-08-18）
 
 皮皮鸟补齐了 2026-08-12 发出的 11 个独立测试包回执。按“测试包”计，**10 个通过、1 个部分通过**；按源条目计，#1/#2/#3/#4/#8/#9/#10/#12/#20/#23/#24/#25/#31/#57 已取得正向玩法回执，#30 仍只覆盖轻弩而未覆盖重弩。该回执不包含此前排除的 #28 与 #66。

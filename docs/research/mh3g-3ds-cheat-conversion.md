@@ -68,7 +68,7 @@ This matrix inventories all 73 entries in the active 3DS Gateway/Citra cheat fil
 | 25 | 子弹不减 | Bowgun ammunition does not decrease | 需独立 PPC 映射 / Requires PPC mapping | Requires independent Wii U PPC research |
 | 26 | 细菌感染无效 | Bio status immunity | 已实现（实验） / Implemented (experimental) | Pack: mh3g-hd-jp-v96-static-26-bio-status-immunity (Runtime Experimental) |
 | 27 | 属性异常无效 | Abnormal-status immunity | 已实现（实验） / Implemented (experimental) | Pack: mh3g-hd-jp-v96-static-27-status-immunity (Runtime Experimental) |
-| 28 | 斩斧能量槽max | Switch Axe energy gauge maximum | 需独立 PPC 映射 / Requires PPC mapping | Requires independent Wii U PPC research |
+| 28 | 斩斧能量槽max | Switch Axe energy gauge maximum | 已实现并通过 / Implemented and verified | Pack: mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max (Runtime Verified / Gameplay Passed) |
 | 29 | 任何地方都可以使用电阻弹 | Power Coating usable everywhere | 已实现（实验） / Implemented (experimental) | Pack: mh3g-hd-jp-v96-static-29-power-coating-anywhere (Runtime Experimental) |
 | 30 | MH3G_v1.0弩系自动装填 | Bowgun auto reload | 需独立 PPC 映射 / Requires PPC mapping | Requires independent Wii U PPC research |
 | 31 | 按a回血 | Press A to heal | 需独立 PPC 映射 / Requires PPC mapping | Requires independent Wii U PPC research |

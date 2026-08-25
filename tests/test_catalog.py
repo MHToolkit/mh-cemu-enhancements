@@ -110,6 +110,7 @@ DISTRIBUTION_CATEGORY_PACKS = {
     },
     "combat-weapons": {
         "mh3g-hd-jp-v96-dynamic-24-30-weapon-auto-refill",
+        "mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max",
         *(
             static_pack_id(index, STATIC_ARM_PACKS[index])
             for index in (5, 6, 29, 49, 50, 52, 72)
@@ -193,6 +194,7 @@ class CatalogTests(unittest.TestCase):
                 "mh3g-hd-jp-v96-lobby-full-item-box",
                 "mh3g-hd-jp-v96-custom-felyne-food-skills",
                 "mh3g-hd-jp-v96-dynamic-24-30-weapon-auto-refill",
+                "mh3g-hd-jp-v96-dynamic-28-switch-axe-energy-max",
                 "mh3g-hd-jp-v96-quest-delivery-full-item-box-experimental",
                 "mh3g-hd-jp-v96-quest-blue-supply-box-full-item-box-control",
                 "mh3g-hd-jp-v96-quest-red-blue-full-item-box-experimental",
@@ -331,7 +333,7 @@ class CatalogTests(unittest.TestCase):
     def test_every_pack_has_effect_first_bilingual_description_and_summary(self):
         result = self.tool.validate_repository(REPO)
         self.assertEqual([], result.errors, "\n".join(result.errors))
-        self.assertEqual(57, len(result.packs))
+        self.assertEqual(58, len(result.packs))
 
         for pack in result.packs:
             rules_path = REPO / pack["pack_dir"] / pack["rules"]
@@ -1684,10 +1686,10 @@ class CatalogTests(unittest.TestCase):
             extracted_root = Path(tmp) / "extracted" / "mh-cemu-enhancements"
             extracted_result = self.tool.validate_repository(extracted_root)
             self.assertEqual([], extracted_result.errors, "\n".join(extracted_result.errors))
-            self.assertEqual(57, distribution_index["pack_count"])
-            self.assertEqual(54, distribution_index["available_pack_count"])
+            self.assertEqual(58, distribution_index["pack_count"])
+            self.assertEqual(55, distribution_index["available_pack_count"])
             self.assertEqual(3, distribution_index["runtime_blocked_pack_count"])
-            self.assertEqual(57, len(distribution_index["packs"]))
+            self.assertEqual(58, len(distribution_index["packs"]))
             for indexed_pack in distribution_index["packs"]:
                 self.assertTrue(indexed_pack["summary"].startswith("中文："))
                 self.assertTrue(

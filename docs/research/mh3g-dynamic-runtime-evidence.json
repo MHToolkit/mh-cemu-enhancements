@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_at": "2026-08-08",
+  "captured_at": "2026-08-25",
   "scope": "MH3G HD JP v96 dynamic 3DS-to-PPC mapping research",
   "target": {
     "title_id": "0005000010104D00",
@@ -24,12 +24,16 @@
   },
   "state_model": {
     "partial-runtime-evidence": "A real runtime address, field, input mask, or candidate hook was observed, but the complete gameplay semantics and safe patch lifecycle are not yet proven.",
-    "gameplay-traced": "The requested gameplay action and all implementation-critical paths were captured under controlled conditions. No entry has this state yet."
+    "gameplay-traced": "The requested gameplay action and all implementation-critical writer paths were captured under controlled conditions, and the generated pack received an explicit gameplay pass."
   },
   "captures": [
     {
       "id": "speed-consumer-village-move",
-      "source_indices": [1, 2, 3],
+      "source_indices": [
+        1,
+        2,
+        3
+      ],
       "kind": "gdb-breakpoint-trace",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/speed-state-village-move-w-20260808T2235.jsonl",
       "raw_size": 2845,
@@ -51,7 +55,13 @@
     },
     {
       "id": "normalized-input-code-window",
-      "source_indices": [1, 2, 3, 31, 57],
+      "source_indices": [
+        1,
+        2,
+        3,
+        31,
+        57
+      ],
       "kind": "runtime-memory-dump-plus-ppc-disassembly",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/input-normalizer-02bcb6d4-02bcba20.bin",
       "raw_size": 844,
@@ -71,7 +81,9 @@
     },
     {
       "id": "input-a-persistent",
-      "source_indices": [31],
+      "source_indices": [
+        31
+      ],
       "kind": "conditional-persistent-gdb-breakpoint-trace",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-a-mask-persistent-20260808T2307.jsonl",
       "raw_size": 233573,
@@ -98,7 +110,11 @@
     },
     {
       "id": "input-l-persistent",
-      "source_indices": [1, 2, 57],
+      "source_indices": [
+        1,
+        2,
+        57
+      ],
       "kind": "conditional-persistent-gdb-breakpoint-trace",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-l-mask-persistent-20260808T2308.jsonl",
       "raw_size": 32748,
@@ -124,7 +140,10 @@
     },
     {
       "id": "input-r-persistent",
-      "source_indices": [3, 57],
+      "source_indices": [
+        3,
+        57
+      ],
       "kind": "conditional-persistent-gdb-breakpoint-trace",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-r-mask-persistent-20260808T2309.jsonl",
       "raw_size": 46321,
@@ -150,7 +169,9 @@
     },
     {
       "id": "input-left-persistent",
-      "source_indices": [57],
+      "source_indices": [
+        57
+      ],
       "kind": "conditional-persistent-gdb-breakpoint-trace",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-persistent-20260808T2300Z/run/evidence/controller-dpad-left-persistent-20260808T2310.jsonl",
       "raw_size": 50264,
@@ -176,7 +197,10 @@
     },
     {
       "id": "inventory-roots-village",
-      "source_indices": [9, 23],
+      "source_indices": [
+        9,
+        23
+      ],
       "kind": "paused-rsp-memory-snapshot",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/runtime-roots-village-20260808T2252.json",
       "raw_size": 695,
@@ -198,7 +222,14 @@
     },
     {
       "id": "player-state-village",
-      "source_indices": [19, 20, 31, 32, 58, 62],
+      "source_indices": [
+        19,
+        20,
+        31,
+        32,
+        58,
+        62
+      ],
       "kind": "paused-rsp-memory-snapshot",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/player-state-village-20260808T2253.json",
       "raw_size": 1670,
@@ -213,15 +244,26 @@
         "derived_defense_at_0x6ea": 633,
         "attack_display_float_at_0x6ec": 3.05,
         "defense_display_float_at_0x6f0": 633.0,
-        "placed_counts_at_0x572_0x573_0x574": [0, 0, 1],
-        "drink_timer_pairs_at_0x974_0x978_0x980_0x984": [0.0, 0.0, 0.0, 0.0]
+        "placed_counts_at_0x572_0x573_0x574": [
+          0,
+          0,
+          1
+        ],
+        "drink_timer_pairs_at_0x974_0x978_0x980_0x984": [
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
       },
       "proves": "The candidate offsets resolve to plausible live player-state values in Moga village.",
       "does_not_prove": "A passive snapshot cannot prove field writers, item identities, hot/cold assignment, underwater drain, or multiplier semantics."
     },
     {
       "id": "drink-timers-village-baseline",
-      "source_indices": [32],
+      "source_indices": [
+        32
+      ],
       "kind": "multi-breakpoint-gdb-trace",
       "raw_path": "/Volumes/GameHub/Development/Games/.release-lock-builds/mh3g-dynamic-ppc-runtime-20260808T2225Z/run/evidence/drink-timers-village-baseline-20260808T2236.jsonl",
       "raw_size": 4128,
@@ -241,6 +283,82 @@
       },
       "proves": "Both candidate timer paths execute against the same live player object and are zero in this baseline context.",
       "does_not_prove": "The hot and cold pair identities remain unresolved until controlled hot-area and cold-area drink traces are captured."
+    },
+    {
+      "id": "switch-axe-gauge-same-lifecycle",
+      "source_indices": [
+        28
+      ],
+      "kind": "same-lifecycle-gdb-snapshot-analysis",
+      "raw_path": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-Switch-Axe-Energy-PPC-Trace-20260825/captures/field-candidates.json",
+      "raw_size": 2084,
+      "raw_sha256": "7664ec8e7df1ed2638274640cb896ee918f9ff81e31f9c7ec3f5d462706e768a",
+      "observed": {
+        "player_snapshot_base": "0x2FD042B0",
+        "strict_candidate_low_byte_offset": "0x062D",
+        "strict_sequence": [
+          100,
+          52,
+          2,
+          57,
+          100
+        ],
+        "resolved_halfword_offset": "0x062C",
+        "source_offset_0x64_sequence": [
+          47,
+          47,
+          47,
+          47,
+          47
+        ],
+        "hypothesis_offset_0x6c_sequence": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "proves": "One same-lifecycle field follows full, two drains, and two recharges; +0x64 and +0x6C are negative controls.",
+      "does_not_prove": "Snapshot differencing alone does not prove the native writer or a safe static patch; the two execution traces provide that evidence."
+    },
+    {
+      "id": "switch-axe-gauge-drain-writer",
+      "source_indices": [
+        28
+      ],
+      "kind": "gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-Switch-Axe-Energy-PPC-Trace-20260825/captures/writer-consume-entry.jsonl",
+      "raw_size": 2690,
+      "raw_sha256": "f8b47ec880685e4d74e2405845158e39efb993438bffd7fb18afb125147f0e58",
+      "observed": {
+        "breakpoint": "0x0285DE70",
+        "preimage": "0x7C0802A6",
+        "outer_player": "0x2FD035D0",
+        "delta_r4_signed": -4,
+        "weapon_runtime_at_outer_plus_0xe30": "0x2FD04410"
+      },
+      "proves": "Sword-mode energy consumption reaches the native gauge-delta writer with a negative delta on the resolved weapon object.",
+      "does_not_prove": "This drain trace alone does not prove natural recharge or the positive writer branch; the independent recharge trace supplies it."
+    },
+    {
+      "id": "switch-axe-gauge-recharge-writer",
+      "source_indices": [
+        28
+      ],
+      "kind": "gdb-breakpoint-trace",
+      "raw_path": "/Volumes/GameHub/Development/Games/.codex-handoffs/MH3G-HD-JP-v96-Switch-Axe-Energy-PPC-Trace-20260825/captures/writer-recharge-positive-path.jsonl",
+      "raw_size": 2693,
+      "raw_sha256": "287daa14b8794352a2a5cf83ea20bba3956620c3153879eae1e311bf6e575e82",
+      "observed": {
+        "breakpoint": "0x0285DEC4",
+        "preimage": "0x7FE3FB78",
+        "outer_player": "0x2FD035D0",
+        "delta_r4_signed": 5,
+        "weapon_runtime_at_outer_plus_0xe30": "0x2FD04410"
+      },
+      "proves": "Natural axe-mode recharge reaches the positive path of the same native gauge writer and the same weapon-runtime object.",
+      "does_not_prove": "This writer trace is code-path evidence; the separate isolated cold-start gameplay receipt proves the generated pack effect."
     }
   ],
   "entry_runtime_state": {
@@ -255,16 +373,18 @@
     "32": "partial-runtime-evidence",
     "57": "partial-runtime-evidence",
     "58": "partial-runtime-evidence",
-    "62": "partial-runtime-evidence"
+    "62": "partial-runtime-evidence",
+    "28": "gameplay-traced"
   },
   "summary": {
     "entry_count": 21,
     "partial_runtime_evidence": 12,
-    "not_traced": 9,
-    "gameplay_traced": 0,
-    "ppc_mapped": 0,
-    "installable_dynamic_packs": 0,
+    "not_traced": 8,
+    "gameplay_traced": 1,
+    "ppc_mapped": 1,
+    "installable_dynamic_packs": 1,
     "persistent_breakpoint_gate": "passed",
     "same_process_independent_attach_count": 4
-  }
+  },
+  "baseline_captured_at": "2026-08-08"
 }

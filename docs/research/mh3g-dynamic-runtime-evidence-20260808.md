@@ -1,5 +1,18 @@
 # MH3G 动态 PPC 运行时证据（2026-08-08）
 
+## 2026-08-25 增量：#28 已闭环
+
+#28 斩斧能量槽最大新增三组可复核证据：同生命周期五快照唯一严格字段、剑模式负 delta
+writer、斧模式正 delta writer。字段为斩斧运行时对象大端 16 位 `+0x62C`，原生 writer
+为 `0x0285DE70`；生成 Pack 的两处固定指令、真实 Cemu PPCAssembler 和本机隔离冷启动
+玩法均通过。当前总计为：12 项 `partial-runtime-evidence`、8 项 `not-traced`、1 项
+`gameplay-traced / ppc-mapped`，1 个动态 Runtime Verified Pack。
+
+This ledger now includes #28's same-lifecycle field sequence, negative sword-drain
+writer, positive axe-recharge writer, and explicit local gameplay acceptance.
+Current totals are twelve partial-runtime entries, eight not-traced entries, one
+gameplay-traced/PPC-mapped entry, and one Runtime Verified dynamic pack.
+
 ## 结论
 
 这轮已经从“只有静态候选”推进到 **12/21 项存在局部运行时证据**，但仍然是研究态：
